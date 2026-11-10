@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Immune System Atlas — BINcyclopedia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* Layout idea: dark lab-bench canvas, diagram on the left, dossier panel on the right. Lineage colors carry meaning. */
+:root {
+  color-scheme: dark;
+  --bg: #0d1117;
+  --surface: #151b24;
+  --surface-2: #1c2431;
+  --line: #2a3445;
+  --text: #e6e9ef;
+  --muted: #8d99ac;
+  --accent: #f2c14e;
+  --c-prog: #b9b3a6;
+  --c-myeloid: #ee7650;
+  --c-apc: #e9b44c;
+  --c-innate: #4cc2a0;
+  --c-t: #5aa2ec;
+  --c-b: #b680e4;
+  --c-sol: #ec6c9c;
+  --c-target: #8b96a7;
+  --display: "Fraunces", Georgia, serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.home-link {
+  color: var(--muted);
+  text-decoration: none;
+  font: 500 12.5px var(--mono);
+  letter-spacing: 0.5px;
+}
+.home-link:hover { color: var(--accent); }
+h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 24px;
+  margin: 0;
+  letter-spacing: 0.2px;
+  text-wrap: balance;
+}
+h1 small {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: 500 12.5px var(--body);
+  cursor: pointer;
+}
+.chip i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); display: inline-block; }
+.chip:hover { border-color: var(--c); }
+.chip[aria-pressed="false"] { opacity: 0.4; }
+.chip:focus-visible, .node:focus-visible, button:focus-visible, input:focus-visible, .rel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+#search {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 6px 11px;
+  font: 400 13px var(--body);
+  width: 190px;
+}
+main { flex: 1; min-height: 0; display: flex; }
+#stage { flex: 1; min-width: 0; min-height: 280px; overflow: hidden; position: relative; touch-action: none; }
+#stage svg { display: block; width: 100%; height: 100%; cursor: grab; user-select: none; }
+#stage svg.panning { cursor: grabbing; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 9px 20px; border-bottom: 1px solid var(--line); }
+.toolbar .controls { margin-left: 0; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { background: var(--surface); color: var(--muted); border: 0; border-right: 1px solid var(--line); padding: 6px 13px; font: 500 12.5px var(--body); cursor: pointer; }
+.seg button:last-child { border-right: 0; }
+.seg button:hover { color: var(--text); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #0d1117; }
+.btn { background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 6px 13px; font: 500 12.5px var(--body); cursor: pointer; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn[aria-pressed="true"] { background: var(--accent); color: #0d1117; border-color: var(--accent); }
+.spacer { flex: 1; }
+.hero { width: 100%; max-width: 150px; height: auto; display: block; margin: 0 auto 4px; }
+#panel {
+  width: 410px;
+  flex: none;
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  overflow-y: auto;
+  padding: 20px 22px 28px;
+}
+#panel h2 { font-family: var(--display); font-size: 26px; line-height: 1.15; margin: 6px 0 4px; text-wrap: balance; }
+#panel h3 {
+  font: 500 11px var(--mono);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 20px 0 6px;
+}
+#panel p { margin: 0 0 8px; }
+.badge {
+  display: inline-block;
+  font: 500 11px var(--mono);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 2px 9px;
+  border-radius: 4px;
+  color: #0d1117;
+  background: var(--c);
+}
+.sub { color: var(--muted); font-size: 13.5px; margin: 0 0 6px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font: 400 12px var(--mono);
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+.rel {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 6px 2px;
+  color: var(--text);
+  font: 400 13.5px var(--body);
+  cursor: pointer;
+}
+.rel:hover { background: var(--surface-2); }
+.rel b { color: var(--c); font-weight: 600; white-space: nowrap; }
+.rel span { color: var(--muted); font-size: 12.5px; }
+.dir { font-family: var(--mono); color: var(--muted); font-size: 12px; }
+.note {
+  border-left: 3px solid var(--accent);
+  background: var(--surface-2);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+}
+#hint { color: var(--muted); }
+#hint h2 { color: var(--text); }
+.legend { display: grid; gap: 7px; margin-top: 10px; }
+.legend div { display: flex; align-items: center; gap: 10px; font-size: 13.5px; }
+.legend svg { width: 46px; height: 12px; flex: none; }
+.node { cursor: pointer; transition: opacity 0.35s; }
+.node .gfx { transition: filter 0.2s; }
+.node:hover .gfx { filter: brightness(1.18); }
+.node .ring { fill: none; stroke: var(--accent); stroke-width: 2.5; opacity: 0; transition: opacity 0.2s; }
+.node:hover .ring { opacity: 0.35; }
+.node.sel .ring { opacity: 1; }
+.node:focus-visible { outline: none; }
+.node:focus-visible .ring { opacity: 1; }
+.node .lbl { font: 600 13.5px var(--body); fill: var(--text); text-anchor: middle; paint-order: stroke; stroke: var(--bg); stroke-width: 4.5px; stroke-linejoin: round; pointer-events: none; }
+.node.sel .lbl { fill: var(--accent); }
+.node.dim { opacity: 0.16; }
+.node.gone { opacity: 0; pointer-events: none; }
+.backdrop { transition: opacity 0.4s; pointer-events: none; }
+.backdrop rect { stroke-width: 1.2; }
+.backdrop text { font: 500 12px var(--mono); letter-spacing: 2.5px; text-transform: uppercase; }
+#zones { transition: opacity 0.4s; }
+.edge { fill: none; stroke-width: 1.4; opacity: 0.22; transition: opacity 0.2s; }
+.edge.on { opacity: 0.95; stroke-width: 2; }
+.edge.off { opacity: 0.04; }
+.edge.gone { display: none; }
+.elabel { pointer-events: none; }
+.elabel rect { fill: var(--bg); fill-opacity: 0.94; stroke-width: 1.4; }
+.elabel text { font: 500 11px var(--mono); fill: var(--text); text-anchor: middle; }
+.zone { font: 500 12px var(--mono); letter-spacing: 3px; fill: var(--muted); opacity: 0.55; }
+.zonebox { fill: none; stroke: var(--line); stroke-dasharray: 4 6; }
+@media (max-width: 900px) {
+  main { flex-direction: column; }
+  #panel { width: 100%; border-left: 0; border-top: 1px solid var(--line); max-height: 55%; }
+  .controls { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<header>
+  <a href="../../index.html" class="home-link">&larr; BINcyclopedia</a>
+  <h1>Immune System Atlas<small>click any cell</small></h1>
+  <input id="search" type="search" placeholder="Search cell, marker, cytokine" aria-label="Search" style="margin-left:auto">
+</header>
+<div class="toolbar">
+  <div class="controls" id="chips"></div>
+  <span class="spacer"></span>
+  <div class="seg" id="layout" role="group" aria-label="Layout">
+    <button data-mode="lineage" aria-pressed="true">Lineage</button>
+    <button data-mode="category" aria-pressed="false">Categories</button>
+    <button data-mode="network" aria-pressed="false">Network</button>
+  </div>
+  <button class="btn" id="focusBtn" aria-pressed="false" disabled title="Select a cell first">Focus on selection</button>
+  <button class="btn" id="fitBtn">Fit to view</button>
+</div>
+<main>
+  <div id="stage"><svg id="svg" viewBox="0 0 1600 1060" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Immune system relationship diagram"></svg></div>
+  <aside id="panel" aria-live="polite"></aside>
+</main>
+<script>
+const GROUPS = {
+  prog: { name: "Progenitors", color: "var(--c-prog)" },
+  myeloid: { name: "Myeloid innate", color: "var(--c-myeloid)" },
+  apc: { name: "Antigen presenting", color: "var(--c-apc)" },
+  innate: { name: "Lymphoid innate", color: "var(--c-innate)" },
+  t: { name: "T cells", color: "var(--c-t)" },
+  b: { name: "B cells", color: "var(--c-b)" },
+  sol: { name: "Soluble factors", color: "var(--c-sol)" },
+  target: { name: "Target", color: "var(--c-target)" }
+}
+const NODES = []
+const EDGES = []
+const N = o => NODES.push(o)
+const E = (a, b, type, label, curve) => EDGES.push({ a, b, type, label, curve: curve || 0 })
+
+N({
+  id: "hsc", name: "HSC", g: "prog", x: 800, y: 60,
+  sub: "Haematopoietic stem cell",
+  markers: ["CD34+", "CD38-", "CD90+", "CD49f+", "Lin-", "c-Kit+ (mouse: LSK, SLAM)"],
+  where: "Bone marrow niche (adult), fetal liver and AGM during development",
+  roles: [
+    "Self-renews and gives rise to every blood and immune lineage. In adults it lives in perivascular and endosteal niches of the marrow, kept going by CXCL12-abundant reticular cells, SCF and TPO.",
+    "Long-term HSCs mostly sit quiescent. Infection, IFN and IL-1 push them into cycle and tilt output toward myeloid cells (emergency myelopoiesis)."
+  ],
+  products: ["Cell fate set by PU.1, GATA1/2, C/EBPα, IKZF1, RUNX1"],
+  notes: "BCG and β-glucan can imprint trained immunity at the HSC and progenitor level, which is why innate memory outlasts the short life of a mature monocyte."
+})
+N({
+  id: "cmp", name: "CMP / GMP", g: "prog", x: 400, y: 190,
+  sub: "Common myeloid and granulocyte-monocyte progenitors",
+  markers: ["CD34+", "CD38+", "CD123 int", "CD45RA- (CMP) / + (GMP)"],
+  where: "Bone marrow",
+  roles: [
+    "Commits to the erythroid, megakaryocytic, granulocytic or monocytic lineages.",
+    "GMPs make neutrophils, eosinophils, basophils, mast cell precursors and monocytes under G-CSF, GM-CSF, M-CSF and IL-3.",
+    "A parallel CDP branch gives the conventional and plasmacytoid DCs, driven by FLT3L."
+  ],
+  products: ["Lineage choice driven by C/EBPα, PU.1 dose, GATA1, IRF8"],
+  notes: "The classical tree is a simplification. Single-cell data fit a continuum in which lineage bias builds up gradually, and the myeloid-lymphoid split is blurrier than textbooks draw it (lymphoid-primed multipotent progenitors keep myeloid potential)."
+})
+N({
+  id: "clp", name: "CLP", g: "prog", x: 1200, y: 190,
+  sub: "Common lymphoid progenitor",
+  markers: ["Lin-", "CD127 (IL-7Rα)+", "FLT3+", "CD10+ (human)", "Sca-1 lo, c-Kit lo (mouse)"],
+  where: "Bone marrow, then thymus (T) or marrow (B)",
+  roles: [
+    "Gives rise to B cells, T cell precursors, NK cells and ILCs.",
+    "T lineage commitment happens after the progenitors reach the thymus, where Notch1 signals from cortical thymic epithelium switch on TCF-1, GATA3 and BCL11B.",
+    "B lineage commitment happens in the marrow and needs E2A, EBF1 and PAX5."
+  ],
+  products: ["IL-7 dependence for survival and proliferation"],
+  notes: "ILC progenitors (ILCP, PLZF+, ID2+) branch off early and leave the marrow already committed to the innate fate."
+})
+N({
+  id: "neut", name: "Neutrophil", g: "myeloid", x: 90, y: 350,
+  sub: "Polymorphonuclear first responder",
+  markers: ["CD66b+", "CD15+", "CD16 hi", "Ly6G (mouse)", "CXCR2+"],
+  where: "Blood (40 to 70% of leukocytes), rapidly recruited to tissue. Lifespan around a day in blood.",
+  roles: [
+    "First cell on the scene at infections and sterile injury, called in by CXCL8 (IL-8), C5a, LTB4 and fMLP.",
+    "Kills by phagocytosis, the NOX2 and MPO oxidative burst, and degranulation of azurophilic, specific and gelatinase granules.",
+    "It can also expel decondensed chromatin studded with histones and granule proteins (NETosis), which traps microbes.",
+    "Makes IL-1β, TNF and chemokines that pull in monocytes and influence T cell responses."
+  ],
+  products: ["MPO", "Elastase", "Lactoferrin", "Defensins", "LL-37", "ROS", "NETs"],
+  notes: "CGD (NOX2 deficiency) means recurrent catalase-positive infections and granulomas. Neutrophil subsets such as low-density neutrophils and PMN-MDSCs depend heavily on context and are hotly debated in tumour immunology."
+})
+N({
+  id: "eos", name: "Eosinophil", g: "myeloid", x: 230, y: 350,
+  sub: "Anti-helminth and type 2 effector",
+  markers: ["Siglec-8+", "CCR3+", "IL-5Rα+", "CD125", "EPX+"],
+  where: "Blood (low), tissue resident in gut lamina propria, adipose tissue, thymus and uterus",
+  roles: [
+    "Kills helminths and other large parasites, often by antibody-dependent degranulation through FcεRI and FcγR.",
+    "Stays alive on IL-5 and follows eotaxins (CCL11) through CCR3.",
+    "Drives type 2 tissue inflammation in asthma and atopic disease, and also takes part in tissue repair and metabolic homeostasis."
+  ],
+  products: ["Major basic protein", "ECP", "EPX", "EDN", "IL-4", "IL-13", "TGF-β", "Charcot-Leyden crystals"],
+  notes: "Anti-IL-5 (mepolizumab) and anti-IL-5Rα (benralizumab, which also drives ADCC against eosinophils) are used in severe eosinophilic asthma."
+})
+N({
+  id: "baso", name: "Basophil", g: "myeloid", x: 370, y: 350,
+  sub: "Rare circulating type 2 cell",
+  markers: ["CD123+", "CD203c+", "FcεRI hi", "CD63 (activation)", "CD49b (mouse)"],
+  where: "Blood (under 1%), recruited to inflamed skin and lung",
+  roles: [
+    "Binds IgE on FcεRI. Allergen crosslinking triggers histamine release and fast IL-4 and IL-13 secretion.",
+    "That early IL-4 can help bias naive CD4 T cells toward Th2 and support class switching to IgE.",
+    "Contributes to the late phase of allergic responses and to immunity against ticks."
+  ],
+  products: ["Histamine", "IL-4", "IL-13", "LTC4", "TSLP response"],
+  notes: "The basophil activation test (CD63 or CD203c upregulation by flow cytometry) gives a functional readout of allergen sensitisation."
+})
+N({
+  id: "mast", name: "Mast cell", g: "myeloid", x: 510, y: 350,
+  sub: "Tissue sentinel of barriers",
+  markers: ["c-Kit (CD117) hi", "FcεRI hi", "Tryptase / chymase", "MRGPRX2"],
+  where: "Skin, mucosae, around vessels and nerves. Mature in tissue, not in blood.",
+  roles: [
+    "IgE-dependent degranulation drives immediate (type I) hypersensitivity. C3a, C5a, neuropeptides and MRGPRX2 ligands can trigger it without IgE.",
+    "Preformed granule mediators act within seconds, and lipid mediators (PGD2, LTC4) and cytokines (TNF, IL-6, IL-13) follow.",
+    "Mast cells also detoxify venoms, defend against bacteria and recruit neutrophils and DCs to the site."
+  ],
+  products: ["Histamine", "Heparin", "Tryptase", "Chymase", "PGD2", "LTC4", "TNF"],
+  notes: "Serum tryptase is the clinical marker for anaphylaxis and mastocytosis (KIT D816V). Omalizumab (anti-IgE) lowers FcεRI expression on mast cells and basophils."
+})
+N({
+  id: "mono", name: "Monocyte", g: "myeloid", x: 650, y: 350,
+  sub: "Circulating precursor of macrophages and DCs",
+  markers: ["CD14 / CD16 (classical, intermediate, non-classical)", "CCR2+ (classical)", "Ly6C hi (mouse)", "CX3CR1"],
+  where: "Blood, spleen reservoir, recruited to inflamed tissue",
+  roles: [
+    "Classical (CD14++CD16-) monocytes leave the marrow through CCR2-CCL2, enter inflamed tissue and become macrophages or monocyte-derived DCs.",
+    "Non-classical (CD14+CD16++) monocytes crawl along the endothelium using LFA-1 and CX3CR1 and clear damaged cells.",
+    "On TLR4 or TLR2 sensing they secrete IL-1β, IL-6 and TNF."
+  ],
+  products: ["IL-1β", "IL-6", "TNF", "CCL2"],
+  notes: "Many tissue macrophages (microglia, Kupffer cells, Langerhans cells, alveolar macrophages) are embryonic in origin and maintain themselves at steady state. They don't come from monocytes."
+})
+N({
+  id: "mac", name: "Macrophage", g: "myeloid", x: 600, y: 520,
+  sub: "Tissue phagocyte, sentinel and tuner",
+  markers: ["CD68", "CD64 (FcγRI)", "F4/80 (mouse)", "CD163 (M2-like)", "MerTK"],
+  where: "Every tissue. Kupffer cells (liver), alveolar (lung), microglia (CNS), Langerhans (skin), osteoclasts (bone), red pulp macrophages (spleen).",
+  roles: [
+    "Eats microbes, apoptotic cells (efferocytosis) and debris, and senses PAMPs and DAMPs through TLRs, NLRs, scavenger receptors and C-type lectins.",
+    "IFN-γ and LPS push it toward an inflammatory program (iNOS, IL-12, IL-1β, TNF). IL-4 and IL-13 push it toward repair (Arg1, CD206, IL-10).",
+    "Presents antigen on MHC II to CD4 T cells, though it primes naive cells less well than a DC does.",
+    "Under sustained Th1 help it forms granulomas, as in tuberculosis."
+  ],
+  products: ["IL-1β", "IL-6", "TNF", "IL-12", "IL-10", "NO", "ROS", "VEGF"],
+  notes: "M1 and M2 are fine shorthand for cultured cells but describe in vivo states poorly. scRNA-seq shows a spectrum, for example the lipid-associated and TREM2+ macrophages in tumours and obesity."
+})
+N({
+  id: "cdc1", name: "cDC1", g: "apc", x: 940, y: 350,
+  sub: "Cross-presenting conventional DC",
+  markers: ["XCR1+", "CLEC9A+", "CD141 (BDCA-3)+", "CD8α / CD103 (mouse)", "IRF8, BATF3"],
+  where: "Lymphoid organs and non-lymphoid tissue (migratory form)",
+  roles: [
+    "Specialised for cross-presentation: loads exogenous antigen (for example from dead tumour cells taken up through CLEC9A) onto MHC I to prime naive CD8 T cells.",
+    "Main source of IL-12, which drives Th1 differentiation and IFN-γ production by NK and T cells.",
+    "Needed for anti-tumour immunity and for checkpoint blockade to work in many mouse models. NK-derived CCL5 and XCL1 recruit it into tumours."
+  ],
+  products: ["IL-12", "CXCL9", "CXCL10", "Type III IFN"],
+  notes: "Batf3-/- mice lack cDC1, which makes them the standard test for whether a response needs cross-priming."
+})
+N({
+  id: "cdc2", name: "cDC2", g: "apc", x: 800, y: 350,
+  sub: "Conventional DC, CD4 T cell activator",
+  markers: ["CD11b+", "SIRPα (CD172a)+", "CD1c (BDCA-1)+", "IRF4+"],
+  where: "Lymphoid organs and tissues, the most abundant DC subset in humans",
+  roles: [
+    "Presents peptide on MHC II to naive CD4 T cells in the T cell zone of lymph nodes.",
+    "Polarises the CD4 response through the cytokines it makes: IL-12 for Th1, IL-23 and IL-6 for Th17, and TSLP-conditioned or IRF4-dependent signals for Th2.",
+    "Once mature, it migrates from tissue to the draining lymph node along CCR7-CCL19 and CCL21 gradients."
+  ],
+  products: ["IL-12", "IL-23", "IL-1β", "IL-6", "OX40L"],
+  notes: "Think of three signals: peptide-MHC (1), CD80/CD86 with CD28 (2) and polarising cytokines (3). An immature DC giving signal 1 without signal 2 tends to induce tolerance or Treg."
+})
+N({
+  id: "pdc", name: "pDC", g: "apc", x: 1080, y: 350,
+  sub: "Plasmacytoid DC, the type I IFN factory",
+  markers: ["CD123+", "BDCA-2 (CD303)+", "BDCA-4", "TLR7, TLR9 hi", "E2-2 (TCF4)"],
+  where: "Blood and lymphoid organs, recruited to inflamed skin and mucosae",
+  roles: [
+    "Senses viral nucleic acid in endosomes through TLR7 and TLR9 and secretes up to 1000 times more type I IFN per cell than other cell types.",
+    "Presents antigen less well than cDCs, but its IFN-α/β boosts NK and T cell responses.",
+    "Chronic pDC activation by self nucleic acid immune complexes is central to SLE pathology."
+  ],
+  products: ["IFN-α", "IFN-β", "IFN-λ", "TNF"],
+  notes: "Anifrolumab (anti-IFNAR1) is approved for SLE. Recent work also shows that some cells formerly called pDCs (AXL+ SIGLEC6+ DCs) are a separate myeloid DC type."
+})
+N({
+  id: "nk", name: "NK cell", g: "innate", x: 1230, y: 350,
+  sub: "Cytotoxic innate lymphocyte",
+  markers: ["CD56+ CD3-", "CD16 (FcγRIII)", "NKp46 (NCR1)", "NKG2D", "KIRs, NKG2A"],
+  where: "Blood (5 to 15% of lymphocytes), liver, spleen, uterus. CD56bright subset enriched in lymph nodes and tissues.",
+  roles: [
+    "Checks for missing self: inhibitory KIR and NKG2A bind MHC I (HLA-C, HLA-E) and hold killing back. When an infected or tumour cell loses MHC I, the brake comes off.",
+    "It also reads induced self: stress ligands (MICA/B, ULBPs, B7-H6) engage activating receptors such as NKG2D and NKp30.",
+    "Kills with perforin and granzymes, FasL and TRAIL, and by ADCC when CD16 binds IgG on a target.",
+    "Makes IFN-γ and TNF, and is primed by IL-12, IL-15 and IL-18."
+  ],
+  products: ["Perforin", "Granzyme B", "IFN-γ", "TNF", "XCL1", "CCL5"],
+  notes: "Licensing (education) tunes an NK cell's responsiveness to how strongly it sees self-MHC I. After CMV infection, adaptive-like memory NK cells expand and express NKG2C."
+})
+N({
+  id: "ilc", name: "ILCs", g: "innate", x: 1370, y: 350,
+  sub: "ILC1, ILC2, ILC3 (and LTi)",
+  markers: ["Lin-", "CD127+", "T-bet (ILC1)", "GATA3 (ILC2)", "RORγt (ILC3)", "No antigen receptor"],
+  where: "Mucosal barriers (gut, lung, skin), lymphoid tissue",
+  roles: [
+    "Mirror the helper T cell programs without a rearranged antigen receptor, and respond to alarmins and cytokines instead.",
+    "ILC1 make IFN-γ and TNF (IL-12, IL-15 and IL-18 in). ILC2 make IL-5, IL-13 and amphiregulin (IL-25, IL-33 and TSLP in). ILC3 make IL-22, IL-17 and GM-CSF (IL-23 and IL-1β in).",
+    "LTi cells build lymph nodes and Peyer's patches in utero.",
+    "As an early cytokine source, they set the stage for the adaptive response."
+  ],
+  products: ["IFN-γ", "IL-5", "IL-13", "IL-22", "IL-17", "AREG"],
+  notes: "ILC3-derived IL-22 reinforces the epithelial barrier and antimicrobial peptide production. ILC3 can also present antigen on MHC II to limit commensal-specific T cells."
+})
+N({
+  id: "unc", name: "Unconventional T", g: "innate", x: 1510, y: 350,
+  sub: "γδ T, MAIT and iNKT cells",
+  markers: ["γδ TCR", "Vα7.2 + CD161 (MAIT)", "Vα24-Jα18 (iNKT)", "MR1 or CD1d restricted"],
+  where: "Epithelia (skin, gut, lung), liver, blood",
+  roles: [
+    "γδ T cells recognise stress molecules and phosphoantigens (Vγ9Vδ2 through butyrophilins BTN3A1 and BTN2A1) without MHC restriction.",
+    "MAIT cells see riboflavin metabolites on MR1. iNKT cells see glycolipids such as α-GalCer on CD1d.",
+    "Their effector programs are preformed, so they respond within hours and bridge innate and adaptive immunity."
+  ],
+  products: ["IFN-γ", "IL-17", "IL-4", "Granzymes"],
+  notes: "iNKT cells can make IL-4 and IFN-γ at the same time within hours of activation, which is why α-GalCer works as a strong adjuvant in mice."
+})
+N({
+  id: "t4", name: "Naive CD4 T", g: "t", x: 960, y: 520,
+  sub: "Helper T cell precursor",
+  markers: ["CD3+ CD4+", "CD45RA+", "CCR7+", "CD62L+", "CD27+"],
+  where: "Lymph nodes, spleen, blood. Recirculate via HEVs.",
+  roles: [
+    "Selected in the thymus for MHC II restriction (positive selection on cortical TEC) and purged of strongly self-reactive clones (negative selection, with AIRE driving tissue antigens in the medulla).",
+    "DCs prime it in lymph nodes with three signals. It then expands and differentiates into effector subsets.",
+    "Fate depends on the cytokines: IL-12 for Th1, IL-4 for Th2, TGF-β with IL-6 for Th17, TGF-β with IL-2 for iTreg, and IL-6 with IL-21 for Tfh."
+  ],
+  products: ["IL-2 (after activation)"],
+  notes: "Homeostatic survival depends on tonic TCR signals from self-pMHC and on IL-7."
+})
+N({
+  id: "t8", name: "Naive CD8 T", g: "t", x: 1230, y: 520,
+  sub: "Cytotoxic T cell precursor",
+  markers: ["CD3+ CD8+", "CD45RA+", "CCR7+", "CD62L+"],
+  where: "Lymph nodes, spleen, blood",
+  roles: [
+    "Recognises peptide on MHC I. Priming needs cross-presentation by cDC1 and CD4 help (CD40-CD40L licensing of the DC, plus IL-2).",
+    "The response runs in three phases: expansion, contraction (90 to 95% of effectors die) and memory formation.",
+    "Cells choose between a terminal effector fate (KLRG1+, T-bet high) and a memory precursor fate (IL-7Rα+, TCF-1+, Eomes high)."
+  ],
+  products: ["IL-2 (after activation)"],
+  notes: "Chronic antigen (tumour, LCMV clone 13, HIV, HCV) drives exhaustion: PD-1, TIM-3, LAG-3, TIGIT, TOX. The stem-like TCF-1+ progenitor exhausted cells are the ones that respond to PD-1 blockade."
+})
+N({
+  id: "th1", name: "Th1", g: "t", x: 700, y: 700,
+  sub: "Type 1 helper, intracellular pathogens",
+  markers: ["T-bet (TBX21)", "STAT4, STAT1", "CXCR3+", "IL-12Rβ2", "IFN-γ+"],
+  where: "Inflamed tissue and lymph node",
+  roles: [
+    "Produces IFN-γ and IL-2. Activates macrophages to kill intracellular microbes such as Mycobacterium, Leishmania and Listeria.",
+    "Helps CD8 T cells prime and form memory, and promotes IgG2a/IgG3 (mouse) or IgG1/IgG3 (human) switching.",
+    "IL-12 from DCs drives it, and IFN-γ feeds back to reinforce it."
+  ],
+  products: ["IFN-γ", "TNF", "IL-2", "LT-α"],
+  notes: "IL-12Rβ1 or IFN-γR deficiency causes Mendelian susceptibility to mycobacterial disease (MSMD). Too much Th1 activity is implicated in type 1 diabetes, MS and Crohn's."
+})
+N({
+  id: "th2", name: "Th2", g: "t", x: 820, y: 700,
+  sub: "Type 2 helper, helminths and allergy",
+  markers: ["GATA3", "STAT6", "CCR4+", "CRTH2+", "ST2 (IL-33R)"],
+  where: "Barrier tissue, lymph node",
+  roles: [
+    "Secretes IL-4, IL-5 and IL-13. IL-4 drives IgE and IgG4 switching in B cells, IL-5 sustains eosinophils, and IL-13 causes mucus production, goblet cell hyperplasia and smooth muscle contraction.",
+    "Needed to expel intestinal helminths, through a circuit of tuft cells, IL-25, ILC2 and Th2.",
+    "Core effector in atopic disease: asthma, atopic dermatitis and eosinophilic oesophagitis."
+  ],
+  products: ["IL-4", "IL-5", "IL-9", "IL-13", "IL-10"],
+  notes: "Dupilumab (anti-IL-4Rα) blocks both IL-4 and IL-13 signalling and is used in atopic dermatitis and asthma."
+})
+N({
+  id: "th17", name: "Th17", g: "t", x: 940, y: 700,
+  sub: "Type 3 helper, extracellular bacteria and fungi",
+  markers: ["RORγt", "STAT3", "CCR6+", "IL-23R+", "IL-17A/F+"],
+  where: "Mucosal surfaces (gut lamina propria), skin",
+  roles: [
+    "Secretes IL-17A/F, IL-22 and GM-CSF. IL-17 acts on epithelial and stromal cells to induce CXCL8 and G-CSF, which recruit neutrophils.",
+    "Defends against Candida and extracellular bacteria such as Klebsiella and Staphylococcus, and IL-22 helps keep the mucosal barrier intact.",
+    "TGF-β with IL-6 or IL-1β differentiates it, and IL-23 stabilises it."
+  ],
+  products: ["IL-17A", "IL-17F", "IL-22", "GM-CSF"],
+  notes: "Pathogenic Th17 cells (IL-23 driven, co-producing GM-CSF and IFN-γ) contribute to psoriasis, MS and IBD. Anti-IL-17A (secukinumab) and anti-IL-23p19 (guselkumab) work well in psoriasis."
+})
+N({
+  id: "treg", name: "Treg", g: "t", x: 1060, y: 700,
+  sub: "Regulatory T cell, peripheral tolerance",
+  markers: ["FOXP3+", "CD25 (IL-2Rα) hi", "CD127 lo", "CTLA-4", "Helios (tTreg)"],
+  where: "Lymphoid tissue, and tissue-resident Tregs in fat, muscle, skin and gut",
+  roles: [
+    "Suppresses by consuming IL-2, by CTLA-4 stripping CD80/CD86 off DCs, and through IL-10, TGF-β, IL-35 and adenosine (CD39 and CD73).",
+    "Thymic Tregs (tTreg) come from high-affinity self-reactive thymocytes. Peripheral Tregs (pTreg) are induced by TGF-β and retinoic acid, notably against food and commensal antigens.",
+    "They restrain autoimmunity and limit collateral damage, and they also dampen anti-tumour immunity."
+  ],
+  products: ["IL-10", "TGF-β", "IL-35", "CTLA-4", "Granzyme B"],
+  notes: "FOXP3 loss of function causes IPEX syndrome. Low-dose IL-2 expands Tregs preferentially because they constitutively express the high-affinity IL-2R."
+})
+N({
+  id: "tfh", name: "Tfh", g: "t", x: 1180, y: 700,
+  sub: "T follicular helper, germinal centre helper",
+  markers: ["BCL6", "CXCR5+", "PD-1 hi", "ICOS hi", "IL-21+"],
+  where: "B cell follicles and germinal centres",
+  roles: [
+    "Migrates to the T-B border through CXCR5 and loss of CCR7, then enters follicles to help cognate B cells.",
+    "CD40L, ICOS and IL-21 (plus IL-4) support B cell survival, germinal centre selection, class switch recombination and somatic hypermutation.",
+    "Because help is limited, Tfh decide which B cell clones survive affinity maturation: the ones that capture and present the most antigen win."
+  ],
+  products: ["IL-21", "IL-4", "CD40L", "CXCL13"],
+  notes: "Circulating Tfh (cTfh, CXCR5+ PD-1+ in blood) are a common readout of vaccine responses. Too many Tfh drive autoantibody formation in SLE (roquin sanroque mice)."
+})
+N({
+  id: "ctl", name: "CTL", g: "t", x: 1320, y: 700,
+  sub: "Effector CD8 cytotoxic T lymphocyte",
+  markers: ["CD8+", "Granzyme B+", "Perforin+", "CD69", "KLRG1 (terminal)"],
+  where: "Sites of infection and tumours, tissue resident memory in barrier sites",
+  roles: [
+    "Kills infected or transformed cells that show cognate peptide on MHC I, through an immunological synapse.",
+    "Perforin forms pores, and granzymes (GzmB) cleave caspase substrates and BID. FasL and TRAIL provide a parallel death receptor route.",
+    "IFN-γ and TNF induce MHC I and antigen processing machinery, and can halt viral replication without killing the cell.",
+    "A single CTL can engage several targets in sequence, so it kills serially."
+  ],
+  products: ["Perforin", "Granzyme A/B", "IFN-γ", "TNF", "FasL"],
+  notes: "Tumours escape through B2M or HLA loss, antigen loss, IFN-γ signalling defects (JAK1/2 mutations) and exhaustion. NK cells can cover for MHC I loss."
+})
+N({
+  id: "bn", name: "Naive B", g: "b", x: 1450, y: 520,
+  sub: "Mature B cell before antigen",
+  markers: ["CD19+", "CD20+", "IgM+ IgD+", "CD21", "CD27-", "BAFF-R"],
+  where: "Follicles of spleen and lymph nodes, blood",
+  roles: [
+    "Its B cell receptor repertoire is built in the marrow by V(D)J recombination (RAG1/2, TdT). Self-reactive clones are removed at the immature stage by receptor editing, deletion or anergy.",
+    "Survival depends on BAFF acting through BAFF-R.",
+    "It captures antigen with its BCR, internalises it and presents peptide on MHC II to Tfh cells at the T-B border.",
+    "Marginal zone and B1 subsets make fast T-independent IgM responses to polysaccharides and blood-borne pathogens."
+  ],
+  products: ["Surface IgM and IgD"],
+  notes: "Rituximab (anti-CD20) depletes B cells and spares plasma cells, which lack CD20. Belimumab blocks BAFF."
+})
+N({
+  id: "pc", name: "Plasma cell", g: "b", x: 1430, y: 700,
+  sub: "Terminally differentiated antibody secretor",
+  markers: ["CD138 (SDC1)+", "CD38 hi", "CD27 hi", "BLIMP1 (PRDM1)", "XBP1", "CD19 and CD20 lo/-"],
+  where: "Bone marrow (long-lived), spleen, mucosal lamina propria (IgA)",
+  roles: [
+    "Secretes thousands of antibodies per second. That takes a hugely expanded ER and the unfolded protein response through XBP1.",
+    "Short-lived plasmablasts appear within days. Long-lived plasma cells home to bone marrow niches (CXCL12, APRIL, IL-6) and can persist for decades, sustaining serological memory.",
+    "IgA plasma cells at mucosae secrete dimeric IgA, which pIgR carries across the epithelium."
+  ],
+  products: ["IgM", "IgG", "IgA", "IgE", "J chain"],
+  notes: "Multiple myeloma is the malignant plasma cell. Proteasome inhibitors (bortezomib) exploit its heavy proteotoxic load."
+})
+N({
+  id: "bm", name: "Memory B", g: "b", x: 1530, y: 870,
+  sub: "Affinity-matured B cell with recall capacity",
+  markers: ["CD27+", "CD19+", "Switched Ig (IgG, IgA)", "CD80+", "T-bet+ atypical subset"],
+  where: "Spleen, lymph nodes, blood, mucosal tissue",
+  roles: [
+    "Arises from germinal centre or extrafollicular responses and carries somatic hypermutations, often with a switched isotype.",
+    "Responds faster than a naive B cell and at a lower antigen threshold. On re-challenge it becomes a plasmablast or re-enters a germinal centre.",
+    "Cross-reactive memory B cells partly buffer against variants of pathogens such as influenza and SARS-CoV-2."
+  ],
+  products: ["Surface Ig"],
+  notes: "Original antigenic sin (imprinting): the first exposure biases memory recall toward the earlier strain, which matters for influenza and SARS-CoV-2 booster design."
+})
+N({
+  id: "tm", name: "Memory T", g: "t", x: 1060, y: 870,
+  sub: "TCM, TEM and TRM",
+  markers: ["CD45RO+", "CCR7+ (TCM) or - (TEM)", "CD69 + CD103 (TRM)", "IL-7Rα hi", "CD127+"],
+  where: "Lymph nodes (TCM), blood and spleen (TEM), barrier tissues (TRM)",
+  roles: [
+    "Central memory (TCM) cells home to lymph nodes and proliferate readily. Effector memory (TEM) cells patrol tissues and respond immediately.",
+    "Tissue-resident memory (TRM) cells don't recirculate. They sit in skin, gut, lung and genital tract and give frontline protection.",
+    "IL-7 and IL-15 maintain them without antigen."
+  ],
+  products: ["IFN-γ", "TNF", "IL-2 (TCM)"],
+  notes: "TRM cells are a major target for mucosal vaccines. Stem-cell-like memory T cells (TSCM) are preferred for CAR-T manufacture."
+})
+N({
+  id: "comp", name: "Complement", g: "sol", x: 200, y: 560,
+  sub: "Cascade of about 30 plasma and membrane proteins",
+  markers: ["C1q, C3, C5, C5b-9 (MAC)", "CR1, CR3 (CD11b/CD18), C5aR1"],
+  where: "Plasma (liver-derived), tissue fluids, locally produced by immune cells",
+  roles: [
+    "Three routes converge on C3: classical (C1q on IgM or IgG immune complexes), lectin (MBL and ficolins on carbohydrates) and alternative (spontaneous C3 tick-over, amplified by properdin).",
+    "C3b opsonises targets for phagocytosis through CR1 and CR3. C3a and C5a are anaphylatoxins that recruit and activate neutrophils, mast cells and monocytes.",
+    "C5b-9 (the membrane attack complex) lyses Gram-negative bacteria and Neisseria. CD55, CD59, factor H and C1-INH protect self cells.",
+    "Complement also clears immune complexes and apoptotic debris, and C3d binding CD21 lowers the B cell activation threshold."
+  ],
+  products: ["C3a", "C5a", "C3b", "C5b-9"],
+  notes: "Deficiency of the terminal pathway (C5 to C9) gives recurrent Neisseria infection. Eculizumab (anti-C5) treats PNH and aHUS. C1q deficiency is a strong monogenic risk factor for SLE."
+})
+N({
+  id: "ab", name: "Antibodies", g: "sol", x: 1380, y: 870,
+  sub: "IgM, IgG, IgA, IgE, IgD",
+  markers: ["Fab binds antigen", "Fc binds FcγR, FcεRI, C1q, pIgR, FcRn"],
+  where: "Plasma, mucosal secretions (sIgA), milk, tissue fluids",
+  roles: [
+    "Neutralise toxins and viruses, opsonise targets for phagocytosis through FcγR, activate complement (IgM, IgG1, IgG3) and trigger ADCC in NK cells.",
+    "IgM comes first, is a pentamer and fixes complement strongly. IgG dominates serum and crosses the placenta via FcRn. IgA works at mucosae without inflaming them. IgE arms mast cells, basophils and eosinophils. IgD is mostly a BCR component.",
+    "Class switch recombination (AID, driven by CD40L and cytokines) swaps the constant region and keeps antigen specificity."
+  ],
+  products: ["Neutralisation", "Opsonisation", "Complement fixation", "ADCC"],
+  notes: "Fc engineering (afucosylation, LALA, YTE half-life extension) tunes therapeutic antibodies: more ADCC for oncology, silent Fc for blockers."
+})
+N({
+  id: "cyt", name: "Cytokines", g: "sol", x: 400, y: 700,
+  sub: "Cytokines and chemokines",
+  markers: ["IL-1, IL-6, TNF (inflammation)", "IL-2, IL-7, IL-15 (lymphocyte growth)", "IL-10, TGF-β (regulatory)", "CXCL8, CCL2, CXCL13 (chemokines)"],
+  where: "Autocrine, paracrine and endocrine",
+  roles: [
+    "IL-1β, IL-6 and TNF drive fever, acute phase protein synthesis (CRP) and vascular activation. IL-1β needs inflammasome-dependent caspase-1 cleavage.",
+    "Common γ-chain cytokines (IL-2, IL-4, IL-7, IL-9, IL-15, IL-21) signal through JAK1/JAK3. Loss of γc causes X-linked SCID.",
+    "Chemokines guide leukocyte migration through GPCRs and glycosaminoglycan gradients on endothelium.",
+    "IL-10 and TGF-β dampen inflammation, while IFN-γ and IL-12 amplify type 1 responses."
+  ],
+  products: ["IL-1β", "IL-2", "IL-6", "IL-10", "IL-12", "IL-17", "TNF", "IFN-γ", "TGF-β"],
+  notes: "Cytokine release syndrome after CAR-T or bispecifics is driven by IL-6 from activated monocytes and macrophages, which is why tocilizumab works."
+})
+N({
+  id: "ifn", name: "Type I IFN", g: "sol", x: 1100, y: 520,
+  sub: "IFN-α, IFN-β, and related",
+  markers: ["IFNAR1/IFNAR2", "JAK1, TYK2", "STAT1/STAT2/IRF9 (ISGF3)", "ISGs"],
+  where: "Produced by nearly any cell after viral nucleic acid sensing (cGAS-STING, RIG-I, MDA5, TLR3/7/9). pDCs are the top producer.",
+  roles: [
+    "Induces a broad antiviral state through interferon-stimulated genes (MX1, OAS, ISG15, IFIT, PKR).",
+    "Upregulates MHC I and antigen processing, activates NK cells, and promotes cDC1 cross-priming and CD8 T cell survival.",
+    "Chronic signalling contributes to T cell exhaustion and to autoimmunity (interferonopathies, SLE)."
+  ],
+  products: ["ISGs", "MHC I upregulation", "NK activation"],
+  notes: "Many viruses encode antagonists of IFN induction or signalling. Autoantibodies against type I IFN turned out to underlie a notable share of severe COVID-19 cases."
+})
+N({
+  id: "tgt", name: "Infected / tumour cell", g: "target", x: 1180, y: 1000,
+  sub: "Target of cytotoxic lymphocytes",
+  markers: ["MHC I + peptide", "Stress ligands (MICA/B)", "PD-L1", "Loss of MHC I in escape"],
+  where: "Any nucleated cell",
+  roles: [
+    "Presents intracellular peptide on MHC I. CTLs read the peptide, while NK cells read the absence of MHC I and the presence of stress ligands.",
+    "Escape routes include MHC I loss, antigen loss, checkpoint ligand upregulation and an immunosuppressive microenvironment (Treg, MDSC, TGF-β, adenosine)."
+  ],
+  products: ["Peptide-MHC I"],
+  notes: "Immune editing (elimination, equilibrium, escape) describes how tumours sculpt their own immunogenicity."
+})
+
+// differentiation
+E("hsc", "cmp", "diff", "myeloid commitment")
+E("hsc", "clp", "diff", "lymphoid commitment")
+E("cmp", "neut", "diff", "G-CSF")
+E("cmp", "eos", "diff", "IL-5, GM-CSF")
+E("cmp", "baso", "diff", "IL-3")
+E("cmp", "mast", "diff", "SCF, IL-3")
+E("cmp", "mono", "diff", "M-CSF")
+E("cmp", "cdc2", "diff", "FLT3L")
+E("cmp", "cdc1", "diff", "FLT3L, BATF3")
+E("cmp", "pdc", "diff", "FLT3L, E2-2", 0.2)
+E("mono", "mac", "diff", "tissue signals")
+E("clp", "nk", "diff", "IL-15")
+E("clp", "ilc", "diff", "IL-7, ID2")
+E("clp", "unc", "diff", "thymus")
+E("clp", "t4", "diff", "thymic selection", 0.15)
+E("clp", "t8", "diff", "thymic selection")
+E("clp", "bn", "diff", "marrow, V(D)J", -0.15)
+E("t4", "th1", "diff", "IL-12, IFN-γ")
+E("t4", "th2", "diff", "IL-4")
+E("t4", "th17", "diff", "TGF-β, IL-6, IL-23")
+E("t4", "treg", "diff", "TGF-β, IL-2")
+E("t4", "tfh", "diff", "IL-6, IL-21")
+E("t8", "ctl", "diff", "IL-2, IL-12")
+E("bn", "pc", "diff", "differentiation")
+E("bn", "bm", "diff", "germinal centre")
+E("ctl", "tm", "diff", "IL-7, IL-15")
+E("th1", "tm", "diff", "memory", 0.15)
+
+// antigen presentation and activation
+E("cdc2", "t4", "present", "MHC II + CD80/86")
+E("cdc1", "t8", "present", "cross-presentation, MHC I", 0.15)
+E("mac", "th1", "present", "MHC II, IL-12", 0.1)
+E("th1", "mac", "act", "IFN-γ activates", -0.2)
+E("th1", "ctl", "act", "help, IL-2", 0.1)
+E("cdc1", "th1", "act", "IL-12", -0.15)
+E("cdc2", "th17", "act", "IL-23, IL-6", 0.15)
+E("th2", "baso", "act", "IL-4", 0.2)
+E("th2", "mast", "act", "IL-4, IL-9", 0.2)
+E("th2", "eos", "act", "IL-5", 0.1)
+E("th2", "bn", "act", "IL-4, IgE switch", 0.15)
+E("th17", "neut", "recruit", "IL-17, G-CSF", 0.1)
+E("tfh", "bn", "act", "CD40L, IL-21", 0.15)
+E("tfh", "pc", "act", "IL-21", 0.15)
+E("treg", "t4", "supp", "IL-2 sink, IL-10", 0.35)
+E("treg", "th1", "supp", "CTLA-4, TGF-β", 0.2)
+E("treg", "cdc2", "supp", "CTLA-4 strips CD80/86", 0.2)
+E("treg", "ctl", "supp", "TGF-β, adenosine", -0.15)
+E("pdc", "ifn", "sec", "TLR7/9")
+E("ifn", "nk", "act", "primes NK", -0.15)
+E("ifn", "t8", "act", "survival", -0.15)
+E("ifn", "cdc1", "act", "maturation", -0.15)
+E("nk", "tgt", "kill", "missing self, ADCC", 0.2)
+E("ctl", "tgt", "kill", "perforin, granzyme")
+E("nk", "cdc1", "act", "XCL1 and CCL5 recruit", 0.15)
+E("cdc1", "nk", "act", "IL-12, IL-15", -0.15)
+E("ilc", "cyt", "sec", "IL-5, IL-13, IL-22", 0.25)
+E("mac", "cyt", "sec", "IL-1β, IL-6, TNF", 0.15)
+E("cyt", "neut", "recruit", "CXCL8", -0.15)
+E("cyt", "mono", "recruit", "CCL2", 0.1)
+E("neut", "cyt", "sec", "IL-1β, TNF", 0.2)
+
+// antibodies and complement
+E("pc", "ab", "sec", "secretes")
+E("ab", "neut", "act", "FcγR opsonisation", 0.3)
+E("ab", "mac", "act", "FcγR opsonisation", 0.3)
+E("ab", "nk", "act", "CD16 ADCC", 0.2)
+E("ab", "mast", "act", "IgE on FcεRI", 0.25)
+E("ab", "eos", "act", "FcεRI, FcγR", 0.2)
+E("ab", "comp", "act", "classical pathway", 0.2)
+E("comp", "neut", "recruit", "C5a, C3b opsonin", 0.15)
+E("comp", "mac", "act", "C3b opsonin", 0.1)
+E("comp", "mast", "act", "C3a, C5a", 0.1)
+E("comp", "bn", "act", "C3d-CD21 coreceptor", 0.2)
+E("comp", "tgt", "kill", "MAC lysis", 0.2)
+E("bm", "pc", "act", "recall response", -0.15)
+E("tm", "ctl", "act", "recall response", -0.1)
+/* ## Cell artwork: flat vector cells, generated from small recipes ## */
+const HEX = { prog: "#c9c2b2", myeloid: "#f07a52", apc: "#f0b84e", innate: "#4fc9a4", t: "#5ca6ee", b: "#b884e8", sol: "#ee6f9f", target: "#93a0b3" }
+const hx = h => {
+  if (h.length === 4) h = "#" + h[1] + h[1] + h[2] + h[2] + h[3] + h[3]
+  return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16))
+}
+const mix = (a, b, t) => {
+  const A = hx(a)
+  const B = hx(b)
+  return "#" + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, "0")).join("")
+}
+const f1 = v => +v.toFixed(1)
+const rng = seed => {
+  let s = 7
+  for (let i = 0; i < seed.length; i++) s = (Math.imul(s, 31) + seed.charCodeAt(i)) >>> 0
+  return () => {
+    s = (Math.imul(s, 1664525) + 1013904223) >>> 0
+    return s / 4294967296
+  }
+}
+const rad = d => d * Math.PI / 180
+
+const blob = (r, n, amp, rnd) => {
+  const pts = []
+  for (let i = 0; i < n; i++) {
+    const a = i / n * Math.PI * 2
+    const rr = r * (1 + amp * (rnd() * 2 - 1))
+    pts.push([rr * Math.cos(a), rr * Math.sin(a)])
+  }
+  const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2]
+  let d = ""
+  for (let i = 0; i < n; i++) {
+    const p = pts[i]
+    const m0 = mid(pts[(i + n - 1) % n], p)
+    const m1 = mid(p, pts[(i + 1) % n])
+    d += (i ? "" : `M${f1(m0[0])} ${f1(m0[1])}`) + `Q${f1(p[0])} ${f1(p[1])} ${f1(m1[0])} ${f1(m1[1])}`
+  }
+  return d + "Z"
+}
+
+/* ## drawing helpers, T is the per-cell context { k, c, rnd, nc, lt, dk } ## */
+const B = (T, r, amp = 0.03, n = 16) =>
+  `<path d="${blob(r, n, amp, T.rnd)}" fill="url(#g-${T.k})"/>` +
+  `<ellipse cx="${f1(-r * 0.3)}" cy="${f1(-r * 0.36)}" rx="${f1(r * 0.36)}" ry="${f1(r * 0.2)}" transform="rotate(-35 ${f1(-r * 0.3)} ${f1(-r * 0.36)})" fill="#fff" opacity="0.2"/>`
+const Nround = (T, r, ox = 0, oy = 0) =>
+  `<circle cx="${ox}" cy="${oy}" r="${r}" fill="${T.nc}"/>` +
+  `<circle cx="${f1(ox - r * 0.3)}" cy="${f1(oy - r * 0.3)}" r="${f1(r * 0.28)}" fill="#fff" opacity="0.14"/>` +
+  `<circle cx="${f1(ox + r * 0.35)}" cy="${f1(oy + r * 0.25)}" r="${f1(r * 0.18)}" fill="#000" opacity="0.18"/>`
+const Nlobes = (T, pts, r) =>
+  `<path d="M${pts.map(p => p.join(" ")).join("L")}" stroke="${T.nc}" stroke-width="${f1(r * 0.55)}" stroke-linejoin="round" fill="none"/>` +
+  pts.map(p => `<circle cx="${p[0]}" cy="${p[1]}" r="${r}" fill="${T.nc}"/><circle cx="${p[0] - 2}" cy="${p[1] - 2}" r="${f1(r * 0.3)}" fill="#fff" opacity="0.14"/>`).join("")
+const Nbean = T => `<path d="M-13 7Q0 -15 13 6" stroke="${T.nc}" stroke-width="12" stroke-linecap="round" fill="none"/>`
+const Dots = (T, n, r0, r1, s, fill, op) => {
+  let o = ""
+  for (let i = 0; i < n; i++) {
+    const a = T.rnd() * Math.PI * 2
+    const d = r0 + T.rnd() * (r1 - r0)
+    o += `<circle cx="${f1(d * Math.cos(a))}" cy="${f1(d * Math.sin(a))}" r="${s}" fill="${fill}" opacity="${op}"/>`
+  }
+  return o
+}
+const Ring = (T, r, col, w, op, dash = "") =>
+  `<circle r="${r}" fill="none" stroke="${col}" stroke-width="${w}" opacity="${op}"${dash ? ` stroke-dasharray="${dash}"` : ""}/>`
+const Yat = (x, y, rot, s, col, w = 2.2) =>
+  `<g transform="translate(${f1(x)} ${f1(y)}) rotate(${f1(rot)})" stroke="${col}" stroke-width="${w}" stroke-linecap="round" fill="none"><path d="M0 0V${-s}M0 ${-s}l${f1(-0.62 * s)} ${f1(-0.6 * s)}M0 ${-s}l${f1(0.62 * s)} ${f1(-0.6 * s)}"/></g>`
+const Yrim = (T, count, r, s, col, start = -90, w = 2.2) => {
+  let o = ""
+  for (let i = 0; i < count; i++) {
+    const a = start + i * 360 / count
+    o += Yat((r - 1) * Math.cos(rad(a)), (r - 1) * Math.sin(rad(a)), a + 90, s, col, w)
+  }
+  return o
+}
+const Lolli = (T, count, r, s, col, start = -90) => {
+  let o = ""
+  for (let i = 0; i < count; i++) {
+    const a = rad(start + i * 360 / count)
+    const x0 = (r - 1) * Math.cos(a)
+    const y0 = (r - 1) * Math.sin(a)
+    o += `<line x1="${f1(x0)}" y1="${f1(y0)}" x2="${f1(x0 + s * Math.cos(a))}" y2="${f1(y0 + s * Math.sin(a))}" stroke="${col}" stroke-width="2" stroke-linecap="round"/><circle cx="${f1(x0 + s * Math.cos(a))}" cy="${f1(y0 + s * Math.sin(a))}" r="3.4" fill="${col}"/>`
+  }
+  return o
+}
+const Stubs = (T, count, r, len, col, start) => {
+  let o = ""
+  for (let i = 0; i < count; i++) {
+    const a = rad(start + i * 22)
+    o += `<line x1="${f1((r - 1) * Math.cos(a))}" y1="${f1((r - 1) * Math.sin(a))}" x2="${f1((r + len) * Math.cos(a))}" y2="${f1((r + len) * Math.sin(a))}" stroke="${col}" stroke-width="3" stroke-linecap="round"/>`
+  }
+  return o
+}
+const Bars = (T, count, r, col, start) => {
+  let o = ""
+  for (let i = 0; i < count; i++) {
+    const a = start + i * 50
+    o += `<g transform="rotate(${a})" stroke="${col}" stroke-width="2.6" stroke-linecap="round"><path d="M${r} 0H${r + 8}M${r + 8} -5V5"/></g>`
+  }
+  return o
+}
+const shape = (kind, x, y, s, col) => {
+  const p = pts => `<polygon points="${pts.map(q => q.map(f1).join(",")).join(" ")}" fill="${col}"/>`
+  if (kind === "star") return p([[x, y - s], [x + s * 0.3, y - s * 0.3], [x + s, y], [x + s * 0.3, y + s * 0.3], [x, y + s], [x - s * 0.3, y + s * 0.3], [x - s, y], [x - s * 0.3, y - s * 0.3]])
+  if (kind === "tri") return p([[x, y - s], [x + s, y + s * 0.8], [x - s, y + s * 0.8]])
+  if (kind === "square") return p([[x - s * 0.8, y - s * 0.8], [x + s * 0.8, y - s * 0.8], [x + s * 0.8, y + s * 0.8], [x - s * 0.8, y + s * 0.8]])
+  if (kind === "diamond") return p([[x, y - s], [x + s, y], [x, y + s], [x - s, y]])
+  return `<circle cx="${f1(x)}" cy="${f1(y)}" r="${f1(s * 0.8)}" fill="${col}"/>`
+}
+const Emit = (T, kind, n, r0, r1, s, col, a0, spread) => {
+  let o = ""
+  for (let i = 0; i < n; i++) {
+    const a = rad(a0 + (i / Math.max(1, n - 1) - 0.5) * spread)
+    const d = r0 + (r1 - r0) * (i % 2 ? 1 : 0.35) + (T.rnd() - 0.5) * 5
+    o += shape(kind, d * Math.cos(a), d * Math.sin(a), s * (0.8 + T.rnd() * 0.5), col)
+  }
+  return o
+}
+const Arms = (T, n, r0, len, w, curl) => {
+  let o = ""
+  for (let i = 0; i < n; i++) {
+    const a = rad(i * 360 / n + (T.rnd() - 0.5) * 14 + 8)
+    const l = len * (0.82 + T.rnd() * 0.3)
+    const tx = l * Math.cos(a)
+    const ty = l * Math.sin(a)
+    const cx = (r0 + l) / 2 * Math.cos(a + curl)
+    const cy = (r0 + l) / 2 * Math.sin(a + curl)
+    o += `<path d="M0 0Q${f1(cx)} ${f1(cy)} ${f1(tx)} ${f1(ty)}" stroke="${mix(T.c, "#000", 0.08)}" stroke-width="${w}" stroke-linecap="round" fill="none"/>` +
+      `<path d="M${f1(tx * 0.72)} ${f1(ty * 0.72)}l${f1(8 * Math.cos(a + 0.9))} ${f1(8 * Math.sin(a + 0.9))}M${f1(tx * 0.8)} ${f1(ty * 0.8)}l${f1(8 * Math.cos(a - 0.9))} ${f1(8 * Math.sin(a - 0.9))}" stroke="${mix(T.c, "#000", 0.08)}" stroke-width="${f1(w * 0.55)}" stroke-linecap="round"/>`
+  }
+  return o
+}
+const tcell = (T, r, rim) => B(T, r, 0.03) + Nround(T, r * 0.6, 0, 0) + rim
+const star8 = (x, y, ro, ri, n) => {
+  const pts = []
+  for (let i = 0; i < n * 2; i++) {
+    const a = i * Math.PI / n
+    const rr = i % 2 ? ri : ro
+    pts.push(`${f1(x + rr * Math.sin(a))},${f1(y - rr * Math.cos(a))}`)
+  }
+  return pts.join(" ")
+}
+
+const PINK = "#ee6f9f"
+const RECIPES = {
+  hsc: { r: 38, draw: T => Ring(T, 40, T.c, 2, 0.55, "3 5") + B(T, 32) + Nround(T, 16) + Dots(T, 7, 22, 29, 2.2, T.lt, 0.9) },
+  cmp: { r: 33, draw: T => B(T, 31, 0.05) + Nround(T, 13, -3, 2) + Dots(T, 6, 18, 27, 2.6, "#f6a07f", 0.9) },
+  clp: { r: 32, draw: T => B(T, 29, 0.04) + Nround(T, 18) + Dots(T, 4, 21, 26, 1.8, T.lt, 0.8) },
+  neut: { r: 33, draw: T => B(T, 30, 0.05) + Nlobes(T, [[-13, 6], [0, -9], [13, 6]], 7.5) + Dots(T, 16, 14, 28, 1.5, T.lt, 0.5) },
+  eos: { r: 33, draw: T => B(T, 30, 0.03) + Dots(T, 13, 10, 26, 3.6, "#e63b2e", 0.95) + Nlobes(T, [[-9, 0], [9, 0]], 8) },
+  baso: { r: 33, draw: T => B(T, 30, 0.03) + Nround(T, 13) + Dots(T, 18, 4, 26, 3.6, "#4b2f8f", 0.9) },
+  mast: { r: 37, draw: T => B(T, 34, 0.04) + Nround(T, 9) + Dots(T, 24, 11, 30, 2.8, "#8b2b6b", 0.95) + Yrim(T, 4, 34, 8, T.lt, -60, 2) },
+  mono: { r: 33, draw: T => B(T, 30, 0.04) + Nbean(T) + Dots(T, 4, 16, 26, 2.6, T.lt, 0.4) },
+  mac: { r: 40, draw: T => B(T, 33, 0.16, 10) + `<circle cx="10" cy="11" r="10" fill="${T.lt}" opacity="0.4"/><rect x="4" y="9" width="11" height="5" rx="2.5" transform="rotate(-25 10 11)" fill="#7fdc86"/>` + Nround(T, 10, -10, -8) },
+  cdc1: { r: 42, draw: T => Arms(T, 8, 12, 40, 7, 0.25) + B(T, 20, 0.06) + Nround(T, 10) },
+  cdc2: { r: 40, draw: T => Arms(T, 6, 12, 37, 8, -0.3) + B(T, 21, 0.06) + Nround(T, 10, 2, 1) },
+  pdc: { r: 34, draw: T => Arms(T, 4, 12, 31, 8, 0.2) + B(T, 26, 0.07, 12) + Ring(T, 15, T.lt, 2.5, 0.5, "18 7") + Ring(T, 20, T.lt, 2, 0.4, "10 8") + Nround(T, 9, 6, -3) },
+  nk: { r: 34, draw: T => B(T, 30, 0.03) + Nbean(T) + Dots(T, 9, 12, 25, 3.5, T.dk, 0.9) + Stubs(T, 3, 30, 5, T.lt, -140) },
+  ilc: { r: 29, draw: T => B(T, 25, 0.05) + Nround(T, 11) + Emit(T, "circle", 4, 30, 41, 3, T.lt, -35, 80) },
+  unc: { r: 32, draw: T => B(T, 28, 0.04) + Nround(T, 14) + Yrim(T, 5, 28, 7, "#e6fff7", -80, 2) + Emit(T, "diamond", 2, 34, 40, 2.6, T.lt, 40, 40) },
+  t4: { r: 31, draw: T => tcell(T, 28, Yrim(T, 6, 28, 7, "#e3f0ff") + Stubs(T, 2, 28, 5, "#e3f0ff", 30)) },
+  t8: { r: 31, draw: T => tcell(T, 28, Yrim(T, 6, 28, 7, "#e3f0ff") + Stubs(T, 2, 28, 11, "#e3f0ff", 30)) },
+  th1: { r: 31, draw: T => tcell(T, 28, Yrim(T, 5, 28, 6, "#e3f0ff", -150)) + Emit(T, "star", 4, 33, 47, 4, PINK, -30, 70) },
+  th2: { r: 31, draw: T => tcell(T, 28, Yrim(T, 5, 28, 6, "#e3f0ff", -150)) + Emit(T, "tri", 4, 33, 47, 4, "#f0b84e", -30, 70) },
+  th17: { r: 31, draw: T => tcell(T, 28, Yrim(T, 5, 28, 6, "#e3f0ff", -150)) + Emit(T, "square", 4, 33, 47, 3.6, "#ee7650", -30, 70) },
+  tfh: { r: 31, draw: T => tcell(T, 28, Yrim(T, 5, 28, 6, "#e3f0ff", -150)) + Emit(T, "diamond", 4, 33, 47, 4, "#c79bf0", -30, 70) },
+  treg: { r: 34, draw: T => Ring(T, 33, "#f2c14e", 3.2, 1) + tcell(T, 28, Yrim(T, 5, 28, 6, "#e3f0ff", -150)) + Bars(T, 3, 37, "#f2994a", -20) },
+  ctl: { r: 33, draw: T => tcell(T, 29, Yrim(T, 5, 29, 6, "#e3f0ff", 150)) + Dots(T, 6, 19, 26, 3.2, T.dk, 0.9) + Ring({}, 5, "#ff5a5f", 2.4, 1).replace("<circle ", `<circle cx="40" cy="-8" `) },
+  tm: { r: 36, draw: T => Ring(T, 35, T.lt, 2.4, 0.9) + Ring(T, 40, T.lt, 1.4, 0.45) + tcell(T, 29, Yrim(T, 5, 29, 6, "#e3f0ff", -150)) },
+  bn: { r: 31, draw: T => B(T, 28, 0.03) + Nround(T, 15) + Yrim(T, 7, 28, 10, "#f3e6ff", -90, 2.4) },
+  bm: { r: 36, draw: T => Ring(T, 35, T.lt, 2.4, 0.9) + Ring(T, 40, T.lt, 1.4, 0.45) + B(T, 28, 0.03) + Nround(T, 14) + Yrim(T, 6, 28, 9, "#f3e6ff", -90, 2.4) },
+  pc: { r: 38, draw: T => B(T, 34, 0.05) + Ring(T, 17, T.lt, 2.4, 0.4, "30 6") + Ring(T, 23, T.lt, 2.2, 0.4, "40 8") + Ring(T, 29, T.lt, 2, 0.4, "50 10") + Nround(T, 9, -12, -9) + Yat(30, -34, 35, 8, "#f3e6ff", 2.2) + Yat(40, -12, 70, 7, "#f3e6ff", 2) + Yat(38, 20, 120, 8, "#f3e6ff", 2.2) },
+  comp: { r: 34, draw: T => `<circle r="28" fill="${T.c}" opacity="0.12"/>` + [0, 1, 2, 3, 4, 5, 6, 7].map(i => `<circle cx="${f1(17 * Math.cos(rad(i * 45)))}" cy="${f1(17 * Math.sin(rad(i * 45)))}" r="7" fill="url(#g-sol)"/>`).join("") + `<circle r="7" fill="${mix(T.c, "#000", 0.65)}"/>` + `<circle cx="34" cy="-14" r="3" fill="${T.lt}"/><circle cx="-33" cy="16" r="2.6" fill="${T.lt}"/><circle cx="10" cy="-35" r="2.2" fill="${T.lt}"/>` },
+  ab: { r: 34, draw: T => `<circle r="30" fill="${T.c}" opacity="0.1"/><path d="M0 24V2M0 2L-17 -18M0 2L17 -18" stroke="${mix(T.c, "#000", 0.2)}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M0 24V2M0 2L-17 -18M0 2L17 -18" stroke="${T.lt}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/><circle cx="-17" cy="-18" r="5" fill="#fff" opacity="0.75"/><circle cx="17" cy="-18" r="5" fill="#fff" opacity="0.75"/>` },
+  cyt: { r: 34, draw: T => `<circle r="30" fill="${T.c}" opacity="0.1"/>` + [[-14, -10, 9], [10, -14, 7], [14, 8, 10], [-8, 12, 7], [0, 0, 6], [-24, 6, 4.5], [24, -4, 4]].map(b => `<circle cx="${b[0]}" cy="${b[1]}" r="${b[2]}" fill="url(#g-sol)"/><circle cx="${b[0] - b[2] * 0.3}" cy="${b[1] - b[2] * 0.3}" r="${f1(b[2] * 0.28)}" fill="#fff" opacity="0.5"/>`).join("") },
+  ifn: { r: 33, draw: T => `<circle r="29" fill="${T.c}" opacity="0.1"/>` + [[-9, -7, 15, 7], [13, 9, 11, 5.5], [-14, 15, 8, 4]].map(s => `<polygon points="${star8(s[0], s[1], s[2], s[3], 8)}" fill="url(#g-sol)"/>`).join("") },
+  tgt: { r: 38, draw: T => B(T, 33, 0.1, 11) + Nround(T, 14, -4, -2) + Lolli(T, 5, 33, 8, "#e6edf7", -70) + `<circle cx="-36" cy="22" r="4" fill="#ff5a5f"/><circle cx="-28" cy="31" r="3.2" fill="#ff5a5f"/>` }
+}
+
+function makeCell(n) {
+  const c = HEX[n.g]
+  const T = { k: n.g, c, rnd: rng(n.id), nc: mix(c, "#1e1236", 0.55), lt: mix(c, "#ffffff", 0.55), dk: mix(c, "#000000", 0.35) }
+  const R = RECIPES[n.id]
+  n.r = R.r
+  n.svg = R.draw(T)
+}
+/* ## Edges, state and DOM ## */
+const ETYPES = {
+  diff: { name: "Differentiates into", color: "#8d99ac", dash: "" },
+  present: { name: "Presents antigen to", color: "#e9b44c", dash: "" },
+  act: { name: "Activates / helps", color: "#5aa2ec", dash: "" },
+  recruit: { name: "Recruits / opsonises", color: "#ee7650", dash: "" },
+  sec: { name: "Secretes / produces", color: "#ec6c9c", dash: "2 5" },
+  kill: { name: "Kills / lyses", color: "#ff5a5f", dash: "7 4" },
+  supp: { name: "Suppresses", color: "#f2994a", dash: "" }
+}
+const NS = "http://www.w3.org/2000/svg"
+const svg = document.getElementById("svg")
+const stage = document.getElementById("stage")
+const panel = document.getElementById("panel")
+const byId = {}
+const nodeEls = {}
+const edgeEls = []
+const hiddenGroups = new Set()
+const cur = {}
+let vis = new Set()
+let selected = null
+let query = ""
+let mode = "lineage"
+let focus = false
+let view = { cx: 800, cy: 500, w: 1600 }
+let anim = null
+
+const el = (tag, attrs, parent) => {
+  const e = document.createElementNS(NS, tag)
+  for (const k in attrs) e.setAttribute(k, attrs[k])
+  if (parent) parent.appendChild(e)
+  return e
+}
+
+NODES.forEach(n => {
+  byId[n.id] = n
+  makeCell(n)
+  cur[n.id] = { x: n.x, y: n.y }
+})
+
+const defs = el("defs", {}, svg)
+for (const k in ETYPES) {
+  const m = el("marker", { id: "ar-" + k, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs)
+  if (k === "supp") el("path", { d: "M8 0 L8 10 L10 10 L10 0 Z", fill: ETYPES[k].color }, m)
+  else el("path", { d: "M0 1 L10 5 L0 9 Z", fill: ETYPES[k].color }, m)
+}
+for (const k in HEX) {
+  const c = HEX[k]
+  const g = el("radialGradient", { id: "g-" + k, cx: "0.35", cy: "0.3", r: "0.85" }, defs)
+  el("stop", { offset: "0", "stop-color": mix(c, "#ffffff", 0.35) }, g)
+  el("stop", { offset: "0.6", "stop-color": c }, g)
+  el("stop", { offset: "1", "stop-color": mix(c, "#000000", 0.3) }, g)
+}
+
+const backLayer = el("g", {}, svg)
+const zonesG = el("g", { id: "zones" }, svg)
+const edgeLayer = el("g", {}, svg)
+const nodeLayer = el("g", {}, svg)
+const labelLayer = el("g", {}, svg)
+
+const zones = [
+  ["HAEMATOPOIETIC PROGENITORS", 20, 40],
+  ["MYELOID INNATE CELLS", 20, 270],
+  ["DENDRITIC CELLS", 740, 270],
+  ["INNATE LYMPHOID", 1160, 270],
+  ["SOLUBLE FACTORS", 20, 480],
+  ["T CELL EFFECTORS", 640, 640],
+  ["B CELL LINEAGE", 1400, 455]
+]
+zones.forEach(z => { const t = el("text", { x: z[1], y: z[2], class: "zone" }, zonesG); t.textContent = z[0] })
+
+const backdrops = {}
+Object.keys(GROUPS).forEach(k => {
+  const g = el("g", { class: "backdrop", opacity: 0 }, backLayer)
+  el("rect", { rx: 22, fill: HEX[k], "fill-opacity": 0.07, stroke: HEX[k], "stroke-opacity": 0.35 }, g)
+  const t = el("text", { fill: HEX[k] }, g)
+  t.textContent = GROUPS[k].name
+  backdrops[k] = g
+})
+
+EDGES.forEach(e => {
+  const ty = ETYPES[e.type]
+  const p = el("path", { class: "edge", stroke: ty.color, "marker-end": `url(#ar-${e.type})` }, edgeLayer)
+  if (ty.dash) p.setAttribute("stroke-dasharray", ty.dash)
+  const lead = el("line", { stroke: ty.color, "stroke-width": 1, "stroke-opacity": 0.6, visibility: "hidden" }, labelLayer)
+  const lab = el("g", { class: "elabel", visibility: "hidden" }, labelLayer)
+  const w = (e.label || "").length * 6.7 + 16
+  el("rect", { x: -w / 2, y: -9, width: w, height: 18, rx: 9, stroke: ty.color }, lab)
+  const txt = el("text", { y: 4 }, lab)
+  txt.textContent = e.label || ""
+  edgeEls.push({ e, p, lab, lead, w, on: false, ax: 0, ay: 0, x: 0, y: 0 })
+})
+
+NODES.forEach(n => {
+  const g = el("g", { class: "node", tabindex: 0, role: "button", "aria-label": n.name + ", " + GROUPS[n.g].name }, nodeLayer)
+  const gfx = el("g", { class: "gfx" }, g)
+  gfx.innerHTML = n.svg
+  el("circle", { class: "ring", r: n.r + 7 }, g)
+  el("circle", { r: n.r, fill: "transparent" }, g)
+  const t = el("text", { class: "lbl", y: -(n.r + 10) }, g)
+  t.textContent = n.name
+  g.addEventListener("pointerdown", ev => ev.stopPropagation())
+  g.addEventListener("click", ev => { ev.stopPropagation(); select(n.id) })
+  g.addEventListener("dblclick", ev => {
+    ev.stopPropagation()
+    const exiting = focus && selected === n.id
+    if (selected !== n.id) select(n.id)
+    if (exiting) setFocus(false)
+    else if (!focus) setFocus(true)
+  })
+  g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(n.id) } })
+  nodeEls[n.id] = g
+})
+
+/* ## Drawing positions and edges ## */
+function drawEdge(item) {
+  const { e, p } = item
+  const a = cur[e.a]
+  const b = cur[e.b]
+  const na = byId[e.a]
+  const nb = byId[e.b]
+  const dx = b.x - a.x
+  const dy = b.y - a.y
+  const k = e.curve || 0.06
+  const c = { x: (a.x + b.x) / 2 - dy * k, y: (a.y + b.y) / 2 + dx * k }
+  const clip = (o, r, m) => {
+    const vx = c.x - o.x
+    const vy = c.y - o.y
+    const l = Math.hypot(vx, vy) || 1
+    return { x: o.x + vx / l * (r + m), y: o.y + vy / l * (r + m) }
+  }
+  const s = clip(a, na.r, 3)
+  const t = clip(b, nb.r, 7)
+  p.setAttribute("d", `M${f1(s.x)} ${f1(s.y)}Q${f1(c.x)} ${f1(c.y)} ${f1(t.x)} ${f1(t.y)}`)
+  const u = 0.55
+  item.ax = (1 - u) * (1 - u) * s.x + 2 * u * (1 - u) * c.x + u * u * t.x
+  item.ay = (1 - u) * (1 - u) * s.y + 2 * u * (1 - u) * c.y + u * u * t.y
+}
+
+/* Pills sit on their arrow, then push apart from each other and from cells and cell names */
+function placeLabels() {
+  const L = edgeEls.filter(it => it.on)
+  if (!L.length) return
+  L.forEach(it => { it.x = it.ax; it.y = it.ay })
+  const obs = []
+  vis.forEach(id => {
+    const n = byId[id]
+    const p = cur[id]
+    obs.push({ x: p.x, y: p.y, hw: n.r + 6, hh: n.r + 6 })
+    obs.push({ x: p.x, y: p.y - n.r - 17, hw: n.name.length * 4.3 + 6, hh: 11 })
+  })
+  for (let k = 0; k < 70; k++) {
+    for (let i = 0; i < L.length; i++) {
+      const a = L[i]
+      for (let j = i + 1; j < L.length; j++) {
+        const b = L[j]
+        const ox = (a.w + b.w) / 2 + 4 - Math.abs(a.x - b.x)
+        const oy = 22 - Math.abs(a.y - b.y)
+        if (ox > 0 && oy > 0) {
+          if (oy < ox) {
+            const sg = a.y <= b.y ? -1 : 1
+            a.y += sg * oy / 2
+            b.y -= sg * oy / 2
+          } else {
+            const sg = a.x <= b.x ? -1 : 1
+            a.x += sg * ox / 2
+            b.x -= sg * ox / 2
+          }
+        }
+      }
+      obs.forEach(o => {
+        const ox = a.w / 2 + o.hw - Math.abs(a.x - o.x)
+        const oy = 9 + o.hh - Math.abs(a.y - o.y)
+        if (ox > 0 && oy > 0) {
+          if (oy < ox) a.y += (a.y >= o.y ? 1 : -1) * oy
+          else a.x += (a.x >= o.x ? 1 : -1) * ox
+        }
+      })
+      a.x += (a.ax - a.x) * 0.03
+      a.y += (a.ay - a.y) * 0.03
+    }
+  }
+  L.forEach(it => {
+    it.lab.setAttribute("transform", `translate(${f1(it.x)} ${f1(it.y)})`)
+    const far = Math.hypot(it.x - it.ax, it.y - it.ay) > 16
+    it.lead.setAttribute("visibility", far ? "visible" : "hidden")
+    if (far) {
+      it.lead.setAttribute("x1", f1(it.ax))
+      it.lead.setAttribute("y1", f1(it.ay))
+      it.lead.setAttribute("x2", f1(it.x))
+      it.lead.setAttribute("y2", f1(it.y))
+    }
+  })
+}
+function drawAll() {
+  NODES.forEach(n => nodeEls[n.id].setAttribute("transform", `translate(${f1(cur[n.id].x)} ${f1(cur[n.id].y)})`))
+  edgeEls.forEach(drawEdge)
+  placeLabels()
+}
+function applyView() {
+  const W = stage.clientWidth || 1000
+  const H = stage.clientHeight || 600
+  const h = view.w * H / W
+  svg.setAttribute("viewBox", `${f1(view.cx - view.w / 2)} ${f1(view.cy - h / 2)} ${f1(view.w)} ${f1(h)}`)
+}
+
+/* ## Layouts: each returns { pos, ids, boxes } for the visible nodes ## */
+const GORDER = ["prog", "myeloid", "apc", "innate", "t", "b", "sol", "target"]
+const baseVisible = () => NODES.filter(n => !hiddenGroups.has(n.g)).map(n => n.id)
+
+function layoutLineage(ids) {
+  const pos = {}
+  ids.forEach(id => { pos[id] = { x: byId[id].x, y: byId[id].y } })
+  return { pos, ids, boxes: null }
+}
+
+function layoutCategory(ids) {
+  const pos = {}
+  const blocks = []
+  const sx = 124
+  const sy = 124
+  GORDER.forEach(k => {
+    const mem = ids.filter(id => byId[id].g === k)
+    if (!mem.length) return
+    const cols = mem.length <= 4 ? mem.length : mem.length <= 8 ? 4 : 5
+    const rows = Math.ceil(mem.length / cols)
+    blocks.push({ k, mem, cols, rows, w: cols * sx + 36, h: rows * sy + 62 })
+  })
+  const maxW = 1700
+  let x = 0
+  let y = 0
+  let rowH = 0
+  const boxes = []
+  blocks.forEach(b => {
+    if (x > 0 && x + b.w > maxW) { x = 0; y += rowH + 34; rowH = 0 }
+    b.mem.forEach((id, i) => {
+      pos[id] = { x: x + 18 + sx / 2 + (i % b.cols) * sx, y: y + 58 + sy / 2 + Math.floor(i / b.cols) * sy - 14 }
+    })
+    boxes.push({ k: b.k, x, y, w: b.w, h: b.h })
+    x += b.w + 34
+    rowH = Math.max(rowH, b.h)
+  })
+  return { pos, ids, boxes }
+}
+
+function layoutNetwork(ids) {
+  const P = ids.map(id => ({ id, x: byId[id].x + (byId[id].y % 7) * 3, y: byId[id].y + (byId[id].x % 5) * 3, vx: 0, vy: 0, g: byId[id].g, r: byId[id].r }))
+  const idx = {}
+  P.forEach((p, i) => { idx[p.id] = i })
+  const links = EDGES.filter(e => idx[e.a] !== undefined && idx[e.b] !== undefined)
+  const iters = 360
+  for (let it = 0; it < iters; it++) {
+    const a = 1 - it / iters
+    for (let i = 0; i < P.length; i++) {
+      for (let j = i + 1; j < P.length; j++) {
+        const p = P[i]
+        const q = P[j]
+        let dx = p.x - q.x
+        let dy = p.y - q.y
+        const d2 = dx * dx + dy * dy + 0.5
+        const d = Math.sqrt(d2)
+        let fr = 60000 / d2
+        const min = p.r + q.r + 95
+        if (d < min) fr += (min - d) * 0.25
+        dx /= d
+        dy /= d
+        p.vx += dx * fr * a
+        p.vy += dy * fr * a
+        q.vx -= dx * fr * a
+        q.vy -= dy * fr * a
+      }
+    }
+    links.forEach(e => {
+      const p = P[idx[e.a]]
+      const q = P[idx[e.b]]
+      const dx = q.x - p.x
+      const dy = q.y - p.y
+      const d = Math.hypot(dx, dy) || 1
+      const fs = (d - 250) * 0.02 * a
+      p.vx += dx / d * fs
+      p.vy += dy / d * fs
+      q.vx -= dx / d * fs
+      q.vy -= dy / d * fs
+    })
+    const cen = {}
+    P.forEach(p => {
+      const c = cen[p.g] || (cen[p.g] = { x: 0, y: 0, n: 0 })
+      c.x += p.x
+      c.y += p.y
+      c.n++
+    })
+    P.forEach(p => {
+      const c = cen[p.g]
+      p.vx += (c.x / c.n - p.x) * 0.03 * a - p.x * 0.004
+      p.vy += (c.y / c.n - p.y) * 0.03 * a - p.y * 0.004
+      p.vx *= 0.8
+      p.vy *= 0.8
+      p.x += p.vx
+      p.y += p.vy
+    })
+  }
+  const pos = {}
+  P.forEach(p => { pos[p.id] = { x: p.x, y: p.y } })
+  return { pos, ids, boxes: null }
+}
+
+function neighborsOf(id) {
+  const ins = []
+  const outs = []
+  const both = []
+  const seen = {}
+  EDGES.forEach(e => {
+    if (e.a !== id && e.b !== id) return
+    const o = e.a === id ? e.b : e.a
+    if (hiddenGroups.has(byId[o].g)) return
+    seen[o] = seen[o] || { i: false, o: false }
+    if (e.a === id) seen[o].o = true
+    else seen[o].i = true
+  })
+  for (const o in seen) (seen[o].i && seen[o].o ? both : seen[o].i ? ins : outs).push(o)
+  return { ins, outs, both }
+}
+
+function layoutFocus(id) {
+  const nb = neighborsOf(id)
+  const pos = { [id]: { x: 0, y: 0 } }
+  const col = (list, side) => {
+    const per = 6
+    const cols = Math.ceil(list.length / per)
+    list.forEach((o, i) => {
+      const c = Math.floor(i / per)
+      const inCol = Math.min(per, list.length - c * per)
+      pos[o] = { x: side * (330 + c * 150), y: (i % per - (inCol - 1) / 2) * 120 }
+    })
+  }
+  col(nb.ins, -1)
+  col(nb.outs, 1)
+  nb.both.forEach((o, i) => { pos[o] = { x: (i - (nb.both.length - 1) / 2) * 140, y: i % 2 ? 250 : -250 } })
+  return { pos, ids: Object.keys(pos), boxes: null }
+}
+
+function computeLayout() {
+  if (focus && selected) return layoutFocus(selected)
+  const ids = baseVisible()
+  if (mode === "category") return layoutCategory(ids)
+  if (mode === "network") return layoutNetwork(ids)
+  return layoutLineage(ids)
+}
+
+function fitFor(layout) {
+  let x0 = Infinity
+  let x1 = -Infinity
+  let y0 = Infinity
+  let y1 = -Infinity
+  layout.ids.forEach(id => {
+    const p = layout.pos[id]
+    const r = byId[id].r
+    x0 = Math.min(x0, p.x - r - 22)
+    x1 = Math.max(x1, p.x + r + 22)
+    y0 = Math.min(y0, p.y - r - 34)
+    y1 = Math.max(y1, p.y + r + 22)
+  })
+  if (layout.boxes) layout.boxes.forEach(b => { x0 = Math.min(x0, b.x - 10); x1 = Math.max(x1, b.x + b.w + 10); y0 = Math.min(y0, b.y - 10); y1 = Math.max(y1, b.y + b.h + 10) })
+  if (mode === "lineage" && !(focus && selected)) { x0 = Math.min(x0, 10); y0 = Math.min(y0, 20) }
+  const W = stage.clientWidth || 1000
+  const H = stage.clientHeight || 600
+  const w = Math.max((x1 - x0) * 1.04, (y1 - y0) * 1.04 * W / H, 1300)
+  return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w }
+}
+
+/* ## Applying a layout with a tween ## */
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+
+function applyLayout(instant) {
+  const L = computeLayout()
+  const newVis = new Set(L.ids)
+  L.ids.forEach(id => { if (!vis.has(id)) cur[id] = { x: L.pos[id].x, y: L.pos[id].y } })
+  vis = newVis
+  const from = {}
+  L.ids.forEach(id => { from[id] = { x: cur[id].x, y: cur[id].y } })
+  const vFrom = { ...view }
+  const vTo = fitFor(L)
+  Object.keys(backdrops).forEach(k => {
+    const bx = L.boxes && L.boxes.find(b => b.k === k)
+    const g = backdrops[k]
+    if (bx) {
+      const r = g.querySelector("rect")
+      r.setAttribute("x", bx.x)
+      r.setAttribute("y", bx.y)
+      r.setAttribute("width", bx.w)
+      r.setAttribute("height", bx.h)
+      const t = g.querySelector("text")
+      t.setAttribute("x", bx.x + 20)
+      t.setAttribute("y", bx.y + 30)
+    }
+    g.setAttribute("opacity", bx ? 1 : 0)
+  })
+  zonesG.style.opacity = mode === "lineage" && !(focus && selected) ? 1 : 0
+  refresh()
+  if (instant) {
+    L.ids.forEach(id => { cur[id] = { x: L.pos[id].x, y: L.pos[id].y } })
+    view = vTo
+    drawAll()
+    applyView()
+    return
+  }
+  const t0 = performance.now()
+  const token = {}
+  anim = token
+  const dur = 750
+  const frame = now => {
+    if (anim !== token) return
+    const t = ease(Math.min(1, (now - t0) / dur))
+    L.ids.forEach(id => {
+      cur[id].x = from[id].x + (L.pos[id].x - from[id].x) * t
+      cur[id].y = from[id].y + (L.pos[id].y - from[id].y) * t
+    })
+    view = { cx: vFrom.cx + (vTo.cx - vFrom.cx) * t, cy: vFrom.cy + (vTo.cy - vFrom.cy) * t, w: vFrom.w + (vTo.w - vFrom.w) * t }
+    drawAll()
+    applyView()
+    if (t < 1) requestAnimationFrame(frame)
+  }
+  requestAnimationFrame(frame)
+}
+/* ## Search, dimming and refresh ## */
+const matches = n => {
+  if (!query) return true
+  const hay = [n.name, n.sub, n.markers.join(" "), n.products.join(" "), n.roles.join(" "), n.notes, n.where].join(" ").toLowerCase()
+  return hay.includes(query)
+}
+
+function refresh() {
+  NODES.forEach(n => {
+    const g = nodeEls[n.id]
+    const shown = vis.has(n.id)
+    const rel = selected && (n.id === selected || EDGES.some(e => (e.a === selected && e.b === n.id) || (e.b === selected && e.a === n.id)))
+    g.classList.toggle("gone", !shown)
+    g.classList.toggle("dim", shown && (!matches(n) || (!!selected && !rel)))
+    g.classList.toggle("sel", n.id === selected)
+  })
+  edgeEls.forEach(it => {
+    const { e, p, lab, lead } = it
+    const shown = vis.has(e.a) && vis.has(e.b)
+    const on = !!(shown && selected && (e.a === selected || e.b === selected))
+    it.on = on
+    p.classList.toggle("gone", !shown)
+    p.classList.toggle("on", on)
+    p.classList.toggle("off", shown && !!selected && !on)
+    lab.setAttribute("visibility", on ? "visible" : "hidden")
+    if (!on) lead.setAttribute("visibility", "hidden")
+  })
+  placeLabels()
+}
+
+/* ## Side panel ## */
+const list = a => a.map(x => `<p>${x}</p>`).join("")
+const tags = a => `<div class="tags">${a.map(x => `<span class="tag">${x}</span>`).join("")}</div>`
+
+function relRows(id) {
+  const rows = []
+  EDGES.forEach(e => {
+    if (e.a === id) rows.push({ other: e.b, out: true, type: e.type, label: e.label })
+    else if (e.b === id) rows.push({ other: e.a, out: false, type: e.type, label: e.label })
+  })
+  return rows.map(r => {
+    const o = byId[r.other]
+    const verb = r.out ? ETYPES[r.type].name.toLowerCase() : "receives from"
+    return `<button class="rel" data-go="${o.id}" style="--c:${GROUPS[o.g].color}"><span class="dir">${r.out ? "→" : "←"}</span><b>${o.name}</b><span>${verb}${r.label ? ", " + r.label : ""}</span></button>`
+  }).join("")
+}
+
+function showDefault() {
+  const legend = Object.keys(ETYPES).map(k => {
+    const t = ETYPES[k]
+    const head = k === "supp" ? `<line x1="40" y1="1" x2="40" y2="11" stroke="${t.color}" stroke-width="3"/>` : `<path d="M36 1 L45 6 L36 11 Z" fill="${t.color}"/>`
+    return `<div><svg viewBox="0 0 46 12"><line x1="2" y1="6" x2="38" y2="6" stroke="${t.color}" stroke-width="2" ${t.dash ? `stroke-dasharray="${t.dash}"` : ""}/>${head}</svg>${t.name}</div>`
+  }).join("")
+  panel.innerHTML = `<div id="hint"><span class="badge" style="--c:var(--accent)">Cheat sheet</span><h2>Pick a cell</h2>
+  <p>Click a cell and its connections light up, each arrow labelled with what the cell does to its neighbour. The panel then fills with markers, location, function and a few things worth knowing.</p>
+  <h3>Rearranging the map</h3>
+  <p>There are three layouts. Lineage follows the haematopoietic tree, Categories boxes cells up by family, and Network lets connected cells pull toward each other. Hide a family with the chips and whatever is left re-packs. Focus on selection puts a cell's inputs on its left and its outputs on its right.</p>
+  <p>Double-click a cell to focus on it, and double-click it again to go back. Drag to pan and scroll to zoom. Search looks through names, markers, cytokines and function text, and Esc clears the selection.</p>
+  <h3>Edge types</h3><div class="legend">${legend}</div></div>`
+}
+
+function showNode(n) {
+  panel.innerHTML = `<svg class="hero" viewBox="-62 -62 124 124" aria-hidden="true">${n.svg}</svg>
+  <span class="badge" style="--c:${GROUPS[n.g].color}">${GROUPS[n.g].name}</span>
+  <h2>${n.name}</h2><p class="sub">${n.sub}</p>
+  <h3>Markers and identity</h3>${tags(n.markers)}
+  <h3>Where</h3><p>${n.where}</p>
+  <h3>What it does</h3>${list(n.roles)}
+  <h3>Products and mediators</h3>${tags(n.products)}
+  <h3>Worth knowing</h3><div class="note">${n.notes}</div>
+  <h3>Relationships (click to jump)</h3><div>${relRows(n.id)}</div>`
+  panel.scrollTop = 0
+  panel.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => select(b.dataset.go)))
+}
+
+const focusBtn = document.getElementById("focusBtn")
+function select(id) {
+  selected = id
+  if (id) showNode(byId[id])
+  else showDefault()
+  focusBtn.disabled = !id
+  focusBtn.title = id ? "Arrange inputs left and outputs right of this cell (or double-click a cell)" : "Select a cell first"
+  try { history.replaceState(null, "", id ? "#" + id : location.pathname) } catch (err) {}
+  if (focus) applyLayout(false)
+  else refresh()
+}
+
+/* ## Controls ## */
+const chips = document.getElementById("chips")
+Object.keys(GROUPS).forEach(k => {
+  const b = document.createElement("button")
+  b.className = "chip"
+  b.setAttribute("aria-pressed", "true")
+  b.style.setProperty("--c", GROUPS[k].color)
+  b.innerHTML = `<i></i>${GROUPS[k].name}`
+  b.addEventListener("click", () => {
+    if (hiddenGroups.has(k)) hiddenGroups.delete(k)
+    else hiddenGroups.add(k)
+    b.setAttribute("aria-pressed", hiddenGroups.has(k) ? "false" : "true")
+    if (selected && hiddenGroups.has(byId[selected].g)) { selected = null; showDefault(); focusBtn.disabled = true }
+    applyLayout(false)
+  })
+  chips.appendChild(b)
+})
+document.querySelectorAll("#layout button").forEach(b => {
+  b.addEventListener("click", () => {
+    mode = b.dataset.mode
+    document.querySelectorAll("#layout button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"))
+    applyLayout(false)
+  })
+})
+function setFocus(on) {
+  focus = on
+  focusBtn.setAttribute("aria-pressed", on ? "true" : "false")
+  applyLayout(false)
+}
+focusBtn.addEventListener("click", () => setFocus(!focus))
+document.getElementById("fitBtn").addEventListener("click", () => applyLayout(false))
+const search = document.getElementById("search")
+search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); refresh() })
+search.addEventListener("keydown", ev => {
+  if (ev.key === "Enter" && query) {
+    const m = NODES.find(n => matches(n) && vis.has(n.id))
+    if (m) select(m.id)
+  }
+})
+document.addEventListener("keydown", ev => { if (ev.key === "Escape") select(null) })
+window.addEventListener("hashchange", () => {
+  const id = location.hash.slice(1)
+  if (byId[id] && !hiddenGroups.has(byId[id].g)) select(id)
+})
+
+/* ## Pan and zoom ## */
+let drag = null
+svg.addEventListener("pointerdown", ev => {
+  anim = null
+  drag = { x: ev.clientX, y: ev.clientY, cx: view.cx, cy: view.cy, moved: false }
+  svg.setPointerCapture(ev.pointerId)
+})
+svg.addEventListener("pointermove", ev => {
+  if (!drag) return
+  const dx = ev.clientX - drag.x
+  const dy = ev.clientY - drag.y
+  if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; svg.classList.add("panning") }
+  if (!drag.moved) return
+  const k = view.w / stage.clientWidth
+  view.cx = drag.cx - dx * k
+  view.cy = drag.cy - dy * k
+  applyView()
+})
+svg.addEventListener("pointerup", () => {
+  if (drag && !drag.moved) select(null)
+  drag = null
+  svg.classList.remove("panning")
+})
+svg.addEventListener("wheel", ev => {
+  ev.preventDefault()
+  anim = null
+  const W = stage.clientWidth
+  const H = stage.clientHeight
+  const r = svg.getBoundingClientRect()
+  const h = view.w * H / W
+  const px = view.cx - view.w / 2 + (ev.clientX - r.left) / W * view.w
+  const py = view.cy - h / 2 + (ev.clientY - r.top) / H * h
+  const nw = Math.min(4000, Math.max(320, view.w * Math.exp(ev.deltaY * 0.0015)))
+  const s = nw / view.w
+  view.cx = px - (px - view.cx) * s
+  view.cy = py - (py - view.cy) * s
+  view.w = nw
+  applyView()
+}, { passive: false })
+
+/* ## Start ## */
+const start = location.hash.slice(1)
+if (byId[start]) { selected = start; showNode(byId[start]); focusBtn.disabled = false } else showDefault()
+applyLayout(true)
+let lastW = stage.clientWidth
+new ResizeObserver(() => {
+  if (stage.clientWidth !== lastW) { lastW = stage.clientWidth; applyLayout(true) }
+  else applyView()
+}).observe(stage)
+</script>
+</body>
+</html>
