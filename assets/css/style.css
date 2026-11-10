@@ -1,0 +1,98 @@
+:root {
+  --bg: #fafaf8;
+  --text: #1d1d1d;
+  --muted: #666;
+  --accent: #2a6f4f;
+  --border: #ddd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, Segoe UI, Roboto, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.5;
+}
+
+header {
+  padding: 2rem 1.5rem 1rem;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+header a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+main {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+h1 {
+  margin-top: 0;
+}
+
+.lesson-list {
+  list-style: none;
+  padding: 0;
+}
+
+.lesson-list li {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.lesson-list a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.lesson-list p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.widget {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin: 1.5rem 0;
+  background: white;
+}
+
+textarea, input {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 1rem;
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+}
+
+.codon {
+  display: inline-block;
+  padding: 0.1rem 0.2rem;
+  border-radius: 4px;
+}
+
+.codon.even { background: #e6f2ec; }
+.codon.odd { background: #f2e9e6; }
+
+.aa-sequence {
+  font-family: ui-monospace, Consolas, monospace;
+  font-size: 1.1rem;
+  margin-top: 0.75rem;
+  word-break: break-word;
+}
