@@ -744,7 +744,7 @@ N({
 })
 N({
   id: "mic", name: "Bacteria & other pathogens", g: "pathogen", x: 950, y: 1000,
-  sub: "Extracellular microbes: bacteria, fungi, protozoa and other free-living pathogens",
+  sub: "Extracellular microbes: bacteria, fungi, and protozoa",
   markers: ["LPS (gram-negative)", "Peptidoglycan (gram-positive)", "β-glucan (fungi)", "Flagellin", "Mannose-rich surfaces"],
   where: "Outside host cells: tissue, blood, mucosal surfaces, gut lumen",
   roles: [
@@ -753,7 +753,20 @@ N({
     "Complement and antibodies also act directly on this kind of target: coating it for faster phagocytosis, punching holes in its membrane, or neutralising it outright."
   ],
   products: ["PAMPs recognised by host cells", "Toxins", "Virulence factors"],
-  notes: "A bacterium, a fungus and a protozoan parasite are recognised and cleared through overlapping but distinct mechanisms. They're grouped into one node here to keep the map legible, rather than adding one per microbe."
+  notes: "A bacterium, a fungus and a protozoan are recognised and cleared through overlapping but distinct mechanisms. They're grouped into one node here to keep the map legible, rather than adding one per microbe."
+})
+N({
+  id: "par", name: "Parasites", g: "pathogen", x: 720, y: 1000,
+  sub: "Multicellular parasites: helminths (worms) and ectoparasites like ticks",
+  markers: ["Helminth surface antigens", "Chitin (some parasites)", "Excretory-secretory products", "Physical tissue damage"],
+  where: "Gut lumen and tissue (helminths), skin (ectoparasites like ticks and mites)",
+  roles: [
+    "Unlike bacteria or fungi, these are often large, multicellular organisms that can't simply be swallowed by a single phagocyte, so the immune system needs an entirely different strategy to fight them.",
+    "Physical damage from the parasite triggers nearby epithelial cells to release alarmins (IL-25, IL-33, TSLP), which kick off a type 2 immune response built around eosinophils, basophils, mast cells and ILC2s rather than neutrophils or macrophages.",
+    "IgE antibodies coat the parasite's surface. Cells like eosinophils and basophils bind that IgE through FcεRI, then degranulate directly onto the surface, since the parasite is too big to engulf."
+  ],
+  products: ["Surface antigens that antibodies bind to", "Excretory-secretory proteins"],
+  notes: "This node stands in for everything from intestinal worms to external parasites like ticks, which trigger overlapping but not identical responses. Grouped here for the same reason as the bacteria and fungi node nearby: one node per microbe would clutter the map."
 })
 
 // differentiation
@@ -837,9 +850,14 @@ E("tm", "ctl", "act", "recall response", -0.1)
 // pathogen clearance
 E("neut", "mic", "kill", "phagocytosis, NETs, ROS", 0.15)
 E("mac", "mic", "kill", "phagocytosis, ROS, NO", -0.15)
-E("eos", "mic", "kill", "degranulation", 0.25)
 E("comp", "mic", "kill", "MAC lysis, opsonisation", 0.15)
 E("ab", "mic", "act", "neutralises, opsonises", 0.2)
+
+// parasite clearance
+E("eos", "par", "kill", "degranulation (MBP, ECP)", 0.2)
+E("baso", "par", "kill", "degranulation, histamine", 0.3)
+E("mast", "par", "kill", "degranulation, histamine", -0.2)
+E("ab", "par", "act", "IgE coats the surface", -0.15)
 /* ## Cell artwork: flat vector cells, generated from small recipes ## */
 const HEX = { prog: "#c9c2b2", myeloid: "#f07a52", apc: "#f0b84e", innate: "#4fc9a4", t: "#5ca6ee", b: "#b884e8", sol: "#ee6f9f", target: "#93a0b3", pathogen: "#c17f4a" }
 const hx = h => {
@@ -1015,7 +1033,14 @@ const RECIPES = {
   cyt: { r: 34, draw: T => `<circle r="30" fill="${T.c}" opacity="0.1"/>` + [[-14, -10, 9], [10, -14, 7], [14, 8, 10], [-8, 12, 7], [0, 0, 6], [-24, 6, 4.5], [24, -4, 4]].map(b => `<circle cx="${b[0]}" cy="${b[1]}" r="${b[2]}" fill="url(#g-sol)"/><circle cx="${b[0] - b[2] * 0.3}" cy="${b[1] - b[2] * 0.3}" r="${f1(b[2] * 0.28)}" fill="#fff" opacity="0.5"/>`).join("") },
   ifn: { r: 33, draw: T => `<circle r="29" fill="${T.c}" opacity="0.1"/>` + [[-9, -7, 15, 7], [13, 9, 11, 5.5], [-14, 15, 8, 4]].map(s => `<polygon points="${star8(s[0], s[1], s[2], s[3], 8)}" fill="url(#g-sol)"/>`).join("") },
   tgt: { r: 38, draw: T => B(T, 33, 0.1, 11) + Nround(T, 14, -4, -2) + Lolli(T, 5, 33, 8, "#e6edf7", -70) + `<circle cx="-36" cy="22" r="4" fill="#ff5a5f"/><circle cx="-28" cy="31" r="3.2" fill="#ff5a5f"/>` },
-  mic: { r: 34, draw: T => B(T, 29, 0.12, 9) + Nround(T, 9, 9, 8) + Stubs(T, 5, 29, 8, T.lt, -95) + `<rect x="-30" y="-36" width="16" height="6" rx="3" fill="${mix(T.c, "#000", 0.1)}"/><rect x="11" y="-31" width="14" height="6" rx="3" fill="${mix(T.c, "#000", 0.1)}" transform="rotate(22 18 -28)"/>` }
+  mic: { r: 34, draw: T => B(T, 29, 0.12, 9) + Nround(T, 9, 9, 8) + Stubs(T, 5, 29, 8, T.lt, -95) + `<rect x="-30" y="-36" width="16" height="6" rx="3" fill="${mix(T.c, "#000", 0.1)}"/><rect x="11" y="-31" width="14" height="6" rx="3" fill="${mix(T.c, "#000", 0.1)}" transform="rotate(22 18 -28)"/>` },
+  par: { r: 34, draw: T => {
+    const body = "M-27 11 Q-13.5 -17 0 11 Q13.5 -17 27 11"
+    return `<path d="${body}" fill="none" stroke="${T.c}" stroke-width="13" stroke-linecap="round"/>`
+      + `<path d="${body}" fill="none" stroke="${mix(T.c, "#fff", 0.4)}" stroke-width="4" stroke-linecap="round" opacity="0.55" transform="translate(0,-3.5)"/>`
+      + Dots(T, 5, 8, 24, 1.8, T.dk, 0.55)
+      + `<circle cx="-27" cy="11" r="7" fill="${T.lt}" opacity="0.9"/>`
+  } }
 }
 
 function makeCell(n) {
@@ -1093,7 +1118,7 @@ const zones = [
   ["SOLUBLE FACTORS", 20, 480],
   ["T CELL EFFECTORS", 640, 640],
   ["B CELL LINEAGE", 1400, 455],
-  ["PATHOGENS", 870, 965],
+  ["PATHOGENS", 760, 965],
   ["SELF (ALTERED)", 1100, 965]
 ]
 zones.forEach(z => { const t = el("text", { x: z[1], y: z[2], class: "zone" }, zonesG); t.textContent = z[0] })
