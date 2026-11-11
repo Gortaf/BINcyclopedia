@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Intro to Programming | BINcyclopedia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<style>
+.py-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 11px var(--mono);
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 11px;
+  margin-top: 0.75rem;
+}
+.py-status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.py-status.ready::before { background: #4cc2a0; }
+.py-status.ready { color: #4cc2a0; border-color: #4cc2a0; }
+
+.concept { margin: 2.5rem 0; }
+.concept h2 {
+  font-family: var(--display);
+  font-size: 1.5rem;
+  margin: 0 0 0.5rem;
+}
+.concept > p { color: var(--text); max-width: 640px; }
+
+.code-block {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 1rem 1.1rem 1.1rem;
+  margin: 1rem 0;
+}
+.code-block .label {
+  display: inline-block;
+  font: 500 10.5px var(--mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.code-block .task {
+  margin: 0 0 0.75rem;
+  color: var(--text);
+}
+.code-block .starter { display: none; }
+.editor-mount .CodeMirror {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  height: auto;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  padding: 2px 0;
+}
+.code-block-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+.run-btn {
+  background: var(--accent);
+  color: #0d1117;
+  border: 0;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font: 600 13px var(--body);
+  cursor: pointer;
+}
+.run-btn:disabled { opacity: 0.4; cursor: default; }
+.run-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.result-badge { font: 500 12.5px var(--mono); }
+.result-badge.pass { color: #4cc2a0; }
+.result-badge.fail { color: #ee7650; }
+.output {
+  margin-top: 0.75rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 1.6em;
+  color: var(--text);
+}
+.output.error { color: #ee7650; }
+.output:empty::before { content: "(output appears here)"; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <a href="../../index.html" class="home-link">&larr; BINcyclopedia</a>
+  <h1>Intro to Programming</h1>
+  <p class="tagline">Scripts, flow control, loops, and functions, with real Python running in the page. Nothing is sent to a server; it all runs in your browser.</p>
+  <span class="py-status" id="pyStatus">Loading Python runtime&hellip;</span>
+</header>
+<main>
+
+<section class="concept">
+  <h2>What is a script?</h2>
+  <p>A script is just a list of instructions the computer carries out one after another, from top to bottom. Each line is a statement, and running the script means running every statement in order.</p>
+
+  <div class="code-block">
+    <span class="label">Example</span>
+    <pre class="starter">print("Hello, BINcyclopedia!")
+print("This line runs second.")
+name = "Ada"
+print("Nice to meet you,", name)</pre>
+    <div class="editor-mount"></div>
+    <div class="code-block-actions">
+      <button class="run-btn" disabled>Run &#9658;</button>
+      <span class="result-badge"></span>
+    </div>
+    <pre class="output"></pre>
+  </div>
+
+  <div class="code-block">
+    <span class="label">Try it</span>
+    <p class="task">Add a line below that prints your own name, then run it.</p>
+    <pre class="starter">print("Hello, BINcyclopedia!")
+print("This line runs second.")</pre>
+    <div class="editor-mount"></div>
+    <div class="code-block-actions">
+      <button class="run-btn" disabled>Run &#9658;</button>
+      <span class="result-badge"></span>
+    </div>
+    <pre class="output"></pre>
+  </div>
+</section>
+
+<section class="concept">
+  <h2>Flow control: if / elif / else</h2>
+  <p>A script can take different paths depending on a condition. An <code>if</code> block runs only when its condition is true, an <code>elif</code> checks another condition when the first was false, and <code>else</code> catches everything else.</p>
+
+  <div class="code-block">
+    <span class="label">Example</span>
+    <pre class="starter">temperature = 15
+
+if temperature &gt; 25:
+    print("It's warm.")
+elif temperature &gt; 10:
+    print("It's mild.")
+else:
+    print("It's cold.")</pre>
+    <div class="editor-mount"></div>
+    <div class="code-block-actions">
+      <button class="run-btn" disabled>Run &#9658;</button>
+      <span class="result-badge"></span>
+    </div>
+    <pre class="output"></pre>
+  </div>
+
+  <div class="code-block" data-expected="Pass">
+    <span class="label">Try it</span>
+    <p class="task">Write an <code>if</code> / <code>else</code> below that prints <code>"Pass"</code> if <code>score</code> is 60 or above, and <code>"Fail"</code> otherwise. Run it with <code>score = 72</code> and check you get <code>Pass</code>.</p>
+    <pre class="starter">score = 72
+
+# your if/else here</pre>
+    <div class="editor-mount"></div>
+    <div class="code-block-actions">
+      <button class="run-btn" disabled>Run &#9658;</button>
+      <span class="result-badge"></span>
+    </div>
+    <pre class="output"></pre>
+  </div>
+</section>
+
+<section class="concept">
+  <h2>Loops: for and while</h2>
+  <p>A loop repeats a block of code multiple times instead of copy-pasting it. A <code>for</code> loop repeats once per item in a sequence, like the numbers produced by <code>range(1, 6)</code>. A <code>while</code> loop instead repeats for as long as a condition stays true.</p>
+
+  <div class="code-block">
+    <span class="label">Example</span>
+    <pre class="starter">total = 0
+for n in range(1, 6):
+    total = total + n
+print("The total is", total)</pre>
+    <div class="editor-mount"></div>
+    <div class="code-block-actions">
+      <button class="run-btn" disabled>Run &#9658;</button>
+      <span class="result-badge"></span>
+    </div>
+    <pre class="output"></pre>
+  </div>
+
+  <div class="code-block" data-expected="The total is 55">
+    <span class="label">Try it</span>
+    <p class="task">Change the loop so it sums the numbers from 1 to 10 instead of 1 to 5, then run it.</p>
+    <pre class="starter">total = 0
+for n in range(1, 6):
+    total = total + n
+print("The total is", total)</pre>
+    <div class="editor-mount"></div>
+    <div class="code-block-actions">
+      <button class="run-btn" disabled>Run &#9658;</button>
+      <span class="result-badge"></span>
+    </div>
+    <pre class="output"></pre>
+  </div>
+</section>
+
+<section class="concept">
+  <h2>Functions</h2>
+  <p>A function packages up a set of instructions under a name, so you can reuse it without rewriting the code every time. You define it once with <code>def</code>, then call it by name whenever you need it, with different inputs.</p>
+
+  <div class="code-block">
+    <span class="label">Example</span>
+    <pre class="starter">def greet(name):
+    return "Hello, " + name + "!"
+
+print(greet("Ada"))
+print(greet("Alan"))</pre>
+    <div class="editor-mount"></div>
+    <div class="code-block-actions">
+      <button class="run-btn" disabled>Run &#9658;</button>
+      <span class="result-badge"></span>
+    </div>
+    <pre class="output"></pre>
+  </div>
+
+  <div class="code-block" data-expected="49">
+    <span class="label">Try it</span>
+    <p class="task">Write a function called <code>square</code> that takes a number <code>n</code> and returns <code>n</code> squared. Then call <code>print(square(7))</code>.</p>
+    <pre class="starter">def square(n):
+    # your code here
+    pass
+
+print(square(7))</pre>
+    <div class="editor-mount"></div>
+    <div class="code-block-actions">
+      <button class="run-btn" disabled>Run &#9658;</button>
+      <span class="result-badge"></span>
+    </div>
+    <pre class="output"></pre>
+  </div>
+</section>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+let pyodide = null
+/* Pyodide is a single shared interpreter, so two Run clicks in quick
+   succession must not interleave (both would race on __user_code__).
+   This queue chains every call so only one runs at a time. */
+let runQueue = Promise.resolve()
+
+function runUserCode(code) {
+  const task = runQueue.then(() => executeInPyodide(code))
+  runQueue = task.then(() => {}, () => {})
+  return task
+}
+
+async function executeInPyodide(code) {
+  pyodide.globals.set("__user_code__", code)
+  const resultProxy = await pyodide.runPythonAsync(`
+import io, contextlib, traceback
+__buf__ = io.StringIO()
+__err__ = None
+try:
+    with contextlib.redirect_stdout(__buf__):
+        exec(__user_code__, {})
+except Exception:
+    __err__ = traceback.format_exc()
+[__buf__.getvalue(), __err__]
+`)
+  const [out, err] = resultProxy.toJs()
+  if (resultProxy && resultProxy.destroy) resultProxy.destroy()
+  return [out, err]
+}
+
+function setupBlocks() {
+  document.querySelectorAll(".code-block").forEach(block => {
+    const starterEl = block.querySelector(".starter")
+    const mount = block.querySelector(".editor-mount")
+    const cm = CodeMirror(mount, {
+      value: starterEl.textContent,
+      mode: "python",
+      theme: "dracula",
+      lineNumbers: true,
+      indentUnit: 4,
+      viewportMargin: Infinity,
+    })
+    const runBtn = block.querySelector(".run-btn")
+    const output = block.querySelector(".output")
+    const badge = block.querySelector(".result-badge")
+    const expected = block.dataset.expected
+
+    runBtn.addEventListener("click", async () => {
+      runBtn.disabled = true
+      output.textContent = "Running…"
+      output.classList.remove("error")
+      badge.textContent = ""
+      badge.className = "result-badge"
+      try {
+        const [out, err] = await runUserCode(cm.getValue())
+        if (err) {
+          output.textContent = err
+          output.classList.add("error")
+        } else {
+          output.textContent = out.length ? out : ""
+          if (expected !== undefined) {
+            const pass = out.trim() === expected.trim()
+            badge.textContent = pass ? "✓ matches expected output" : "✗ not quite yet"
+            badge.className = "result-badge " + (pass ? "pass" : "fail")
+          }
+        }
+      } finally {
+        runBtn.disabled = false
+      }
+    })
+  })
+}
+
+async function boot() {
+  setupBlocks()
+  const status = document.getElementById("pyStatus")
+  pyodide = await loadPyodide()
+  status.textContent = "Python ready"
+  status.classList.add("ready")
+  document.querySelectorAll(".run-btn").forEach(b => b.disabled = false)
+}
+
+boot()
+</script>
+</body>
+</html>

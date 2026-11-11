@@ -30,4 +30,25 @@ const ICONS = {
       <circle cx="29" cy="-11" r="2.2" fill="#ffb3b3"/>
     </svg>
   `,
+
+  /* Terminal window: rounded badge with window-control dots and a prompt,
+     standing in for "code you write and run" the way a cell stands in for
+     a specific immune function. */
+  terminal: `
+    <svg viewBox="-40 -40 80 80" aria-hidden="true">
+      <defs>
+        <radialGradient id="icon-g-term" cx="0.35" cy="0.25" r="0.9">
+          <stop offset="0" stop-color="#a9cdf5"/>
+          <stop offset="0.6" stop-color="#5aa2ec"/>
+          <stop offset="1" stop-color="#3f72a5"/>
+        </radialGradient>
+      </defs>
+      <rect x="-30" y="-22" width="60" height="44" rx="9" fill="url(#icon-g-term)"/>
+      <path d="M-30 -13a9 9 0 0 1 9 -9h42a9 9 0 0 1 9 9v6h-60Z" fill="#000" opacity="0.18"/>
+      <circle cx="-23" cy="-16" r="2.1" fill="#fff" opacity="0.85"/>
+      <circle cx="-15" cy="-16" r="2.1" fill="#fff" opacity="0.6"/>
+      <circle cx="-7" cy="-16" r="2.1" fill="#fff" opacity="0.4"/>
+      <text x="-21" y="12" font-family="ui-monospace, monospace" font-size="19" font-weight="700" fill="#e3f0ff">&gt;_</text>
+    </svg>
+  `,
 }

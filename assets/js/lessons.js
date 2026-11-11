@@ -38,4 +38,14 @@ const LESSONS = [
     classes: [],
     icon: "ctl",
   },
+  {
+    id: "intro-to-programming",
+    title: "Intro to Programming",
+    blurb: "Write and run real Python right in the page: scripts, flow control, loops, and functions, with challenges you can check as you go.",
+    href: "lessons/intro-to-programming/index.html",
+    category: "cs-programming",
+    matter: ["python", "flow control", "loops", "functions", "beginner"],
+    classes: [],
+    icon: "terminal",
+  },
 ]
