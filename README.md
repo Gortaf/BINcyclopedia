@@ -20,13 +20,28 @@ Some of the visuals and interactive pages on this site are built with the help o
 
 ## Structure
 
-- `index.html` — landing page, links to all lessons
+- `index.html` — landing page, renders itself from the data below
 - `assets/css/style.css` — shared styling
+- `assets/js/lessons.js` — the `CATEGORIES` and `LESSONS` manifest (see tags below)
+- `assets/js/icons.js` — small hand-authored SVG icons, atlas-style, keyed by name
+- `assets/js/site.js` — renders the landing page and handles search/tag filtering
 - `lessons/<lesson-name>/index.html` — one self-contained page per lesson
+
+## Tags and categories
+
+Each entry in `LESSONS` (`assets/js/lessons.js`) carries:
+
+- `category` — one id from `CATEGORIES`, grouping lessons by subject under Computer Science, Biochemistry, Statistics, or Bioinformatics
+- `matter` — free-text topic tags for searching (e.g. `"immunology"`, `"dynamic programming"`)
+- `classes` — UdeM course codes a lesson is useful for (e.g. `"BIN6007"`), left empty until relevant
+
+All three show up as clickable tags on the landing page and feed the search box.
 
 ## Adding a lesson
 
-Create a folder under `lessons/<lesson-name>/` with its own `index.html`, link `../../assets/css/style.css` for consistent styling (or keep styles inline if the lesson needs its own look), and add an entry to the list in `index.html`.
+1. Create a folder under `lessons/<lesson-name>/` with its own `index.html`. Link `../../assets/css/style.css` for consistent styling, or keep styles inline if the lesson needs its own look.
+2. Add an entry to `LESSONS` in `assets/js/lessons.js` (title, blurb, href, category, matter, classes, icon).
+3. If no existing icon in `assets/js/icons.js` fits, add a new one in the same visual style (radial-gradient blob, darker nucleus, a couple of accents) and reference its key from the lesson entry.
 
 ## Local preview
 

@@ -75,10 +75,66 @@ p {
   color: var(--text);
 }
 
+a {
+  color: var(--accent);
+}
+
 .tagline {
   color: var(--muted);
   font-size: 1.05rem;
   max-width: 560px;
+  margin-bottom: 0.6rem;
+}
+
+.disclaimer {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0;
+}
+
+.disclaimer a {
+  color: var(--muted);
+  text-decoration: underline;
+}
+
+.disclaimer a:hover {
+  color: var(--accent);
+}
+
+/* Search */
+
+.search-bar {
+  margin-bottom: 1.75rem;
+}
+
+#search {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 0.6rem 0.9rem;
+  font: 400 14px var(--body);
+  width: 100%;
+}
+
+#search:focus {
+  outline: 2px solid var(--accent);
+  outline-offset: 1px;
+}
+
+/* Domains and lessons */
+
+.domain {
+  margin-bottom: 2rem;
+}
+
+.domain-title {
+  font-family: var(--mono);
+  font-size: 0.78rem;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--c, var(--accent));
+  margin: 0 0 0.75rem;
 }
 
 .lesson-list {
@@ -86,7 +142,7 @@ p {
   padding: 0;
   display: grid;
   gap: 0.9rem;
-  margin-top: 1.5rem;
+  margin: 0;
 }
 
 .lesson-list li {
@@ -101,23 +157,94 @@ p {
   border-color: var(--accent);
 }
 
-.lesson-list a {
-  color: var(--text);
+.lesson-link {
+  display: flex;
+  gap: 1rem;
+  align-items: flex-start;
   text-decoration: none;
+  color: inherit;
+}
+
+.lesson-icon {
+  flex: none;
+  width: 48px;
+  height: 48px;
+}
+
+.lesson-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.lesson-body {
+  min-width: 0;
+}
+
+.lesson-title {
+  display: block;
+  color: var(--text);
   font-family: var(--display);
   font-weight: 600;
   font-size: 1.15rem;
 }
 
-.lesson-list a:hover {
+.lesson-link:hover .lesson-title {
   color: var(--accent);
 }
 
-.lesson-list p {
+.lesson-body p {
   margin: 0.3rem 0 0;
   color: var(--muted);
   font-size: 0.92rem;
 }
+
+.empty {
+  color: var(--muted);
+}
+
+/* Tags */
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.8rem;
+}
+
+.tag {
+  font: 500 10.5px var(--mono);
+  letter-spacing: 0.3px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--surface-2);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.tag:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.tag-category {
+  color: #0d1117;
+  background: var(--accent);
+  border-color: var(--accent);
+  text-transform: uppercase;
+}
+
+.tag-matter {
+  color: var(--text);
+}
+
+.tag-class {
+  color: var(--text);
+  border-style: dashed;
+}
+
+/* Misc shared widgets (used by in-lesson demos) */
 
 .badge {
   display: inline-block;

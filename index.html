@@ -12,18 +12,20 @@
 <body>
 <header>
   <h1>BINcyclopedia<small>knowledge, interactively</small></h1>
-  <p class="tagline">Interactive lessons and reference pages on bioinformatics and related topics, built from years of learning and teaching the subject.</p>
+  <p class="tagline">Interactive lessons on bioinformatics and related topics, built to share what I've learned and taught in a more fun format &mdash; for students, future bioinformaticians, and the curious.</p>
+  <p class="disclaimer">Pages are built with Claude's help; all information is mine and checked for accuracy before it goes up. <a href="https://github.com/Gortaf/BINcyclopedia#readme">More in the README &rarr;</a></p>
 </header>
 <main>
-  <ul class="lesson-list">
-    <li>
-      <a href="lessons/immune-system-atlas/index.html">Immune System Atlas</a>
-      <p>An explorable map of the immune system: click any cell to see its markers, roles, products, and how it connects to everything else.</p>
-    </li>
-  </ul>
+  <div class="search-bar">
+    <input id="search" type="search" placeholder="Search lessons, topics, course codes&hellip;" aria-label="Search lessons">
+  </div>
+  <div id="lessons"></div>
 </main>
 <footer>
   BINcyclopedia &mdash; see the <a href="https://github.com/Gortaf/BINcyclopedia#readme" style="color:inherit">README</a> for what this is and how it's made.
 </footer>
+<script src="assets/js/icons.js"></script>
+<script src="assets/js/lessons.js"></script>
+<script src="assets/js/site.js"></script>
 </body>
 </html>
