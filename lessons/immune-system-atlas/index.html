@@ -26,6 +26,7 @@
   --c-b: #b680e4;
   --c-sol: #ec6c9c;
   --c-target: #8b96a7;
+  --c-pathogen: #b2713f;
   --display: "Fraunces", Georgia, serif;
   --body: "IBM Plex Sans", system-ui, sans-serif;
   --mono: "IBM Plex Mono", ui-monospace, monospace;
@@ -181,6 +182,36 @@ main { flex: 1; min-height: 0; display: flex; }
 #hint { color: var(--muted); }
 #hint h2 { color: var(--text); }
 .legend { display: grid; gap: 7px; margin-top: 10px; }
+.edge-legend {
+  position: absolute;
+  right: 12px;
+  top: 12px;
+  background: color-mix(in srgb, var(--surface) 90%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 7px 9px;
+  max-width: 140px;
+  z-index: 5;
+}
+.edge-legend .legend-toggle {
+  display: block;
+  width: 100%;
+  background: none;
+  border: 0;
+  padding: 0;
+  text-align: left;
+  font: 500 10px var(--mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+}
+.edge-legend .legend-toggle:hover { color: var(--text); }
+.edge-legend .legend { margin-top: 6px; gap: 4px; grid-template-columns: minmax(0, 1fr); }
+.edge-legend.collapsed .legend { display: none; }
+.edge-legend .legend div { font-size: 10.5px; gap: 5px; }
+.edge-legend .legend svg { width: 28px !important; height: 9px !important; flex: none; }
+.edge-legend .legend span { flex: 1; min-width: 0; }
 .legend div { display: flex; align-items: center; gap: 10px; font-size: 13.5px; }
 .legend svg { width: 46px; height: 12px; flex: none; }
 .node { cursor: pointer; transition: opacity 0.35s; }
@@ -234,7 +265,10 @@ main { flex: 1; min-height: 0; display: flex; }
   <button class="btn" id="fitBtn">Fit to view</button>
 </div>
 <main>
-  <div id="stage"><svg id="svg" viewBox="0 0 1600 1060" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Immune system relationship diagram"></svg></div>
+  <div id="stage">
+    <svg id="svg" viewBox="0 0 1600 1060" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Immune system relationship diagram"></svg>
+    <div id="edgeLegend" class="edge-legend" aria-label="Edge type legend"></div>
+  </div>
   <aside id="panel" aria-live="polite"></aside>
 </main>
 <script>
@@ -246,7 +280,8 @@ const GROUPS = {
   t: { name: "T cells", color: "var(--c-t)" },
   b: { name: "B cells", color: "var(--c-b)" },
   sol: { name: "Soluble factors", color: "var(--c-sol)" },
-  target: { name: "Target", color: "var(--c-target)" }
+  target: { name: "Self (altered)", color: "var(--c-target)" },
+  pathogen: { name: "Pathogens", color: "var(--c-pathogen)" }
 }
 const NODES = []
 const EDGES = []
@@ -259,6 +294,7 @@ N({
   markers: ["CD34+", "CD38-", "CD90+", "CD49f+", "Lin-", "c-Kit+ (mouse: LSK, SLAM)"],
   where: "Bone marrow niche (adult), fetal liver and AGM during development",
   roles: [
+    "This is the ancestral cell, sitting in the bone marrow, that every other blood and immune cell in the body ultimately descends from.",
     "Self-renews and gives rise to every blood and immune lineage. In adults it lives in perivascular and endosteal niches of the marrow, kept going by CXCL12-abundant reticular cells, SCF and TPO.",
     "Long-term HSCs mostly sit quiescent. Infection, IFN and IL-1 push them into cycle and tilt output toward myeloid cells (emergency myelopoiesis)."
   ],
@@ -271,6 +307,7 @@ N({
   markers: ["CD34+", "CD38+", "CD123 int", "CD45RA- (CMP) / + (GMP)"],
   where: "Bone marrow",
   roles: [
+    "This progenitor has already committed to becoming a myeloid cell: the branch of white blood cells that includes neutrophils, monocytes and dendritic cells, rather than lymphocytes like T and B cells.",
     "Commits to the erythroid, megakaryocytic, granulocytic or monocytic lineages.",
     "GMPs make neutrophils, eosinophils, basophils, mast cell precursors and monocytes under G-CSF, GM-CSF, M-CSF and IL-3.",
     "A parallel CDP branch gives the conventional and plasmacytoid DCs, driven by FLT3L."
@@ -284,6 +321,7 @@ N({
   markers: ["Lin-", "CD127 (IL-7Rα)+", "FLT3+", "CD10+ (human)", "Sca-1 lo, c-Kit lo (mouse)"],
   where: "Bone marrow, then thymus (T) or marrow (B)",
   roles: [
+    "This progenitor has committed to the lymphoid branch instead: the lineage that produces T cells, B cells, and NK cells.",
     "Gives rise to B cells, T cell precursors, NK cells and ILCs.",
     "T lineage commitment happens after the progenitors reach the thymus, where Notch1 signals from cortical thymic epithelium switch on TCF-1, GATA3 and BCL11B.",
     "B lineage commitment happens in the marrow and needs E2A, EBF1 and PAX5."
@@ -297,6 +335,7 @@ N({
   markers: ["CD66b+", "CD15+", "CD16 hi", "Ly6G (mouse)", "CXCR2+"],
   where: "Blood (40 to 70% of leukocytes), rapidly recruited to tissue. Lifespan around a day in blood.",
   roles: [
+    "This is the most abundant white blood cell in the body, and usually the very first immune cell to arrive at an infection or injury.",
     "First cell on the scene at infections and sterile injury, called in by CXCL8 (IL-8), C5a, LTB4 and fMLP.",
     "Kills by phagocytosis, the NOX2 and MPO oxidative burst, and degranulation of azurophilic, specific and gelatinase granules.",
     "It can also expel decondensed chromatin studded with histones and granule proteins (NETosis), which traps microbes.",
@@ -311,6 +350,7 @@ N({
   markers: ["Siglec-8+", "CCR3+", "IL-5Rα+", "CD125", "EPX+"],
   where: "Blood (low), tissue resident in gut lamina propria, adipose tissue, thymus and uterus",
   roles: [
+    "This white blood cell specialises in fighting parasites too large to be eaten by a single cell, and is also heavily involved in allergic disease.",
     "Kills helminths and other large parasites, often by antibody-dependent degranulation through FcεRI and FcγR.",
     "Stays alive on IL-5 and follows eotaxins (CCL11) through CCR3.",
     "Drives type 2 tissue inflammation in asthma and atopic disease, and also takes part in tissue repair and metabolic homeostasis."
@@ -324,6 +364,7 @@ N({
   markers: ["CD123+", "CD203c+", "FcεRI hi", "CD63 (activation)", "CD49b (mouse)"],
   where: "Blood (under 1%), recruited to inflamed skin and lung",
   roles: [
+    "This is the rarest circulating white blood cell, and it works alongside mast cells to drive allergic reactions.",
     "Binds IgE on FcεRI. Allergen crosslinking triggers histamine release and fast IL-4 and IL-13 secretion.",
     "That early IL-4 can help bias naive CD4 T cells toward Th2 and support class switching to IgE.",
     "Contributes to the late phase of allergic responses and to immunity against ticks."
@@ -337,6 +378,7 @@ N({
   markers: ["c-Kit (CD117) hi", "FcεRI hi", "Tryptase / chymase", "MRGPRX2"],
   where: "Skin, mucosae, around vessels and nerves. Mature in tissue, not in blood.",
   roles: [
+    "This cell lives permanently in tissues like skin and gut lining, and its sudden release of stored chemicals is what causes the immediate symptoms of an allergic reaction.",
     "IgE-dependent degranulation drives immediate (type I) hypersensitivity. C3a, C5a, neuropeptides and MRGPRX2 ligands can trigger it without IgE.",
     "Preformed granule mediators act within seconds, and lipid mediators (PGD2, LTC4) and cytokines (TNF, IL-6, IL-13) follow.",
     "Mast cells also detoxify venoms, defend against bacteria and recruit neutrophils and DCs to the site."
@@ -350,6 +392,7 @@ N({
   markers: ["CD14 / CD16 (classical, intermediate, non-classical)", "CCR2+ (classical)", "Ly6C hi (mouse)", "CX3CR1"],
   where: "Blood, spleen reservoir, recruited to inflamed tissue",
   roles: [
+    "This cell circulates in the blood as a reservoir, ready to turn into either a macrophage or a dendritic cell once it moves into a tissue.",
     "Classical (CD14++CD16-) monocytes leave the marrow through CCR2-CCL2, enter inflamed tissue and become macrophages or monocyte-derived DCs.",
     "Non-classical (CD14+CD16++) monocytes crawl along the endothelium using LFA-1 and CX3CR1 and clear damaged cells.",
     "On TLR4 or TLR2 sensing they secrete IL-1β, IL-6 and TNF."
@@ -363,6 +406,7 @@ N({
   markers: ["CD68", "CD64 (FcγRI)", "F4/80 (mouse)", "CD163 (M2-like)", "MerTK"],
   where: "Every tissue. Kupffer cells (liver), alveolar (lung), microglia (CNS), Langerhans (skin), osteoclasts (bone), red pulp macrophages (spleen).",
   roles: [
+    "This is the immune system's general-purpose scavenger cell, living permanently in every tissue of the body, where it swallows up microbes, debris and dying cells.",
     "Eats microbes, apoptotic cells (efferocytosis) and debris, and senses PAMPs and DAMPs through TLRs, NLRs, scavenger receptors and C-type lectins.",
     "IFN-γ and LPS push it toward an inflammatory program (iNOS, IL-12, IL-1β, TNF). IL-4 and IL-13 push it toward repair (Arg1, CD206, IL-10).",
     "Presents antigen on MHC II to CD4 T cells, though it primes naive cells less well than a DC does.",
@@ -377,6 +421,7 @@ N({
   markers: ["XCR1+", "CLEC9A+", "CD141 (BDCA-3)+", "CD8α / CD103 (mouse)", "IRF8, BATF3"],
   where: "Lymphoid organs and non-lymphoid tissue (migratory form)",
   roles: [
+    "This dendritic cell subtype's specialty is showing material it has swallowed to CD8 T cells, which is essential for the immune system to start attacking virus-infected or cancerous cells.",
     "Specialised for cross-presentation: loads exogenous antigen (for example from dead tumour cells taken up through CLEC9A) onto MHC I to prime naive CD8 T cells.",
     "Main source of IL-12, which drives Th1 differentiation and IFN-γ production by NK and T cells.",
     "Needed for anti-tumour immunity and for checkpoint blockade to work in many mouse models. NK-derived CCL5 and XCL1 recruit it into tumours."
@@ -390,6 +435,7 @@ N({
   markers: ["CD11b+", "SIRPα (CD172a)+", "CD1c (BDCA-1)+", "IRF4+"],
   where: "Lymphoid organs and tissues, the most abundant DC subset in humans",
   roles: [
+    "This is the most common dendritic cell subtype in humans, and its main job is to activate CD4 helper T cells by showing them fragments of antigen it has processed.",
     "Presents peptide on MHC II to naive CD4 T cells in the T cell zone of lymph nodes.",
     "Polarises the CD4 response through the cytokines it makes: IL-12 for Th1, IL-23 and IL-6 for Th17, and TSLP-conditioned or IRF4-dependent signals for Th2.",
     "Once mature, it migrates from tissue to the draining lymph node along CCR7-CCL19 and CCL21 gradients."
@@ -403,6 +449,7 @@ N({
   markers: ["CD123+", "BDCA-2 (CD303)+", "BDCA-4", "TLR7, TLR9 hi", "E2-2 (TCF4)"],
   where: "Blood and lymphoid organs, recruited to inflamed skin and mucosae",
   roles: [
+    "This dendritic cell's specialty is detecting viral genetic material and responding by flooding the body with antiviral signalling proteins called type I interferons.",
     "Senses viral nucleic acid in endosomes through TLR7 and TLR9 and secretes up to 1000 times more type I IFN per cell than other cell types.",
     "Presents antigen less well than cDCs, but its IFN-α/β boosts NK and T cell responses.",
     "Chronic pDC activation by self nucleic acid immune complexes is central to SLE pathology."
@@ -416,6 +463,7 @@ N({
   markers: ["CD56+ CD3-", "CD16 (FcγRIII)", "NKp46 (NCR1)", "NKG2D", "KIRs, NKG2A"],
   where: "Blood (5 to 15% of lymphocytes), liver, spleen, uterus. CD56bright subset enriched in lymph nodes and tissues.",
   roles: [
+    "This lymphocyte can kill infected or cancerous cells without needing to recognise a specific antigen first, which is why it's called a 'natural' killer.",
     "Checks for missing self: inhibitory KIR and NKG2A bind MHC I (HLA-C, HLA-E) and hold killing back. When an infected or tumour cell loses MHC I, the brake comes off.",
     "It also reads induced self: stress ligands (MICA/B, ULBPs, B7-H6) engage activating receptors such as NKG2D and NKp30.",
     "Kills with perforin and granzymes, FasL and TRAIL, and by ADCC when CD16 binds IgG on a target.",
@@ -430,6 +478,7 @@ N({
   markers: ["Lin-", "CD127+", "T-bet (ILC1)", "GATA3 (ILC2)", "RORγt (ILC3)", "No antigen receptor"],
   where: "Mucosal barriers (gut, lung, skin), lymphoid tissue",
   roles: [
+    "These innate lymphocytes act like a mirror image of helper T cells, but they react immediately to tissue distress signals instead of needing days to be trained against a specific target.",
     "Mirror the helper T cell programs without a rearranged antigen receptor, and respond to alarmins and cytokines instead.",
     "ILC1 make IFN-γ and TNF (IL-12, IL-15 and IL-18 in). ILC2 make IL-5, IL-13 and amphiregulin (IL-25, IL-33 and TSLP in). ILC3 make IL-22, IL-17 and GM-CSF (IL-23 and IL-1β in).",
     "LTi cells build lymph nodes and Peyer's patches in utero.",
@@ -444,6 +493,7 @@ N({
   markers: ["γδ TCR", "Vα7.2 + CD161 (MAIT)", "Vα24-Jα18 (iNKT)", "MR1 or CD1d restricted"],
   where: "Epithelia (skin, gut, lung), liver, blood",
   roles: [
+    "These T cells recognise broad patterns of danger rather than one specific pathogen, so they can react within hours of infection instead of the days a normal T cell response takes.",
     "γδ T cells recognise stress molecules and phosphoantigens (Vγ9Vδ2 through butyrophilins BTN3A1 and BTN2A1) without MHC restriction.",
     "MAIT cells see riboflavin metabolites on MR1. iNKT cells see glycolipids such as α-GalCer on CD1d.",
     "Their effector programs are preformed, so they respond within hours and bridge innate and adaptive immunity."
@@ -457,6 +507,7 @@ N({
   markers: ["CD3+ CD4+", "CD45RA+", "CCR7+", "CD62L+", "CD27+"],
   where: "Lymph nodes, spleen, blood. Recirculate via HEVs.",
   roles: [
+    "This is a T cell that hasn't yet met the one antigen it's built to recognise. Once it does, it becomes a 'helper' cell that coordinates the rest of the immune response.",
     "Selected in the thymus for MHC II restriction (positive selection on cortical TEC) and purged of strongly self-reactive clones (negative selection, with AIRE driving tissue antigens in the medulla).",
     "DCs prime it in lymph nodes with three signals. It then expands and differentiates into effector subsets.",
     "Fate depends on the cytokines: IL-12 for Th1, IL-4 for Th2, TGF-β with IL-6 for Th17, TGF-β with IL-2 for iTreg, and IL-6 with IL-21 for Tfh."
@@ -470,6 +521,7 @@ N({
   markers: ["CD3+ CD8+", "CD45RA+", "CCR7+", "CD62L+"],
   where: "Lymph nodes, spleen, blood",
   roles: [
+    "This is a T cell that hasn't yet met its matching antigen either. Once activated, it becomes a cytotoxic T cell that directly kills infected or abnormal cells.",
     "Recognises peptide on MHC I. Priming needs cross-presentation by cDC1 and CD4 help (CD40-CD40L licensing of the DC, plus IL-2).",
     "The response runs in three phases: expansion, contraction (90 to 95% of effectors die) and memory formation.",
     "Cells choose between a terminal effector fate (KLRG1+, T-bet high) and a memory precursor fate (IL-7Rα+, TCF-1+, Eomes high)."
@@ -483,6 +535,7 @@ N({
   markers: ["T-bet (TBX21)", "STAT4, STAT1", "CXCR3+", "IL-12Rβ2", "IFN-γ+"],
   where: "Inflamed tissue and lymph node",
   roles: [
+    "This helper T cell subtype specialises in coordinating the attack on pathogens that hide and replicate inside our own cells, like viruses and some bacteria.",
     "Produces IFN-γ and IL-2. Activates macrophages to kill intracellular microbes such as Mycobacterium, Leishmania and Listeria.",
     "Helps CD8 T cells prime and form memory, and promotes IgG2a/IgG3 (mouse) or IgG1/IgG3 (human) switching.",
     "IL-12 from DCs drives it, and IFN-γ feeds back to reinforce it."
@@ -496,6 +549,7 @@ N({
   markers: ["GATA3", "STAT6", "CCR4+", "CRTH2+", "ST2 (IL-33R)"],
   where: "Barrier tissue, lymph node",
   roles: [
+    "This helper T cell subtype coordinates the response to parasitic worms, and is also the main driver of allergic disease when it reacts to otherwise harmless substances.",
     "Secretes IL-4, IL-5 and IL-13. IL-4 drives IgE and IgG4 switching in B cells, IL-5 sustains eosinophils, and IL-13 causes mucus production, goblet cell hyperplasia and smooth muscle contraction.",
     "Needed to expel intestinal helminths, through a circuit of tuft cells, IL-25, ILC2 and Th2.",
     "Core effector in atopic disease: asthma, atopic dermatitis and eosinophilic oesophagitis."
@@ -509,6 +563,7 @@ N({
   markers: ["RORγt", "STAT3", "CCR6+", "IL-23R+", "IL-17A/F+"],
   where: "Mucosal surfaces (gut lamina propria), skin",
   roles: [
+    "This helper T cell subtype specialises in defending the body's surfaces, like the gut lining and skin, against bacteria and fungi.",
     "Secretes IL-17A/F, IL-22 and GM-CSF. IL-17 acts on epithelial and stromal cells to induce CXCL8 and G-CSF, which recruit neutrophils.",
     "Defends against Candida and extracellular bacteria such as Klebsiella and Staphylococcus, and IL-22 helps keep the mucosal barrier intact.",
     "TGF-β with IL-6 or IL-1β differentiates it, and IL-23 stabilises it."
@@ -522,6 +577,7 @@ N({
   markers: ["FOXP3+", "CD25 (IL-2Rα) hi", "CD127 lo", "CTLA-4", "Helios (tTreg)"],
   where: "Lymphoid tissue, and tissue-resident Tregs in fat, muscle, skin and gut",
   roles: [
+    "This T cell's job is to suppress immune responses, which keeps the immune system from attacking the body's own tissues or overreacting to a threat.",
     "Suppresses by consuming IL-2, by CTLA-4 stripping CD80/CD86 off DCs, and through IL-10, TGF-β, IL-35 and adenosine (CD39 and CD73).",
     "Thymic Tregs (tTreg) come from high-affinity self-reactive thymocytes. Peripheral Tregs (pTreg) are induced by TGF-β and retinoic acid, notably against food and commensal antigens.",
     "They restrain autoimmunity and limit collateral damage, and they also dampen anti-tumour immunity."
@@ -535,6 +591,7 @@ N({
   markers: ["BCL6", "CXCR5+", "PD-1 hi", "ICOS hi", "IL-21+"],
   where: "B cell follicles and germinal centres",
   roles: [
+    "This helper T cell lives inside the structures in lymph nodes where B cells mature, and its direct support is what B cells need to produce strong, specific antibodies.",
     "Migrates to the T-B border through CXCR5 and loss of CCR7, then enters follicles to help cognate B cells.",
     "CD40L, ICOS and IL-21 (plus IL-4) support B cell survival, germinal centre selection, class switch recombination and somatic hypermutation.",
     "Because help is limited, Tfh decide which B cell clones survive affinity maturation: the ones that capture and present the most antigen win."
@@ -548,6 +605,7 @@ N({
   markers: ["CD8+", "Granzyme B+", "Perforin+", "CD69", "KLRG1 (terminal)"],
   where: "Sites of infection and tumours, tissue resident memory in barrier sites",
   roles: [
+    "This is an activated, cytotoxic CD8 T cell: one built to directly recognise and kill individual infected or cancerous cells, one at a time.",
     "Kills infected or transformed cells that show cognate peptide on MHC I, through an immunological synapse.",
     "Perforin forms pores, and granzymes (GzmB) cleave caspase substrates and BID. FasL and TRAIL provide a parallel death receptor route.",
     "IFN-γ and TNF induce MHC I and antigen processing machinery, and can halt viral replication without killing the cell.",
@@ -562,6 +620,7 @@ N({
   markers: ["CD19+", "CD20+", "IgM+ IgD+", "CD21", "CD27-", "BAFF-R"],
   where: "Follicles of spleen and lymph nodes, blood",
   roles: [
+    "This is a B cell that hasn't yet encountered the antigen matching its receptor. Once activated, it can mature into either an antibody factory or a memory cell.",
     "Its B cell receptor repertoire is built in the marrow by V(D)J recombination (RAG1/2, TdT). Self-reactive clones are removed at the immature stage by receptor editing, deletion or anergy.",
     "Survival depends on BAFF acting through BAFF-R.",
     "It captures antigen with its BCR, internalises it and presents peptide on MHC II to Tfh cells at the T-B border.",
@@ -576,6 +635,7 @@ N({
   markers: ["CD138 (SDC1)+", "CD38 hi", "CD27 hi", "BLIMP1 (PRDM1)", "XBP1", "CD19 and CD20 lo/-"],
   where: "Bone marrow (long-lived), spleen, mucosal lamina propria (IgA)",
   roles: [
+    "This is a B cell that has fully committed to one job: manufacturing and secreting huge quantities of a single, specific antibody.",
     "Secretes thousands of antibodies per second. That takes a hugely expanded ER and the unfolded protein response through XBP1.",
     "Short-lived plasmablasts appear within days. Long-lived plasma cells home to bone marrow niches (CXCL12, APRIL, IL-6) and can persist for decades, sustaining serological memory.",
     "IgA plasma cells at mucosae secrete dimeric IgA, which pIgR carries across the epithelium."
@@ -589,6 +649,7 @@ N({
   markers: ["CD27+", "CD19+", "Switched Ig (IgG, IgA)", "CD80+", "T-bet+ atypical subset"],
   where: "Spleen, lymph nodes, blood, mucosal tissue",
   roles: [
+    "This is a B cell left over from a past immune response that 'remembers' the pathogen, letting the body make antibodies faster and better the next time it's encountered.",
     "Arises from germinal centre or extrafollicular responses and carries somatic hypermutations, often with a switched isotype.",
     "Responds faster than a naive B cell and at a lower antigen threshold. On re-challenge it becomes a plasmablast or re-enters a germinal centre.",
     "Cross-reactive memory B cells partly buffer against variants of pathogens such as influenza and SARS-CoV-2."
@@ -602,6 +663,7 @@ N({
   markers: ["CD45RO+", "CCR7+ (TCM) or - (TEM)", "CD69 + CD103 (TRM)", "IL-7Rα hi", "CD127+"],
   where: "Lymph nodes (TCM), blood and spleen (TEM), barrier tissues (TRM)",
   roles: [
+    "After an infection clears, a small number of T cells persist as long-lived memory cells, letting the body respond much faster if it meets the same pathogen again.",
     "Central memory (TCM) cells home to lymph nodes and proliferate readily. Effector memory (TEM) cells patrol tissues and respond immediately.",
     "Tissue-resident memory (TRM) cells don't recirculate. They sit in skin, gut, lung and genital tract and give frontline protection.",
     "IL-7 and IL-15 maintain them without antigen."
@@ -615,6 +677,7 @@ N({
   markers: ["C1q, C3, C5, C5b-9 (MAC)", "CR1, CR3 (CD11b/CD18), C5aR1"],
   where: "Plasma (liver-derived), tissue fluids, locally produced by immune cells",
   roles: [
+    "This is a chain reaction of blood proteins that can tag pathogens for destruction, attract other immune cells to the scene, or punch holes directly in a microbe's membrane.",
     "Three routes converge on C3: classical (C1q on IgM or IgG immune complexes), lectin (MBL and ficolins on carbohydrates) and alternative (spontaneous C3 tick-over, amplified by properdin).",
     "C3b opsonises targets for phagocytosis through CR1 and CR3. C3a and C5a are anaphylatoxins that recruit and activate neutrophils, mast cells and monocytes.",
     "C5b-9 (the membrane attack complex) lyses Gram-negative bacteria and Neisseria. CD55, CD59, factor H and C1-INH protect self cells.",
@@ -629,6 +692,7 @@ N({
   markers: ["Fab binds antigen", "Fc binds FcγR, FcεRI, C1q, pIgR, FcRn"],
   where: "Plasma, mucosal secretions (sIgA), milk, tissue fluids",
   roles: [
+    "These Y-shaped proteins are made by plasma cells and work by physically grabbing onto a specific target, such as a virus or toxin, to neutralise it or mark it for destruction.",
     "Neutralise toxins and viruses, opsonise targets for phagocytosis through FcγR, activate complement (IgM, IgG1, IgG3) and trigger ADCC in NK cells.",
     "IgM comes first, is a pentamer and fixes complement strongly. IgG dominates serum and crosses the placenta via FcRn. IgA works at mucosae without inflaming them. IgE arms mast cells, basophils and eosinophils. IgD is mostly a BCR component.",
     "Class switch recombination (AID, driven by CD40L and cytokines) swaps the constant region and keeps antigen specificity."
@@ -642,6 +706,7 @@ N({
   markers: ["IL-1, IL-6, TNF (inflammation)", "IL-2, IL-7, IL-15 (lymphocyte growth)", "IL-10, TGF-β (regulatory)", "CXCL8, CCL2, CXCL13 (chemokines)"],
   where: "Autocrine, paracrine and endocrine",
   roles: [
+    "These are the small signalling proteins immune cells use to talk to each other, coordinating how a response ramps up, shifts direction, or shuts back down.",
     "IL-1β, IL-6 and TNF drive fever, acute phase protein synthesis (CRP) and vascular activation. IL-1β needs inflammasome-dependent caspase-1 cleavage.",
     "Common γ-chain cytokines (IL-2, IL-4, IL-7, IL-9, IL-15, IL-21) signal through JAK1/JAK3. Loss of γc causes X-linked SCID.",
     "Chemokines guide leukocyte migration through GPCRs and glycosaminoglycan gradients on endothelium.",
@@ -656,6 +721,7 @@ N({
   markers: ["IFNAR1/IFNAR2", "JAK1, TYK2", "STAT1/STAT2/IRF9 (ISGF3)", "ISGs"],
   where: "Produced by nearly any cell after viral nucleic acid sensing (cGAS-STING, RIG-I, MDA5, TLR3/7/9). pDCs are the top producer.",
   roles: [
+    "These are the body's first-responder signals against viral infection, warning nearby cells to activate their own antiviral defences before the infection can spread further.",
     "Induces a broad antiviral state through interferon-stimulated genes (MX1, OAS, ISG15, IFIT, PKR).",
     "Upregulates MHC I and antigen processing, activates NK cells, and promotes cDC1 cross-priming and CD8 T cell survival.",
     "Chronic signalling contributes to T cell exhaustion and to autoimmunity (interferonopathies, SLE)."
@@ -669,11 +735,25 @@ N({
   markers: ["MHC I + peptide", "Stress ligands (MICA/B)", "PD-L1", "Loss of MHC I in escape"],
   where: "Any nucleated cell",
   roles: [
+    "This represents any normal cell in the body that has become infected or cancerous, and so turns into a target for the immune system's killer cells. Unlike the pathogen nearby, it started out as the body's own tissue.",
     "Presents intracellular peptide on MHC I. CTLs read the peptide, while NK cells read the absence of MHC I and the presence of stress ligands.",
     "Escape routes include MHC I loss, antigen loss, checkpoint ligand upregulation and an immunosuppressive microenvironment (Treg, MDSC, TGF-β, adenosine)."
   ],
   products: ["Peptide-MHC I"],
   notes: "Immune editing (elimination, equilibrium, escape) describes how tumours sculpt their own immunogenicity."
+})
+N({
+  id: "mic", name: "Bacteria & other pathogens", g: "pathogen", x: 950, y: 1000,
+  sub: "Extracellular microbes: bacteria, fungi, protozoa and other free-living pathogens",
+  markers: ["LPS (gram-negative)", "Peptidoglycan (gram-positive)", "β-glucan (fungi)", "Flagellin", "Mannose-rich surfaces"],
+  where: "Outside host cells: tissue, blood, mucosal surfaces, gut lumen",
+  roles: [
+    "Unlike the infected or cancerous cell nearby, this stands in for pathogens that live outside the body's own cells: bacteria, fungi, and protozoa such as amoebae.",
+    "Phagocytes recognise shared microbial patterns (PAMPs) through pattern recognition receptors such as TLRs, NLRs and C-type lectins, then engulf and destroy the microbe directly, rather than needing to spot it hiding inside a host cell.",
+    "Complement and antibodies also act directly on this kind of target: coating it for faster phagocytosis, punching holes in its membrane, or neutralising it outright."
+  ],
+  products: ["PAMPs recognised by host cells", "Toxins", "Virulence factors"],
+  notes: "A bacterium, a fungus and a protozoan parasite are recognised and cleared through overlapping but distinct mechanisms. They're grouped into one node here to keep the map legible, rather than adding one per microbe."
 })
 
 // differentiation
@@ -753,8 +833,15 @@ E("comp", "bn", "act", "C3d-CD21 coreceptor", 0.2)
 E("comp", "tgt", "kill", "MAC lysis", 0.2)
 E("bm", "pc", "act", "recall response", -0.15)
 E("tm", "ctl", "act", "recall response", -0.1)
+
+// pathogen clearance
+E("neut", "mic", "kill", "phagocytosis, NETs, ROS", 0.15)
+E("mac", "mic", "kill", "phagocytosis, ROS, NO", -0.15)
+E("eos", "mic", "kill", "degranulation", 0.25)
+E("comp", "mic", "kill", "MAC lysis, opsonisation", 0.15)
+E("ab", "mic", "act", "neutralises, opsonises", 0.2)
 /* ## Cell artwork: flat vector cells, generated from small recipes ## */
-const HEX = { prog: "#c9c2b2", myeloid: "#f07a52", apc: "#f0b84e", innate: "#4fc9a4", t: "#5ca6ee", b: "#b884e8", sol: "#ee6f9f", target: "#93a0b3" }
+const HEX = { prog: "#c9c2b2", myeloid: "#f07a52", apc: "#f0b84e", innate: "#4fc9a4", t: "#5ca6ee", b: "#b884e8", sol: "#ee6f9f", target: "#93a0b3", pathogen: "#c17f4a" }
 const hx = h => {
   if (h.length === 4) h = "#" + h[1] + h[1] + h[2] + h[2] + h[3] + h[3]
   return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16))
@@ -927,7 +1014,8 @@ const RECIPES = {
   ab: { r: 34, draw: T => `<circle r="30" fill="${T.c}" opacity="0.1"/><path d="M0 24V2M0 2L-17 -18M0 2L17 -18" stroke="${mix(T.c, "#000", 0.2)}" stroke-width="9" stroke-linecap="round" stroke-linejoin="round" fill="none"/><path d="M0 24V2M0 2L-17 -18M0 2L17 -18" stroke="${T.lt}" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none" opacity="0.6"/><circle cx="-17" cy="-18" r="5" fill="#fff" opacity="0.75"/><circle cx="17" cy="-18" r="5" fill="#fff" opacity="0.75"/>` },
   cyt: { r: 34, draw: T => `<circle r="30" fill="${T.c}" opacity="0.1"/>` + [[-14, -10, 9], [10, -14, 7], [14, 8, 10], [-8, 12, 7], [0, 0, 6], [-24, 6, 4.5], [24, -4, 4]].map(b => `<circle cx="${b[0]}" cy="${b[1]}" r="${b[2]}" fill="url(#g-sol)"/><circle cx="${b[0] - b[2] * 0.3}" cy="${b[1] - b[2] * 0.3}" r="${f1(b[2] * 0.28)}" fill="#fff" opacity="0.5"/>`).join("") },
   ifn: { r: 33, draw: T => `<circle r="29" fill="${T.c}" opacity="0.1"/>` + [[-9, -7, 15, 7], [13, 9, 11, 5.5], [-14, 15, 8, 4]].map(s => `<polygon points="${star8(s[0], s[1], s[2], s[3], 8)}" fill="url(#g-sol)"/>`).join("") },
-  tgt: { r: 38, draw: T => B(T, 33, 0.1, 11) + Nround(T, 14, -4, -2) + Lolli(T, 5, 33, 8, "#e6edf7", -70) + `<circle cx="-36" cy="22" r="4" fill="#ff5a5f"/><circle cx="-28" cy="31" r="3.2" fill="#ff5a5f"/>` }
+  tgt: { r: 38, draw: T => B(T, 33, 0.1, 11) + Nround(T, 14, -4, -2) + Lolli(T, 5, 33, 8, "#e6edf7", -70) + `<circle cx="-36" cy="22" r="4" fill="#ff5a5f"/><circle cx="-28" cy="31" r="3.2" fill="#ff5a5f"/>` },
+  mic: { r: 34, draw: T => B(T, 29, 0.12, 9) + Nround(T, 9, 9, 8) + Stubs(T, 5, 29, 8, T.lt, -95) + `<rect x="-30" y="-36" width="16" height="6" rx="3" fill="${mix(T.c, "#000", 0.1)}"/><rect x="11" y="-31" width="14" height="6" rx="3" fill="${mix(T.c, "#000", 0.1)}" transform="rotate(22 18 -28)"/>` }
 }
 
 function makeCell(n) {
@@ -1004,7 +1092,9 @@ const zones = [
   ["INNATE LYMPHOID", 1160, 270],
   ["SOLUBLE FACTORS", 20, 480],
   ["T CELL EFFECTORS", 640, 640],
-  ["B CELL LINEAGE", 1400, 455]
+  ["B CELL LINEAGE", 1400, 455],
+  ["PATHOGENS", 870, 965],
+  ["SELF (ALTERED)", 1100, 965]
 ]
 zones.forEach(z => { const t = el("text", { x: z[1], y: z[2], class: "zone" }, zonesG); t.textContent = z[0] })
 
@@ -1144,7 +1234,7 @@ function applyView() {
 }
 
 /* ## Layouts: each returns { pos, ids, boxes } for the visible nodes ## */
-const GORDER = ["prog", "myeloid", "apc", "innate", "t", "b", "sol", "target"]
+const GORDER = ["prog", "myeloid", "apc", "innate", "t", "b", "sol", "target", "pathogen"]
 const baseVisible = () => NODES.filter(n => !hiddenGroups.has(n.g)).map(n => n.id)
 
 function layoutLineage(ids) {
@@ -1408,18 +1498,19 @@ function relRows(id) {
   }).join("")
 }
 
-function showDefault() {
-  const legend = Object.keys(ETYPES).map(k => {
+function legendHTML() {
+  return Object.keys(ETYPES).map(k => {
     const t = ETYPES[k]
     const head = k === "supp" ? `<line x1="40" y1="1" x2="40" y2="11" stroke="${t.color}" stroke-width="3"/>` : `<path d="M36 1 L45 6 L36 11 Z" fill="${t.color}"/>`
-    return `<div><svg viewBox="0 0 46 12"><line x1="2" y1="6" x2="38" y2="6" stroke="${t.color}" stroke-width="2" ${t.dash ? `stroke-dasharray="${t.dash}"` : ""}/>${head}</svg>${t.name}</div>`
+    return `<div><svg viewBox="0 0 46 12"><line x1="2" y1="6" x2="38" y2="6" stroke="${t.color}" stroke-width="2" ${t.dash ? `stroke-dasharray="${t.dash}"` : ""}/>${head}</svg><span>${t.name}</span></div>`
   }).join("")
-  panel.innerHTML = `<div id="hint"><span class="badge" style="--c:var(--accent)">Cheat sheet</span><h2>Pick a cell</h2>
+}
+
+function showDefault() {
+  panel.innerHTML = `<div id="hint"><h2>Pick a cell</h2>
   <p>Click a cell and its connections light up, each arrow labelled with what the cell does to its neighbour. The panel then fills with markers, location, function and a few things worth knowing.</p>
-  <h3>Rearranging the map</h3>
-  <p>There are three layouts. Lineage follows the haematopoietic tree, Categories boxes cells up by family, and Network lets connected cells pull toward each other. Hide a family with the chips and whatever is left re-packs. Focus on selection puts a cell's inputs on its left and its outputs on its right.</p>
-  <p>Double-click a cell to focus on it, and double-click it again to go back. Drag to pan and scroll to zoom. Search looks through names, markers, cytokines and function text, and Esc clears the selection.</p>
-  <h3>Edge types</h3><div class="legend">${legend}</div></div>`
+  <h3>Controls</h3>
+  <p>Lineage, Categories, or Network layouts. Chips hide a family. Focus on selection isolates a cell's inputs and outputs. Double-click to focus, drag to pan, scroll to zoom, search by name, marker, or function, Esc to clear.</p></div>`
 }
 
 function showNode(n) {
@@ -1534,6 +1625,14 @@ svg.addEventListener("wheel", ev => {
 }, { passive: false })
 
 /* ## Start ## */
+const edgeLegendEl = document.getElementById("edgeLegend")
+const startCollapsed = window.innerWidth <= 900
+edgeLegendEl.classList.toggle("collapsed", startCollapsed)
+edgeLegendEl.innerHTML = `<button class="legend-toggle" id="legendToggle">Edge types ${startCollapsed ? "▸" : "▾"}</button><div class="legend">${legendHTML()}</div>`
+document.getElementById("legendToggle").addEventListener("click", () => {
+  const collapsed = edgeLegendEl.classList.toggle("collapsed")
+  document.getElementById("legendToggle").textContent = "Edge types " + (collapsed ? "▸" : "▾")
+})
 const start = location.hash.slice(1)
 if (byId[start]) { selected = start; showNode(byId[start]); focusBtn.disabled = false } else showDefault()
 applyLayout(true)
