@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Project: Number Guessing Game | BINcyclopedia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/css/style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<style>
+.py-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 11px var(--mono);
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 11px;
+  margin-top: 0.75rem;
+}
+.py-status::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--muted);
+}
+.py-status.ready::before { background: #4cc2a0; }
+.py-status.ready { color: #4cc2a0; border-color: #4cc2a0; }
+
+.project-badge {
+  display: inline-block;
+  font: 600 10.5px var(--mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #f2994a;
+  border: 1px solid #f2994a;
+  border-radius: 999px;
+  padding: 3px 11px;
+  margin-bottom: 0.75rem;
+}
+
+.brief {
+  border-left: 3px solid var(--accent);
+  background: var(--surface-2);
+  padding: 0.9rem 1.1rem;
+  border-radius: 0 10px 10px 0;
+  margin: 1.25rem 0;
+}
+.brief p:first-child { margin-top: 0; }
+.brief p:last-child { margin-bottom: 0; }
+
+.stretch {
+  margin: 1.5rem 0;
+}
+.stretch h3 {
+  font-family: var(--display);
+  font-size: 1.1rem;
+  margin: 0 0 0.5rem;
+}
+.stretch ul { margin: 0; padding-left: 1.2rem; color: var(--text); }
+.stretch li { margin-bottom: 0.3rem; }
+
+.code-block {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  padding: 1rem 1.1rem 1.1rem;
+  margin: 1.5rem 0;
+}
+.code-block .label {
+  display: inline-block;
+  font: 500 10.5px var(--mono);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 0.5rem;
+}
+.code-block .starter { display: none; }
+.editor-mount .CodeMirror {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  height: auto;
+  font-family: var(--mono);
+  font-size: 13.5px;
+  padding: 2px 0;
+}
+.code-block-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-top: 0.75rem;
+}
+.run-btn {
+  background: var(--accent);
+  color: #0d1117;
+  border: 0;
+  border-radius: 8px;
+  padding: 7px 16px;
+  font: 600 13px var(--body);
+  cursor: pointer;
+}
+.run-btn:disabled { opacity: 0.4; cursor: default; }
+.run-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.solution-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font: 500 12px var(--body);
+  cursor: pointer;
+}
+.solution-btn:disabled { opacity: 0.35; cursor: default; }
+.solution-btn:not(:disabled):hover { border-color: var(--accent); color: var(--text); }
+.solution-btn.unlocked { border-color: var(--accent); color: var(--accent); }
+.solution-code {
+  margin-top: 0.75rem;
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+.result-badge { font: 500 12.5px var(--mono); }
+.result-badge.pass { color: #4cc2a0; }
+.result-badge.fail { color: #ee7650; }
+.output {
+  margin-top: 0.75rem;
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 1.6em;
+  color: var(--text);
+}
+.output.error { color: #ee7650; }
+.output:empty::before { content: "(output appears here)"; color: var(--muted); }
+
+.prompt-block {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  margin: 1.25rem 0;
+  overflow: hidden;
+}
+.prompt-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+.prompt-header .label {
+  font: 600 13px var(--body);
+  color: var(--text);
+}
+.copy-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--text);
+  border-radius: 6px;
+  padding: 5px 12px;
+  font: 500 12px var(--body);
+  cursor: pointer;
+}
+.copy-btn:hover { border-color: var(--accent); }
+.prompt-text {
+  margin: 0;
+  padding: 1rem;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  line-height: 1.6;
+  color: var(--text);
+  white-space: pre-wrap;
+  max-height: 260px;
+  overflow-y: auto;
+}
+.prompt-text mark {
+  background: rgba(242, 193, 78, 0.22);
+  color: var(--accent);
+  border-radius: 3px;
+  padding: 0 2px;
+}
+</style>
+</head>
+<body>
+<header>
+  <a href="../../index.html" class="home-link">&larr; BINcyclopedia</a>
+  <span class="project-badge">Project</span>
+  <h1>Number Guessing Game</h1>
+  <p class="tagline">A project, not a test. No grades, just a fun challenge that pulls together scripts, flow control, and loops from the Intro to Programming lesson. Stuck? The tutor prompt below will help without just handing you the answer.</p>
+  <span class="py-status" id="pyStatus">Loading Python runtime&hellip;</span>
+</header>
+<main>
+
+<h2>The brief</h2>
+<div class="brief">
+  <p>Write a number-guessing game. The computer picks a secret whole number between 1 and 20. A player makes a series of guesses, and after each one the game says whether it was too low, too high, or correct, then reports how many guesses it took once it's correct.</p>
+  <p>To keep this checkable without live typing, you won't use <code>input()</code>. Instead you're given a ready-made list of guesses, as if a player had already typed them one at a time. Loop through the list and react to each guess.</p>
+</div>
+
+<div class="code-block">
+  <span class="label">Your code</span>
+  <pre class="starter">import random
+random.seed(42)   # keeps the secret number the same every run, so your output is checkable
+secret = random.randint(1, 20)
+
+guesses = [10, 2, 5, 4]   # pretend a player typed these guesses, one at a time
+attempts = 0
+
+# Your job: loop through `guesses`. For each one:
+#   - add 1 to attempts
+#   - if the guess is too low, print "Too low"
+#   - if the guess is too high, print "Too high"
+#   - if the guess is correct, print "Correct! It took", attempts, "guesses."
+#     and stop checking any further guesses</pre>
+  <div class="editor-mount"></div>
+  <div class="code-block-actions">
+    <button class="run-btn" disabled>Run &#9658;</button>
+    <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
+    <span class="result-badge"></span>
+  </div>
+  <pre class="output"></pre>
+  <pre class="solution-code" hidden>import random
+random.seed(42)
+secret = random.randint(1, 20)
+
+guesses = [10, 2, 5, 4]
+attempts = 0
+
+for guess in guesses:
+    attempts += 1
+    if guess < secret:
+        print("Too low")
+    elif guess > secret:
+        print("Too high")
+    else:
+        print("Correct! It took", attempts, "guesses.")
+        break</pre>
+</div>
+
+<div class="stretch">
+  <h3>Want to go further?</h3>
+  <ul>
+    <li>Change the <code>guesses</code> list, or the range the secret is picked from, and see what happens.</li>
+    <li>Add a message if someone runs out of guesses without finding the secret.</li>
+    <li>Write your own list of guesses: what strategy would get the secret in the fewest tries?</li>
+  </ul>
+</div>
+
+<h2>Working with an AI tutor</h2>
+<p>These two prompts are meant for your own AI assistant (Claude, ChatGPT, or anything similar), not this page. Copy one, paste your code where marked, and send it.</p>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <span class="label">Tutor prompt (use while you're working on it)</span>
+    <button class="copy-btn" data-target="tutor-prompt">Copy</button>
+  </div>
+  <pre class="prompt-text" id="tutor-prompt">I'm working on a beginner Python project from a lesson called BINcyclopedia. Here's the brief:
+
+Write a number-guessing game. The computer picks a secret whole number between 1 and 20. A player makes a series of guesses, and after each one the game says whether it was too low, too high, or correct, then reports how many guesses it took once it's correct.
+
+I'm given this starter code and need to fill in the loop logic:
+
+[PASTE YOUR CODE HERE]
+
+Please act as a patient tutor, not a solution machine. Ask me guiding questions about what I think each part of my code should do, point me toward relevant Python concepts (loops, if/elif/else, comparisons) when I'm off track, and only offer a small hint if I say I'm stuck after actually trying. Please don't hand me the full solution unless I explicitly ask for it after a few attempts.</pre>
+</div>
+
+<div class="prompt-block">
+  <div class="prompt-header">
+    <span class="label">Feedback prompt (use once you're done)</span>
+    <button class="copy-btn" data-target="feedback-prompt">Copy</button>
+  </div>
+  <pre class="prompt-text" id="feedback-prompt">I just finished a beginner Python project from a lesson called BINcyclopedia: a number-guessing game. Here's the brief:
+
+Write a number-guessing game. The computer picks a secret whole number between 1 and 20. A player makes a series of guesses, and after each one the game says whether it was too low, too high, or correct, then reports how many guesses it took once it's correct.
+
+Here's my finished code:
+
+[PASTE YOUR CODE HERE]
+
+Please review it like a kind but honest mentor, not a grader. Point out what's working well, flag anything that could break on different inputs, suggest one or two concrete ways I could make the code cleaner, and tell me plainly whether it meets the brief. Please be specific rather than just saying it looks good.</pre>
+</div>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+let pyodide = null
+let runQueue = Promise.resolve()
+function runUserCode(code) {
+  const task = runQueue.then(() => executeInPyodide(code))
+  runQueue = task.then(() => {}, () => {})
+  return task
+}
+async function executeInPyodide(code) {
+  pyodide.globals.set("__user_code__", code)
+  const resultProxy = await pyodide.runPythonAsync(`
+import io, contextlib, traceback
+__buf__ = io.StringIO()
+__err__ = None
+try:
+    with contextlib.redirect_stdout(__buf__):
+        exec(__user_code__, {})
+except Exception:
+    __err__ = traceback.format_exc()
+[__buf__.getvalue(), __err__]
+`)
+  const [out, err] = resultProxy.toJs()
+  if (resultProxy && resultProxy.destroy) resultProxy.destroy()
+  return [out, err]
+}
+
+const ALL_EDITORS = []
+function setupBlocks() {
+  document.querySelectorAll(".code-block").forEach(block => {
+    const starterEl = block.querySelector(".starter")
+    const mount = block.querySelector(".editor-mount")
+    const cm = CodeMirror(mount, {
+      value: starterEl.textContent,
+      mode: "python",
+      theme: "dracula",
+      lineNumbers: true,
+      indentUnit: 4,
+      viewportMargin: Infinity,
+    })
+    ALL_EDITORS.push({ block, cm })
+
+    const expected = "Too high\nToo low\nToo high\nCorrect! It took 4 guesses."
+    const runBtn = block.querySelector(".run-btn")
+    const output = block.querySelector(".output")
+    const badge = block.querySelector(".result-badge")
+    const solutionBtn = block.querySelector(".solution-btn")
+    const solutionCode = block.querySelector(".solution-code")
+    let attempts = 0
+    let unlocked = false
+    function unlockSolution() {
+      if (unlocked) return
+      unlocked = true
+      solutionBtn.disabled = false
+      solutionBtn.classList.add("unlocked")
+      solutionBtn.title = "Click to see a suggested solution"
+    }
+    solutionBtn.addEventListener("click", () => {
+      if (!unlocked) return
+      solutionCode.hidden = !solutionCode.hidden
+      solutionBtn.textContent = solutionCode.hidden ? "Show solution" : "Hide solution"
+    })
+
+    runBtn.addEventListener("click", async () => {
+      runBtn.disabled = true
+      output.textContent = "Running…"
+      output.classList.remove("error")
+      badge.textContent = ""
+      badge.className = "result-badge"
+      try {
+        const [out, err] = await runUserCode(cm.getValue())
+        if (err) {
+          output.textContent = err
+          output.classList.add("error")
+          attempts++
+          if (attempts >= 3) unlockSolution()
+        } else {
+          output.textContent = out.length ? out : ""
+          const pass = out.trim() === expected.trim()
+          badge.textContent = pass ? "✓ matches expected output" : "✗ not quite yet"
+          badge.className = "result-badge " + (pass ? "pass" : "fail")
+          if (pass) unlockSolution()
+          else { attempts++; if (attempts >= 3) unlockSolution() }
+        }
+      } finally {
+        runBtn.disabled = false
+      }
+    })
+  })
+}
+
+function setupCopyButtons() {
+  document.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const target = document.getElementById(btn.dataset.target)
+      const text = target.textContent
+      try {
+        await navigator.clipboard.writeText(text)
+        btn.textContent = "Copied!"
+      } catch (e) {
+        // Clipboard permission can be denied by the browser or the user;
+        // fall back to selecting the text so Ctrl+C / Cmd+C still works.
+        const range = document.createRange()
+        range.selectNodeContents(target)
+        const sel = window.getSelection()
+        sel.removeAllRanges()
+        sel.addRange(range)
+        btn.textContent = "Selected, press Ctrl+C"
+      }
+      setTimeout(() => { btn.textContent = "Copy" }, 2000)
+    })
+  })
+}
+
+function refreshAllEditors() {
+  requestAnimationFrame(() => {
+    ALL_EDITORS.forEach(e => e.cm.refresh())
+  })
+}
+
+async function boot() {
+  setupBlocks()
+  setupCopyButtons()
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(refreshAllEditors)
+  }
+  window.addEventListener("load", refreshAllEditors)
+  const status = document.getElementById("pyStatus")
+  pyodide = await loadPyodide()
+  status.textContent = "Python ready"
+  status.classList.add("ready")
+  document.querySelectorAll(".run-btn").forEach(b => b.disabled = false)
+  refreshAllEditors()
+}
+
+boot()
+</script>
+</body>
+</html>

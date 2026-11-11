@@ -190,7 +190,7 @@ a {
   outline-offset: 1px;
 }
 
-/* Domains and lessons */
+/* Domains and entries */
 
 .domain {
   margin-bottom: 2rem;
@@ -205,7 +205,7 @@ a {
   margin: 0 0 0.75rem;
 }
 
-.lesson-list {
+.entry-list {
   list-style: none;
   padding: 0;
   display: grid;
@@ -213,7 +213,7 @@ a {
   margin: 0;
 }
 
-.lesson-list li {
+.entry-list li {
   border: 1px solid var(--line);
   border-radius: 10px;
   padding: 1.1rem 1.3rem;
@@ -221,11 +221,11 @@ a {
   transition: border-color 0.15s;
 }
 
-.lesson-list li:hover {
+.entry-list li:hover {
   border-color: var(--accent);
 }
 
-.lesson-link {
+.entry-link {
   display: flex;
   gap: 1rem;
   align-items: flex-start;
@@ -233,23 +233,51 @@ a {
   color: inherit;
 }
 
-.lesson-icon {
+.entry-icon {
   flex: none;
   width: 48px;
   height: 48px;
 }
 
-.lesson-icon svg {
+.entry-icon svg {
   width: 100%;
   height: 100%;
   display: block;
 }
 
-.lesson-body {
+.entry-body {
   min-width: 0;
 }
 
-.lesson-title {
+.entry-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: 0;
+  padding: 0;
+  margin-bottom: 0.3rem;
+  font: 600 10px var(--mono);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.entry-type:hover {
+  color: var(--c, var(--accent));
+}
+
+.entry-type::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--c, var(--muted));
+  flex: none;
+}
+
+.entry-title {
   display: block;
   color: var(--text);
   font-family: var(--display);
@@ -257,11 +285,11 @@ a {
   font-size: 1.15rem;
 }
 
-.lesson-link:hover .lesson-title {
+.entry-link:hover .entry-title {
   color: var(--accent);
 }
 
-.lesson-body p {
+.entry-body p {
   margin: 0.3rem 0 0;
   color: var(--muted);
   font-size: 0.92rem;

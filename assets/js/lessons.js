@@ -1,5 +1,17 @@
-/* Category and lesson manifest. Add a lesson by pushing to LESSONS; the
-   landing page renders itself from this data, grouped by category domain. */
+/* Category and entry manifest. BINcyclopedia has three kinds of entries:
+   - cheatsheet: an interactive infographic, like the Immune System Atlas
+   - lesson: a guided, interactive lesson, like Intro to Programming
+   - project: a fun, do-it-yourself project with no grades, plus copy-able
+     prompts to turn a student's own AI assistant into a tutor and a
+     feedback-giver for their work
+   Add an entry by pushing to ENTRIES; the landing page renders itself from
+   this data, grouped by category domain. */
+
+const ENTRY_TYPES = {
+  cheatsheet: { label: "Cheat Sheet", color: "#ec6c9c" },
+  lesson: { label: "Lesson", color: "#5aa2ec" },
+  project: { label: "Project", color: "#f2994a" },
+}
 
 const CATEGORIES = [
   { id: "cs-algorithms", name: "Algorithms & Data Structures", domain: "Computer Science" },
@@ -26,13 +38,14 @@ const DOMAIN_COLORS = {
   "Bioinformatics": "#f2c14e",
 }
 
-/* matter: free-text topic tags for search. classes: UdeM course codes this lesson supports, e.g. "BIN6007". */
-const LESSONS = [
+/* matter: free-text topic tags for search. classes: UdeM course codes this entry supports, e.g. "BIN6007". */
+const ENTRIES = [
   {
     id: "immune-system-atlas",
     title: "Immune System Atlas",
     blurb: "An explorable map of the immune system: click any cell to see its markers, roles, products, and how it connects to everything else.",
     href: "lessons/immune-system-atlas/index.html",
+    type: "cheatsheet",
     category: "bc-immunology",
     matter: ["immunology", "immune cells", "cytokines", "cell biology"],
     classes: [],
@@ -43,8 +56,20 @@ const LESSONS = [
     title: "Intro to Programming",
     blurb: "Write and run real Python right in the page: scripts, debugging, flow control, loops, and functions, with predict-and-check challenges and a built-in Python dictionary.",
     href: "lessons/intro-to-programming/index.html",
+    type: "lesson",
     category: "cs-programming",
     matter: ["python", "types", "debugging", "flow control", "loops", "functions", "strings", "lists", "beginner"],
+    classes: [],
+    icon: "terminal",
+  },
+  {
+    id: "number-guessing-game",
+    title: "Number Guessing Game",
+    blurb: "Build a little guessing game that pulls together scripts, flow control, and loops. No grades, just a fun challenge, with AI prompts to tutor you through it and review your work when you're done.",
+    href: "lessons/number-guessing-game/index.html",
+    type: "project",
+    category: "cs-programming",
+    matter: ["python", "flow control", "loops", "project", "beginner"],
     classes: [],
     icon: "terminal",
   },
