@@ -33,13 +33,42 @@
 .py-status.ready::before { background: #4cc2a0; }
 .py-status.ready { color: #4cc2a0; border-color: #4cc2a0; }
 
-.concept { margin: 2.5rem 0; }
+.concept { margin: 2.75rem 0; padding-bottom: 1.5rem; border-bottom: 1px solid var(--line); }
+.concept:last-of-type { border-bottom: 0; }
 .concept h2 {
   font-family: var(--display);
   font-size: 1.5rem;
   margin: 0 0 0.5rem;
 }
 .concept > p { color: var(--text); max-width: 640px; }
+
+.callout {
+  border-left: 3px solid var(--accent);
+  background: var(--surface-2);
+  padding: 0.7rem 1rem;
+  border-radius: 0 8px 8px 0;
+  margin: 1rem 0;
+  max-width: 640px;
+}
+.callout p { margin: 0; }
+
+/* Collapsible subsections */
+.subsection { margin: 1.25rem 0; }
+.subsection-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: 0;
+  padding: 0.4rem 0;
+  font: 600 13.5px var(--body);
+  color: var(--text);
+  cursor: pointer;
+}
+.subsection-toggle:hover { color: var(--accent); }
+.subsection-toggle .chevron { color: var(--muted); font-size: 11px; width: 10px; display: inline-block; }
+.subsection-toggle .progress-count { color: var(--muted); font: 500 11.5px var(--mono); }
+.subsection-body { margin-top: 0.5rem; }
 
 .code-block {
   border: 1px solid var(--line);
@@ -48,6 +77,7 @@
   padding: 1rem 1.1rem 1.1rem;
   margin: 1rem 0;
 }
+.code-block.done { border-color: #4cc2a0; }
 .code-block .label {
   display: inline-block;
   font: 500 10.5px var(--mono);
@@ -69,10 +99,11 @@
   font-size: 13.5px;
   padding: 2px 0;
 }
+.code-block.inspecting .CodeMirror { cursor: help; }
 .code-block-actions {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.6rem;
   margin-top: 0.75rem;
 }
 .run-btn {
@@ -86,9 +117,26 @@
 }
 .run-btn:disabled { opacity: 0.4; cursor: default; }
 .run-btn:hover:not(:disabled) { filter: brightness(1.08); }
+.inspect-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.inspect-btn:hover { border-color: var(--accent); color: var(--text); }
+.inspect-btn.active { background: var(--accent); color: #0d1117; border-color: var(--accent); }
 .result-badge { font: 500 12.5px var(--mono); }
 .result-badge.pass { color: #4cc2a0; }
 .result-badge.fail { color: #ee7650; }
+.result-badge.checked { color: var(--muted); }
 .output {
   margin-top: 0.75rem;
   background: var(--surface-2);
@@ -104,56 +152,452 @@
 }
 .output.error { color: #ee7650; }
 .output:empty::before { content: "(output appears here)"; color: var(--muted); }
+
+/* Python dictionary (glossary) */
+.glossary-fab {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 8px 16px 8px 10px;
+  color: var(--text);
+  font: 600 13px var(--body);
+  cursor: pointer;
+  z-index: 20;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+}
+.glossary-fab:hover { border-color: var(--accent); }
+.glossary-fab .book-icon { width: 26px; height: 22px; overflow: visible; }
+.glossary-fab .book-cover-left,
+.glossary-fab .book-cover-right {
+  transition: transform 0.45s cubic-bezier(0.4, 1.6, 0.4, 1);
+  transform-origin: 20px 16px;
+}
+.glossary-fab.open .book-cover-right { transform: rotateY(-45deg); }
+.glossary-fab.open .book-cover-left { transform: rotateY(45deg); }
+
+.glossary-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 25;
+}
+
+.glossary-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 380px;
+  max-width: 90vw;
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.35s ease;
+}
+.glossary-drawer.open { transform: translateX(0); }
+.glossary-header {
+  position: relative;
+  padding: 1rem 2.5rem 0.75rem 1rem;
+  border-bottom: 1px solid var(--line);
+}
+.glossary-header h2 {
+  font-family: var(--display);
+  font-size: 1.3rem;
+  margin: 0 0 0.6rem;
+}
+.glossary-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  background: none;
+  border: 0;
+  color: var(--muted);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.glossary-close:hover { color: var(--text); }
+.glossary-list {
+  overflow-y: auto;
+  padding: 0.75rem 1rem 1.5rem;
+  flex: 1;
+}
+.glossary-entry {
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--line);
+  scroll-margin-top: 1rem;
+}
+.glossary-entry .term {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  font-family: var(--mono);
+  font-weight: 600;
+  color: var(--accent);
+}
+.glossary-entry .kind {
+  font: 400 10px var(--mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.glossary-entry p { margin: 0.25rem 0 0; color: var(--text); font-size: 13.5px; }
+.glossary-entry.highlight { background: var(--surface-2); border-radius: 8px; }
 </style>
 </head>
 <body>
 <header>
   <a href="../../index.html" class="home-link">&larr; BINcyclopedia</a>
   <h1>Intro to Programming</h1>
-  <p class="tagline">Scripts, flow control, loops, and functions, with real Python running in the page. Nothing is sent to a server; it all runs in your browser.</p>
+  <p class="tagline">Scripts, debugging, flow control, loops, and functions, taught with real Python running in the page. A whole concept is dedicated to reading error messages calmly, and a built-in Python dictionary explains any keyword or function, including ones you click on directly in the code.</p>
   <span class="py-status" id="pyStatus">Loading Python runtime&hellip;</span>
 </header>
 <main>
 
-<section class="concept">
+<section class="concept" id="concept-script">
   <h2>What is a script?</h2>
   <p>A script is just a list of instructions the computer carries out one after another, from top to bottom. Each line is a statement, and running the script means running every statement in order.</p>
 
-  <div class="code-block">
-    <span class="label">Example</span>
-    <pre class="starter">print("Hello, BINcyclopedia!")
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="true"><span class="chevron">&#9662;</span> Examples</button>
+    <div class="subsection-body">
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">print("Hello, BINcyclopedia!")
 print("This line runs second.")
 name = "Ada"
 print("Nice to meet you,", name)</pre>
-    <div class="editor-mount"></div>
-    <div class="code-block-actions">
-      <button class="run-btn" disabled>Run &#9658;</button>
-      <span class="result-badge"></span>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">price = 4
+quantity = 3
+total = price * quantity
+print("You're buying", quantity, "items.")
+print("Total cost:", total)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">first_name = "Grace"
+last_name = "Hopper"
+full_name = first_name + " " + last_name
+greeting = f"Welcome, {full_name}!"
+print(greeting)
+print("Your name has", len(full_name), "characters.")</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
     </div>
-    <pre class="output"></pre>
   </div>
 
-  <div class="code-block">
-    <span class="label">Try it</span>
-    <p class="task">Add a line below that prints your own name, then run it.</p>
-    <pre class="starter">print("Hello, BINcyclopedia!")
-print("This line runs second.")</pre>
-    <div class="editor-mount"></div>
-    <div class="code-block-actions">
-      <button class="run-btn" disabled>Run &#9658;</button>
-      <span class="result-badge"></span>
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="script-predict-1" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will this print? Decide first, then run it to check.</p>
+        <pre class="starter">x = 5
+x = x + 1
+print(x)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="script-predict-2" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will this print? Decide first, then run it to check.</p>
+        <pre class="starter">a = "3"
+b = 4
+print(a * b)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="script-predict-3" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will both lines print? Decide first, then run it to check.</p>
+        <pre class="starter">greeting = "Hello"
+greeting = greeting + ", World!"
+print(greeting)
+print(greeting[0])</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
     </div>
-    <pre class="output"></pre>
+  </div>
+
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Do it yourself <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="script-diy-1">
+        <span class="label">Do it yourself</span>
+        <p class="task">Make two variables, <code>first</code> and <code>last</code>, holding your first and last name, then print them combined as one full name.</p>
+        <pre class="starter">first = ""
+last = ""
+# print the combined full name below</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="script-diy-2" data-expected="64">
+        <span class="label">Do it yourself</span>
+        <p class="task">Create a variable <code>n = 8</code>, then print its square.</p>
+        <pre class="starter">n = 8
+# print n squared below</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="script-diy-3" data-expected="Area: 18">
+        <span class="label">Do it yourself</span>
+        <p class="task">Create <code>width = 6</code> and <code>height = 3</code>, then print the area as <code>"Area:", width * height</code>.</p>
+        <pre class="starter">width = 6
+height = 3
+# print the area below</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+    </div>
   </div>
 </section>
 
-<section class="concept">
+<section class="concept" id="concept-debug">
+  <h2>Errors are normal: reading and fixing them</h2>
+  <p>Every programmer sees error messages constantly, no matter how experienced. An error is not a judgment on you. It is Python telling you exactly where it got stuck and why, which makes it one of the most useful tools you have. Learning to read an error message, then calmly fixing what it points to, matters more than getting code right on the first try. That skill, debugging, is the one you will use the most for the rest of your programming life.</p>
+
+  <div class="callout">
+    <p><strong>Reading a traceback:</strong> Python prints the chain of calls that led to the error, then the final line names the exception type, like <code>NameError</code> or <code>TypeError</code>, and a short message. Start from that last line. It almost always tells you exactly what went wrong.</p>
+  </div>
+
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="true"><span class="chevron">&#9662;</span> Examples</button>
+    <div class="subsection-body">
+
+      <div class="code-block">
+        <span class="label">Example: a typo</span>
+        <pre class="starter">plyaer_name = "Max"
+print(player_name)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example: mixing types</span>
+        <pre class="starter">age = 25
+print("I am " + age + " years old.")</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example: off by one</span>
+        <pre class="starter">scores = [88, 92, 79]
+for i in range(4):
+    print(scores[i])</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="debug-predict-1" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">Will this run cleanly, or raise an error? If it errors, which exception type do you expect?</p>
+        <pre class="starter">total = 10
+print(total / 0)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="debug-predict-2" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">Will this run cleanly, or raise an error? If it errors, which exception type do you expect?</p>
+        <pre class="starter">items = ["pen", "book"]
+print(items[2])</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="debug-predict-3" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">Will this run cleanly, or raise an error? If it errors, which exception type do you expect?</p>
+        <pre class="starter">def add(a, b):
+    return a + b
+
+print(add(2))</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Do it yourself <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="debug-diy-1" data-expected="Hello there!">
+        <span class="label">Fix the bug</span>
+        <p class="task">This code has a bug. Read the error, find the typo, and fix it so it runs.</p>
+        <pre class="starter">message = "Hello there!"
+print(mesage)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="debug-diy-2" data-expected="Final price: 15">
+        <span class="label">Fix the bug</span>
+        <p class="task">This code has a bug. Read the error, work out why Python won't combine these values, and fix it.</p>
+        <pre class="starter">price = 20
+discount = 5
+print("Final price: " + (price - discount))</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="debug-diy-3" data-expected="Total: 66">
+        <span class="label">Fix the bug</span>
+        <p class="task">This code has a bug. Read the error, work out which index goes too far, and fix it.</p>
+        <pre class="starter">numbers = [4, 8, 15, 16, 23]
+total = 0
+for i in range(len(numbers) + 1):
+    total = total + numbers[i]
+print("Total:", total)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="concept" id="concept-flow">
   <h2>Flow control: if / elif / else</h2>
   <p>A script can take different paths depending on a condition. An <code>if</code> block runs only when its condition is true, an <code>elif</code> checks another condition when the first was false, and <code>else</code> catches everything else.</p>
 
-  <div class="code-block">
-    <span class="label">Example</span>
-    <pre class="starter">temperature = 15
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="true"><span class="chevron">&#9662;</span> Examples</button>
+    <div class="subsection-body">
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">temperature = 15
 
 if temperature &gt; 25:
     print("It's warm.")
@@ -161,117 +605,681 @@ elif temperature &gt; 10:
     print("It's mild.")
 else:
     print("It's cold.")</pre>
-    <div class="editor-mount"></div>
-    <div class="code-block-actions">
-      <button class="run-btn" disabled>Run &#9658;</button>
-      <span class="result-badge"></span>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">score = 82
+
+if score &gt;= 90:
+    grade = "A"
+elif score &gt;= 80:
+    grade = "B"
+elif score &gt;= 70:
+    grade = "C"
+else:
+    grade = "F"
+
+print("Grade:", grade)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">age = 20
+has_ticket = True
+
+if age &gt;= 18 and has_ticket:
+    print("You may enter.")
+else:
+    print("Entry denied.")</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
     </div>
-    <pre class="output"></pre>
   </div>
 
-  <div class="code-block" data-expected="Pass">
-    <span class="label">Try it</span>
-    <p class="task">Write an <code>if</code> / <code>else</code> below that prints <code>"Pass"</code> if <code>score</code> is 60 or above, and <code>"Fail"</code> otherwise. Run it with <code>score = 72</code> and check you get <code>Pass</code>.</p>
-    <pre class="starter">score = 72
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
 
-# your if/else here</pre>
-    <div class="editor-mount"></div>
-    <div class="code-block-actions">
-      <button class="run-btn" disabled>Run &#9658;</button>
-      <span class="result-badge"></span>
+      <div class="code-block" data-item-id="flow-predict-1" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will this print? Decide first, then run it to check.</p>
+        <pre class="starter">x = 7
+if x % 2 == 0:
+    print("even")
+else:
+    print("odd")</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="flow-predict-2" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will this print? Decide first, then run it to check.</p>
+        <pre class="starter">a = 5
+b = 10
+if a &gt; b:
+    print("a wins")
+elif a &lt; b:
+    print("b wins")
+else:
+    print("tie")</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="flow-predict-3" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will this print? Decide first, then run it to check.</p>
+        <pre class="starter">flag = False
+if not flag:
+    print("flag is off")
+else:
+    print("flag is on")</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
     </div>
-    <pre class="output"></pre>
+  </div>
+
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Do it yourself <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="flow-diy-1" data-expected="Even">
+        <span class="label">Do it yourself</span>
+        <p class="task">Print <code>"Even"</code> if <code>number = 14</code> is divisible by 2, and <code>"Odd"</code> otherwise.</p>
+        <pre class="starter">number = 14
+# your if/else here</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="flow-diy-2" data-expected="Minor">
+        <span class="label">Do it yourself</span>
+        <p class="task">Print <code>"Minor"</code> if <code>age = 16</code> is under 18, otherwise print <code>"Adult"</code>.</p>
+        <pre class="starter">age = 16
+# your if/else here</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="flow-diy-3" data-expected="See a doctor">
+        <span class="label">Do it yourself</span>
+        <p class="task">Set <code>temp = 101</code> and <code>has_fever_symptoms = True</code>. Print <code>"See a doctor"</code> if temp is over 100 and has_fever_symptoms is true, otherwise print <code>"You're probably fine."</code>.</p>
+        <pre class="starter">temp = 101
+has_fever_symptoms = True
+# your if/else here</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+    </div>
   </div>
 </section>
 
-<section class="concept">
+<section class="concept" id="concept-loops">
   <h2>Loops: for and while</h2>
   <p>A loop repeats a block of code multiple times instead of copy-pasting it. A <code>for</code> loop repeats once per item in a sequence, like the numbers produced by <code>range(1, 6)</code>. A <code>while</code> loop instead repeats for as long as a condition stays true.</p>
 
-  <div class="code-block">
-    <span class="label">Example</span>
-    <pre class="starter">total = 0
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="true"><span class="chevron">&#9662;</span> Examples</button>
+    <div class="subsection-body">
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">total = 0
 for n in range(1, 6):
     total = total + n
 print("The total is", total)</pre>
-    <div class="editor-mount"></div>
-    <div class="code-block-actions">
-      <button class="run-btn" disabled>Run &#9658;</button>
-      <span class="result-badge"></span>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">count = 5
+while count &gt; 0:
+    print(count)
+    count = count - 1
+print("Liftoff!")</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">fruits = ["apple", "banana", "cherry"]
+for fruit in fruits:
+    print("I like", fruit)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
     </div>
-    <pre class="output"></pre>
   </div>
 
-  <div class="code-block" data-expected="The total is 55">
-    <span class="label">Try it</span>
-    <p class="task">Change the loop so it sums the numbers from 1 to 10 instead of 1 to 5, then run it.</p>
-    <pre class="starter">total = 0
-for n in range(1, 6):
-    total = total + n
-print("The total is", total)</pre>
-    <div class="editor-mount"></div>
-    <div class="code-block-actions">
-      <button class="run-btn" disabled>Run &#9658;</button>
-      <span class="result-badge"></span>
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="loops-predict-1" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will this print? Decide first, then run it to check.</p>
+        <pre class="starter">for i in range(3):
+    print(i)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="loops-predict-2" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What single number will this print? Decide first, then run it to check.</p>
+        <pre class="starter">n = 1
+while n &lt; 20:
+    n = n * 2
+print(n)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="loops-predict-3" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will this print? A string is a sequence of characters, so it can be looped over too.</p>
+        <pre class="starter">word = "cat"
+for letter in word:
+    print(letter)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
     </div>
-    <pre class="output"></pre>
+  </div>
+
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Do it yourself <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="loops-diy-1" data-expected="1&#10;2&#10;3&#10;4&#10;5">
+        <span class="label">Do it yourself</span>
+        <p class="task">Use a <code>for</code> loop to print the numbers 1 through 5, each on its own line.</p>
+        <pre class="starter"># your for loop here</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="loops-diy-2" data-expected="Go!&#10;Go!&#10;Go!">
+        <span class="label">Do it yourself</span>
+        <p class="task">Use a <code>while</code> loop to print <code>"Go!"</code> three times.</p>
+        <pre class="starter"># your while loop here</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="loops-diy-3" data-expected="6&#10;12&#10;18&#10;24">
+        <span class="label">Do it yourself</span>
+        <p class="task">Given <code>numbers = [3, 6, 9, 12]</code>, use a <code>for</code> loop to print double each number.</p>
+        <pre class="starter">numbers = [3, 6, 9, 12]
+# your for loop here</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+    </div>
   </div>
 </section>
 
-<section class="concept">
+<section class="concept" id="concept-functions">
   <h2>Functions</h2>
   <p>A function packages up a set of instructions under a name, so you can reuse it without rewriting the code every time. You define it once with <code>def</code>, then call it by name whenever you need it, with different inputs.</p>
 
-  <div class="code-block">
-    <span class="label">Example</span>
-    <pre class="starter">def greet(name):
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="true"><span class="chevron">&#9662;</span> Examples</button>
+    <div class="subsection-body">
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">def greet(name):
     return "Hello, " + name + "!"
 
 print(greet("Ada"))
 print(greet("Alan"))</pre>
-    <div class="editor-mount"></div>
-    <div class="code-block-actions">
-      <button class="run-btn" disabled>Run &#9658;</button>
-      <span class="result-badge"></span>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">def rectangle_area(width, height):
+    return width * height
+
+print(rectangle_area(4, 3))
+print(rectangle_area(10, 2))</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">def sum_up_to(n):
+    total = 0
+    for i in range(1, n + 1):
+        total = total + i
+    return total
+
+print(sum_up_to(5))
+print(sum_up_to(10))</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
     </div>
-    <pre class="output"></pre>
   </div>
 
-  <div class="code-block" data-expected="49">
-    <span class="label">Try it</span>
-    <p class="task">Write a function called <code>square</code> that takes a number <code>n</code> and returns <code>n</code> squared. Then call <code>print(square(7))</code>.</p>
-    <pre class="starter">def square(n):
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="functions-predict-1" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will this print? Decide first, then run it to check.</p>
+        <pre class="starter">def double(x):
+    return x * 2
+
+result = double(6)
+print(result)</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="functions-predict-2" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will this print? <code>.upper()</code> is a string method that returns an upper-case copy.</p>
+        <pre class="starter">def shout(word):
+    print(word.upper())
+
+shout("hello")</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="functions-predict-3" data-track="predict">
+        <span class="label">Predict</span>
+        <p class="task">What will these two lines print? Decide first, then run it to check.</p>
+        <pre class="starter">def is_even(n):
+    return n % 2 == 0
+
+print(is_even(4))
+print(is_even(7))</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Do it yourself <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="functions-diy-1" data-expected="49">
+        <span class="label">Do it yourself</span>
+        <p class="task">Write a function called <code>square</code> that takes a number <code>n</code> and returns <code>n</code> squared. Then print <code>square(7)</code>.</p>
+        <pre class="starter">def square(n):
     # your code here
     pass
 
 print(square(7))</pre>
-    <div class="editor-mount"></div>
-    <div class="code-block-actions">
-      <button class="run-btn" disabled>Run &#9658;</button>
-      <span class="result-badge"></span>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="functions-diy-2" data-expected="True&#10;False">
+        <span class="label">Do it yourself</span>
+        <p class="task">Write a function <code>is_adult(age)</code> that returns <code>True</code> if age is 18 or over, else <code>False</code>. Print <code>is_adult(20)</code> then <code>is_adult(15)</code>.</p>
+        <pre class="starter">def is_adult(age):
+    # your code here
+    pass
+
+print(is_adult(20))
+print(is_adult(15))</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block" data-item-id="functions-diy-3" data-expected="36">
+        <span class="label">Do it yourself</span>
+        <p class="task">Write a function <code>total_cost(price, quantity)</code> that returns price times quantity. Print the cost of 3 items at $12 each.</p>
+        <pre class="starter">def total_cost(price, quantity):
+    # your code here
+    pass
+
+print(total_cost(12, 3))</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
     </div>
-    <pre class="output"></pre>
   </div>
 </section>
 
 </main>
 
+<button class="glossary-fab" id="glossaryToggle" aria-haspopup="dialog">
+  <svg class="book-icon" viewBox="0 0 40 32" aria-hidden="true">
+    <g class="book-cover-left"><path d="M20 4 L4 2 Q2 2 2 4 L2 28 Q2 30 4 30 L20 28 Z" fill="#5aa2ec"/></g>
+    <g class="book-cover-right"><path d="M20 4 L36 2 Q38 2 38 4 L38 28 Q38 30 36 30 L20 28 Z" fill="#5aa2ec"/></g>
+    <rect x="17" y="2" width="6" height="28" rx="1" fill="#3f72a5"/>
+  </svg>
+  Python dictionary
+</button>
+<div class="glossary-backdrop" id="glossaryBackdrop" hidden></div>
+<div class="glossary-drawer" id="glossaryDrawer" role="dialog" aria-label="Python dictionary" aria-hidden="true">
+  <div class="glossary-header">
+    <h2>Python dictionary</h2>
+    <input id="glossarySearch" type="search" placeholder="Search keywords and functions&hellip;">
+    <button class="glossary-close" id="glossaryClose" aria-label="Close">&times;</button>
+  </div>
+  <div class="glossary-list" id="glossaryList"></div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 <script>
-let pyodide = null
-/* Pyodide is a single shared interpreter, so two Run clicks in quick
-   succession must not interleave (both would race on __user_code__).
-   This queue chains every call so only one runs at a time. */
-let runQueue = Promise.resolve()
+/* ## Python dictionary data ## */
+const PYTHON_GLOSSARY = {
+  "False": { kind: "keyword", desc: "The boolean value representing falsehood." },
+  "None": { kind: "keyword", desc: "A special value meaning 'nothing' or 'no value here'." },
+  "True": { kind: "keyword", desc: "The boolean value representing truth." },
+  "and": { kind: "keyword", desc: "Combines two conditions. The result is true only if both sides are true." },
+  "as": { kind: "keyword", desc: "Gives something a short alias, often used with import or with." },
+  "assert": { kind: "keyword", desc: "Checks that a condition is true, raising an error if it isn't. Often used to catch bugs early." },
+  "async": { kind: "keyword", desc: "Marks a function as asynchronous, able to pause and resume without blocking other code." },
+  "await": { kind: "keyword", desc: "Pauses an async function until another asynchronous operation finishes." },
+  "break": { kind: "keyword", desc: "Immediately exits the loop it's inside, skipping any remaining iterations." },
+  "class": { kind: "keyword", desc: "Defines a new type of object, bundling data and behaviour together." },
+  "continue": { kind: "keyword", desc: "Skips the rest of the current loop iteration and moves to the next one." },
+  "def": { kind: "keyword", desc: "Defines a function." },
+  "del": { kind: "keyword", desc: "Deletes a variable, or removes an item from a list or dictionary." },
+  "elif": { kind: "keyword", desc: "Short for 'else if': checks another condition if the previous ones were false." },
+  "else": { kind: "keyword", desc: "Runs when none of the preceding if/elif conditions were true." },
+  "except": { kind: "keyword", desc: "Catches and handles an error raised inside a try block." },
+  "finally": { kind: "keyword", desc: "Runs no matter what, whether a try block succeeded or raised an error." },
+  "for": { kind: "keyword", desc: "Repeats a block of code once for each item in a sequence." },
+  "from": { kind: "keyword", desc: "Used with import to bring in specific parts of a module." },
+  "global": { kind: "keyword", desc: "Lets a function modify a variable defined outside it, at the top level." },
+  "if": { kind: "keyword", desc: "Runs a block of code only when its condition is true." },
+  "import": { kind: "keyword", desc: "Brings in code from another file or module so you can use it." },
+  "in": { kind: "keyword", desc: "Checks whether a value appears in a sequence, or drives a for loop." },
+  "is": { kind: "keyword", desc: "Checks whether two names refer to the exact same object in memory." },
+  "lambda": { kind: "keyword", desc: "Creates a small, unnamed function in a single expression." },
+  "nonlocal": { kind: "keyword", desc: "Lets a nested function modify a variable from its enclosing function." },
+  "not": { kind: "keyword", desc: "Flips a boolean value: true becomes false, and false becomes true." },
+  "or": { kind: "keyword", desc: "Combines two conditions. The result is true if at least one side is true." },
+  "pass": { kind: "keyword", desc: "Does nothing. A placeholder where code is syntactically required but not needed yet." },
+  "raise": { kind: "keyword", desc: "Triggers an error on purpose, with a chosen exception type and message." },
+  "return": { kind: "keyword", desc: "Sends a value back from a function to wherever it was called." },
+  "try": { kind: "keyword", desc: "Marks a block of code where errors should be caught instead of crashing the script." },
+  "while": { kind: "keyword", desc: "Repeats a block of code for as long as its condition stays true." },
+  "with": { kind: "keyword", desc: "Wraps a block of code so a resource, like a file, is automatically cleaned up afterward." },
+  "yield": { kind: "keyword", desc: "Produces one value from a generator function, pausing until the next value is requested." },
+  "print": { kind: "function", desc: "Displays text or values to the output." },
+  "range": { kind: "function", desc: "Produces a sequence of numbers, commonly used to control how many times a loop runs." },
+  "len": { kind: "function", desc: "Returns how many items are in something, like a string, list, or dictionary." },
+  "int": { kind: "function", desc: "Converts a value to a whole number, or defines an integer." },
+  "str": { kind: "function", desc: "Converts a value to text, or defines a string." },
+  "float": { kind: "function", desc: "Converts a value to a decimal number." },
+  "bool": { kind: "function", desc: "Converts a value to True or False." },
+  "input": { kind: "function", desc: "Pauses the script to read a line of text typed by the user." },
+  "list": { kind: "function", desc: "Creates a list: an ordered, changeable collection of items." },
+  "dict": { kind: "function", desc: "Creates a dictionary: a collection of key-value pairs." },
+  "tuple": { kind: "function", desc: "Creates a tuple: an ordered, unchangeable collection of items." },
+  "set": { kind: "function", desc: "Creates a set: an unordered collection of unique items." },
+  "type": { kind: "function", desc: "Returns the type of a value, like int, str, or list." },
+  "abs": { kind: "function", desc: "Returns the absolute (non-negative) value of a number." },
+  "min": { kind: "function", desc: "Returns the smallest value among its arguments or in a sequence." },
+  "max": { kind: "function", desc: "Returns the largest value among its arguments or in a sequence." },
+  "sum": { kind: "function", desc: "Adds up all the numbers in a sequence." },
+  "sorted": { kind: "function", desc: "Returns a new, sorted list from the items in a sequence." },
+  "enumerate": { kind: "function", desc: "Pairs each item in a sequence with its index, for use in a for loop." },
+  "zip": { kind: "function", desc: "Pairs up items from two or more sequences, one from each at a time." },
+  "open": { kind: "function", desc: "Opens a file so your script can read from or write to it." },
+  "isinstance": { kind: "function", desc: "Checks whether a value is of a particular type." },
+}
 
+function renderGlossary() {
+  const list = document.getElementById("glossaryList")
+  const terms = Object.keys(PYTHON_GLOSSARY).sort((a, b) => a.toLowerCase().localeCompare(b.toLowerCase()))
+  list.innerHTML = terms.map(term => {
+    const e = PYTHON_GLOSSARY[term]
+    return `<div class="glossary-entry" id="gloss-${term}" data-term="${term.toLowerCase()}">
+      <span class="term">${term}<span class="kind">${e.kind}</span></span>
+      <p>${e.desc}</p>
+    </div>`
+  }).join("")
+}
+
+const glossaryFab = document.getElementById("glossaryToggle")
+const glossaryDrawer = document.getElementById("glossaryDrawer")
+const glossaryBackdrop = document.getElementById("glossaryBackdrop")
+
+function setGlossaryOpen(open) {
+  glossaryFab.classList.toggle("open", open)
+  glossaryDrawer.classList.toggle("open", open)
+  glossaryDrawer.setAttribute("aria-hidden", String(!open))
+  glossaryBackdrop.hidden = !open
+}
+function openGlossaryTerm(word) {
+  const entry = document.getElementById("gloss-" + word)
+  if (!entry) return
+  const search = document.getElementById("glossarySearch")
+  if (search.value) {
+    search.value = ""
+    search.dispatchEvent(new Event("input"))
+  }
+  setGlossaryOpen(true)
+  document.querySelectorAll(".glossary-entry").forEach(e => e.classList.remove("highlight"))
+  entry.classList.add("highlight")
+  entry.scrollIntoView({ block: "center", behavior: "smooth" })
+}
+glossaryFab.addEventListener("click", () => setGlossaryOpen(!glossaryDrawer.classList.contains("open")))
+document.getElementById("glossaryClose").addEventListener("click", () => setGlossaryOpen(false))
+glossaryBackdrop.addEventListener("click", () => setGlossaryOpen(false))
+document.getElementById("glossarySearch").addEventListener("input", e => {
+  const q = e.target.value.trim().toLowerCase()
+  document.querySelectorAll(".glossary-entry").forEach(el => {
+    const match = !q || el.dataset.term.includes(q) || el.textContent.toLowerCase().includes(q)
+    el.style.display = match ? "" : "none"
+  })
+})
+renderGlossary()
+
+/* ## Per-item completion tracking (localStorage) ## */
+const DONE_PREFIX = "bin:intro-to-programming:done:"
+function isDone(id) {
+  try { return localStorage.getItem(DONE_PREFIX + id) === "1" } catch (e) { return false }
+}
+function setDone(id) {
+  try { localStorage.setItem(DONE_PREFIX + id, "1") } catch (e) {}
+}
+function updateProgress(subsectionEl) {
+  const items = subsectionEl.querySelectorAll("[data-item-id]")
+  if (!items.length) return
+  const done = Array.from(items).filter(b => isDone(b.dataset.itemId)).length
+  const label = subsectionEl.querySelector(".progress-count")
+  if (label) label.textContent = `(${done}/${items.length})`
+}
+
+/* ## Collapsible subsections ## */
+const ALL_EDITORS = []
+function setupSubsections() {
+  document.querySelectorAll(".subsection").forEach(sec => {
+    updateProgress(sec)
+    const btn = sec.querySelector(".subsection-toggle")
+    const body = sec.querySelector(".subsection-body")
+    btn.addEventListener("click", () => {
+      const expanded = btn.getAttribute("aria-expanded") === "true"
+      btn.setAttribute("aria-expanded", String(!expanded))
+      body.hidden = expanded
+      btn.querySelector(".chevron").textContent = expanded ? "▸" : "▾"
+      if (!expanded) {
+        ALL_EDITORS.filter(e => body.contains(e.block)).forEach(e => e.cm.refresh())
+      }
+    })
+  })
+}
+
+/* ## Pyodide execution, serialized so two Run clicks never race ## */
+let pyodide = null
+let runQueue = Promise.resolve()
 function runUserCode(code) {
   const task = runQueue.then(() => executeInPyodide(code))
   runQueue = task.then(() => {}, () => {})
   return task
 }
-
 async function executeInPyodide(code) {
   pyodide.globals.set("__user_code__", code)
   const resultProxy = await pyodide.runPythonAsync(`
@@ -290,6 +1298,7 @@ except Exception:
   return [out, err]
 }
 
+/* ## Code blocks: editor, run, inspect mode ## */
 function setupBlocks() {
   document.querySelectorAll(".code-block").forEach(block => {
     const starterEl = block.querySelector(".starter")
@@ -302,10 +1311,16 @@ function setupBlocks() {
       indentUnit: 4,
       viewportMargin: Infinity,
     })
+    ALL_EDITORS.push({ block, cm })
+
+    const itemId = block.dataset.itemId
+    const track = block.dataset.track
+    const expected = block.dataset.expected
+    if (itemId && isDone(itemId)) block.classList.add("done")
+
     const runBtn = block.querySelector(".run-btn")
     const output = block.querySelector(".output")
     const badge = block.querySelector(".result-badge")
-    const expected = block.dataset.expected
 
     runBtn.addEventListener("click", async () => {
       runBtn.disabled = true
@@ -320,20 +1335,57 @@ function setupBlocks() {
           output.classList.add("error")
         } else {
           output.textContent = out.length ? out : ""
-          if (expected !== undefined) {
-            const pass = out.trim() === expected.trim()
+        }
+        if (itemId) {
+          let completed = false
+          if (track === "predict") {
+            completed = true
+            badge.textContent = "checked, compare with your guess"
+            badge.className = "result-badge checked"
+          } else if (expected !== undefined) {
+            const pass = !err && out.trim() === expected.trim()
+            completed = pass
             badge.textContent = pass ? "✓ matches expected output" : "✗ not quite yet"
             badge.className = "result-badge " + (pass ? "pass" : "fail")
+          } else {
+            completed = !err
+          }
+          if (completed) {
+            setDone(itemId)
+            block.classList.add("done")
+            const subsection = block.closest(".subsection")
+            if (subsection) updateProgress(subsection)
           }
         }
       } finally {
         runBtn.disabled = false
       }
     })
+
+    /* Inspect mode: click a keyword or builtin in the code to open its
+       dictionary entry, instead of placing the cursor. */
+    const inspectBtn = block.querySelector(".inspect-btn")
+    let inspecting = false
+    inspectBtn.addEventListener("click", () => {
+      inspecting = !inspecting
+      inspectBtn.classList.toggle("active", inspecting)
+      inspectBtn.setAttribute("aria-pressed", String(inspecting))
+      block.classList.toggle("inspecting", inspecting)
+      cm.setOption("readOnly", inspecting ? "nocursor" : false)
+    })
+    cm.getWrapperElement().addEventListener("mousedown", e => {
+      if (!inspecting) return
+      e.preventDefault()
+      const pos = cm.coordsChar({ left: e.clientX, top: e.clientY })
+      const range = cm.findWordAt(pos)
+      const word = cm.getRange(range.anchor, range.head)
+      if (PYTHON_GLOSSARY[word]) openGlossaryTerm(word)
+    })
   })
 }
 
 async function boot() {
+  setupSubsections()
   setupBlocks()
   const status = document.getElementById("pyStatus")
   pyodide = await loadPyodide()
