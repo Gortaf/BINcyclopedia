@@ -169,6 +169,16 @@
   background: #262a1f !important;
   border-color: var(--accent);
 }
+/* CodeMirror sets cursor:text on its inner text layer, which otherwise wins
+   over the rule above for exactly the area you'd hover to inspect a word. */
+.code-block.inspecting .CodeMirror,
+.code-block.inspecting .CodeMirror pre,
+.code-block.inspecting .CodeMirror-line,
+.code-block.inspecting .CodeMirror-lines,
+.code-block.inspecting .CodeMirror-scroll,
+.code-block.inspecting .CodeMirror-sizer {
+  cursor: zoom-in !important;
+}
 .code-block-actions {
   display: flex;
   align-items: center;
@@ -201,6 +211,7 @@
   justify-content: center;
 }
 .inspect-btn:hover { border-color: var(--accent); color: var(--text); }
+.inspect-btn:disabled { opacity: 0.4; cursor: default; }
 .inspect-btn.active { background: var(--accent); color: #0d1117; border-color: var(--accent); }
 .inspect-label {
   display: inline-block;
@@ -335,6 +346,8 @@
   letter-spacing: 0.5px;
 }
 .glossary-entry p { margin: 0.25rem 0 0; color: var(--text); font-size: 13.5px; }
+.glossary-link { display: inline-block; margin-top: 0.35rem; font-size: 11.5px; color: var(--muted); text-decoration: none; }
+.glossary-link:hover { color: var(--accent); text-decoration: underline; }
 .glossary-entry.highlight { background: var(--surface-2); border-radius: 8px; }
 </style>
 </head>
@@ -357,14 +370,20 @@
 
       <div class="code-block">
         <span class="label">Example</span>
-        <pre class="starter">print("Hello, BINcyclopedia!")
+        <pre class="starter"># This is a comment. It starts with a "#" and does nothing at all:
+# Python skips it. Comments are just notes for whoever reads the code.
+
+print("Hello, BINcyclopedia!")
 print("This line runs second.")
+
+# "name" below is a variable: a label that stores a value (here, the
+# text "Ada") so you can reuse it later just by writing its name.
 name = "Ada"
 print("Nice to meet you,", name)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -375,13 +394,14 @@ print("Nice to meet you,", name)</pre>
         <span class="label">Example</span>
         <pre class="starter">price = 4
 quantity = 3
-total = price * quantity
+total = price * quantity  # price times quantity, stored in a new variable
+
 print("You're buying", quantity, "items.")
 print("Total cost:", total)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -392,14 +412,14 @@ print("Total cost:", total)</pre>
         <span class="label">Example</span>
         <pre class="starter">first_name = "Grace"
 last_name = "Hopper"
-full_name = first_name + " " + last_name
-greeting = f"Welcome, {full_name}!"
+full_name = first_name + " " + last_name  # + joins strings end to end
+greeting = f"Welcome, {full_name}!"  # an f-string: {full_name} becomes its value
 print(greeting)
 print("Your name has", len(full_name), "characters.")</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -423,7 +443,7 @@ print(x)</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -441,7 +461,7 @@ print(a * b)</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -460,7 +480,7 @@ print(greeting[0])</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -484,7 +504,7 @@ last = ""
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -503,7 +523,7 @@ print(first + " " + last)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -522,7 +542,7 @@ height = 3
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -547,14 +567,15 @@ print("Area:", width * height)</pre>
 
       <div class="code-block">
         <span class="label">Example</span>
-        <pre class="starter">print(type(5))
-print(type(3.14))
-print(type("hello"))
-print(type(True))</pre>
+        <pre class="starter"># type() tells you what kind of value something is
+print(type(5))        # a whole number: int
+print(type(3.14))     # a decimal number: float
+print(type("hello"))  # text: str
+print(type(True))     # a boolean, True or False: bool</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -563,14 +584,14 @@ print(type(True))</pre>
 
       <div class="code-block">
         <span class="label">Example</span>
-        <pre class="starter">age_text = "25"
-age_number = int(age_text)
+        <pre class="starter">age_text = "25"              # this is text (str), not a number
+age_number = int(age_text)   # int() converts text into a whole number
 print(age_number + 5)
 print(type(age_number))</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -581,17 +602,17 @@ print(type(age_number))</pre>
         <span class="label">Example</span>
         <pre class="starter">quantity = 3
 price = 2.5
-total = quantity * price
+total = quantity * price  # int * float gives a float
 print(total)
 print(type(total))
 
-result = None
+result = None  # None means "no value at all", not zero or empty text
 print(result)
 print(type(result))</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -614,7 +635,7 @@ print("5" + "2")</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -633,7 +654,7 @@ print(bool("hi"))</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="3" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -651,7 +672,7 @@ print(x * y)</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -674,7 +695,7 @@ print(x * y)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -692,7 +713,7 @@ print(int(value) + 8)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -711,7 +732,7 @@ unit_price = 2.5
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -740,12 +761,12 @@ print(int(quantity) * unit_price)</pre>
 
       <div class="code-block">
         <span class="label">Example: a typo</span>
-        <pre class="starter">plyaer_name = "Max"
-print(player_name)</pre>
+        <pre class="starter">plyaer_name = "Max"   # notice the typo: "plyaer_name", not "player_name"
+print(player_name)    # Python can't find a variable by this exact spelling</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -755,11 +776,11 @@ print(player_name)</pre>
       <div class="code-block">
         <span class="label">Example: mixing types</span>
         <pre class="starter">age = 25
-print("I am " + age + " years old.")</pre>
+print("I am " + age + " years old.")  # can't join text and a number with +</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -768,13 +789,13 @@ print("I am " + age + " years old.")</pre>
 
       <div class="code-block">
         <span class="label">Example: off by one</span>
-        <pre class="starter">scores = [88, 92, 79]
-for i in range(4):
+        <pre class="starter">scores = [88, 92, 79]  # a list with 3 items, at indices 0, 1, 2
+for i in range(4):      # range(4) goes one index too far: 0, 1, 2, 3
     print(scores[i])</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -797,7 +818,7 @@ print(total / 0)</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="e.g. ZeroDivisionError, or 'no error'"></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -814,7 +835,7 @@ print(items[2])</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="e.g. IndexError, or 'no error'"></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -833,7 +854,7 @@ print(add(2))</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="e.g. TypeError, or 'no error'"></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -856,7 +877,7 @@ print(mesage)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -875,7 +896,7 @@ print("Final price: " + (price - discount))</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -897,7 +918,7 @@ print("Total:", total)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -926,16 +947,16 @@ print("Total:", total)</pre>
         <span class="label">Example</span>
         <pre class="starter">temperature = 15
 
-if temperature &gt; 25:
+if temperature &gt; 25:    # checked first
     print("It's warm.")
-elif temperature &gt; 10:
+elif temperature &gt; 10:  # only checked if the first condition was false
     print("It's mild.")
-else:
+else:                    # runs if none of the above were true
     print("It's cold.")</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -948,7 +969,7 @@ else:
 
 if score &gt;= 90:
     grade = "A"
-elif score &gt;= 80:
+elif score &gt;= 80:   # score is 82, so this is the first true condition
     grade = "B"
 elif score &gt;= 70:
     grade = "C"
@@ -959,7 +980,7 @@ print("Grade:", grade)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -971,14 +992,14 @@ print("Grade:", grade)</pre>
         <pre class="starter">age = 20
 has_ticket = True
 
-if age &gt;= 18 and has_ticket:
+if age &gt;= 18 and has_ticket:  # both conditions must be true
     print("You may enter.")
 else:
     print("Entry denied.")</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1004,7 +1025,7 @@ else:
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1027,7 +1048,7 @@ else:
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1047,7 +1068,7 @@ else:
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1070,7 +1091,7 @@ else:
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1091,7 +1112,7 @@ else:
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1113,7 +1134,7 @@ has_fever_symptoms = True
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1142,13 +1163,13 @@ else:
       <div class="code-block">
         <span class="label">Example</span>
         <pre class="starter">total = 0
-for n in range(1, 6):
+for n in range(1, 6):   # n takes each value 1, 2, 3, 4, 5 in turn
     total = total + n
 print("The total is", total)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1158,14 +1179,14 @@ print("The total is", total)</pre>
       <div class="code-block">
         <span class="label">Example</span>
         <pre class="starter">count = 5
-while count &gt; 0:
+while count &gt; 0:   # keeps looping as long as this stays true
     print(count)
     count = count - 1
 print("Liftoff!")</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1175,12 +1196,12 @@ print("Liftoff!")</pre>
       <div class="code-block">
         <span class="label">Example</span>
         <pre class="starter">fruits = ["apple", "banana", "cherry"]
-for fruit in fruits:
+for fruit in fruits:   # fruit becomes each item in the list, one at a time
     print("I like", fruit)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1203,7 +1224,7 @@ for fruit in fruits:
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1222,7 +1243,7 @@ print(n)</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1240,7 +1261,7 @@ for letter in word:
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1262,7 +1283,7 @@ for letter in word:
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1279,7 +1300,7 @@ for letter in word:
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1299,7 +1320,7 @@ while count &lt; 3:
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1324,15 +1345,15 @@ for n in numbers:
 
       <div class="code-block">
         <span class="label">Example</span>
-        <pre class="starter">def greet(name):
-    return "Hello, " + name + "!"
+        <pre class="starter">def greet(name):                   # name is this function's input
+    return "Hello, " + name + "!"  # return sends a value back to the caller
 
-print(greet("Ada"))
+print(greet("Ada"))    # calling the function with "Ada" as the input
 print(greet("Alan"))</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1341,7 +1362,7 @@ print(greet("Alan"))</pre>
 
       <div class="code-block">
         <span class="label">Example</span>
-        <pre class="starter">def rectangle_area(width, height):
+        <pre class="starter">def rectangle_area(width, height):   # two inputs this time
     return width * height
 
 print(rectangle_area(4, 3))
@@ -1349,7 +1370,7 @@ print(rectangle_area(10, 2))</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1360,7 +1381,7 @@ print(rectangle_area(10, 2))</pre>
         <span class="label">Example</span>
         <pre class="starter">def sum_up_to(n):
     total = 0
-    for i in range(1, n + 1):
+    for i in range(1, n + 1):   # reuses the loop idea, now inside a function
         total = total + i
     return total
 
@@ -1369,7 +1390,7 @@ print(sum_up_to(10))</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1395,7 +1416,7 @@ print(result)</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1414,7 +1435,7 @@ shout("hello")</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1434,7 +1455,7 @@ print(is_even(7))</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1460,7 +1481,7 @@ print(square(7))</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1484,7 +1505,7 @@ print(is_adult(15))</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1508,7 +1529,7 @@ print(total_cost(12, 3))</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1535,13 +1556,13 @@ print(total_cost(12, 3))</pre>
       <div class="code-block">
         <span class="label">Example</span>
         <pre class="starter">word = "BINcyclopedia"
-print(word[0:3])
-print(word[3:])
-print(word[-4:])</pre>
+print(word[0:3])   # characters at index 0, 1, 2
+print(word[3:])    # everything from index 3 to the end
+print(word[-4:])   # the last 4 characters (negative counts from the end)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1551,13 +1572,13 @@ print(word[-4:])</pre>
       <div class="code-block">
         <span class="label">Example</span>
         <pre class="starter">title = "  intro to programming  "
-print(title.strip())
-print(title.strip().upper())
-print(title.strip().replace("programming", "Python"))</pre>
+print(title.strip())                                     # drops leading/trailing spaces
+print(title.strip().upper())                             # then makes it all upper case
+print(title.strip().replace("programming", "Python"))    # then swaps one word for another</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1567,14 +1588,14 @@ print(title.strip().replace("programming", "Python"))</pre>
       <div class="code-block">
         <span class="label">Example</span>
         <pre class="starter">sentence = "learning to code is fun"
-words = sentence.split()
+words = sentence.split()   # breaks the text apart at each space, into a list
 print(words)
 print(len(words), "words")
-print("-".join(words))</pre>
+print("-".join(words))     # glues the list back together with "-" between items</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1597,7 +1618,7 @@ print(name[1:4])</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1615,7 +1636,7 @@ print(text.lower().replace("o", "0"))</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1634,7 +1655,7 @@ print(colors[1])</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1657,7 +1678,7 @@ print(colors[1])</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1675,7 +1696,7 @@ print(phrase[:5])</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1693,7 +1714,7 @@ print(raw.strip().lower())</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1719,13 +1740,13 @@ print(len(words))</pre>
       <div class="code-block">
         <span class="label">Example</span>
         <pre class="starter">groceries = ["milk", "eggs", "bread"]
-print(groceries[0])
-print(groceries[-1])
-print(len(groceries))</pre>
+print(groceries[0])    # the first item, index 0
+print(groceries[-1])   # the last item, counting from the end
+print(len(groceries))  # how many items are in the list</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1735,13 +1756,13 @@ print(len(groceries))</pre>
       <div class="code-block">
         <span class="label">Example</span>
         <pre class="starter">scores = [70, 85, 90]
-scores.append(100)
-scores[0] = 75
+scores.append(100)   # adds a new item to the end
+scores[0] = 75        # overwrites the item at index 0
 print(scores)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1751,17 +1772,17 @@ print(scores)</pre>
       <div class="code-block">
         <span class="label">Example</span>
         <pre class="starter">fruits = ["apple", "banana", "cherry"]
-print("banana" in fruits)
+print("banana" in fruits)   # checks whether the value is somewhere in the list
 print("grape" in fruits)
 
-squares = []
+squares = []                 # starts as an empty list
 for n in range(1, 5):
-    squares.append(n * n)
+    squares.append(n * n)    # adds one new item each time through the loop
 print(squares)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1784,7 +1805,7 @@ print(nums[1:3])</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1803,7 +1824,7 @@ print(letters)</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1822,7 +1843,7 @@ print(max(nums))</pre>
         <label class="predict-field">Your prediction<textarea class="predict-input" rows="3" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
@@ -1845,7 +1866,7 @@ print(max(nums))</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1864,7 +1885,7 @@ print(colors)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1884,7 +1905,7 @@ print(result)</pre>
         <div class="editor-mount"></div>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
-          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up" disabled>&#128269;</button>
           <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
@@ -1926,64 +1947,65 @@ print(result)</pre>
 <script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
 <script>
 /* ## Python dictionary data ## */
+const PY_DOCS = "https://docs.python.org/3/"
 const PYTHON_GLOSSARY = {
-  "False": { kind: "keyword", desc: "The boolean value representing falsehood." },
-  "None": { kind: "keyword", desc: "A special value meaning 'nothing' or 'no value here'." },
-  "True": { kind: "keyword", desc: "The boolean value representing truth." },
-  "and": { kind: "keyword", desc: "Combines two conditions. The result is true only if both sides are true." },
-  "as": { kind: "keyword", desc: "Gives something a short alias, often used with import or with." },
-  "assert": { kind: "keyword", desc: "Checks that a condition is true, raising an error if it isn't. Often used to catch bugs early." },
-  "async": { kind: "keyword", desc: "Marks a function as asynchronous, able to pause and resume without blocking other code." },
-  "await": { kind: "keyword", desc: "Pauses an async function until another asynchronous operation finishes." },
-  "break": { kind: "keyword", desc: "Immediately exits the loop it's inside, skipping any remaining iterations." },
-  "class": { kind: "keyword", desc: "Defines a new type of object, bundling data and behaviour together." },
-  "continue": { kind: "keyword", desc: "Skips the rest of the current loop iteration and moves to the next one." },
-  "def": { kind: "keyword", desc: "Defines a function." },
-  "del": { kind: "keyword", desc: "Deletes a variable, or removes an item from a list or dictionary." },
-  "elif": { kind: "keyword", desc: "Short for 'else if': checks another condition if the previous ones were false." },
-  "else": { kind: "keyword", desc: "Runs when none of the preceding if/elif conditions were true." },
-  "except": { kind: "keyword", desc: "Catches and handles an error raised inside a try block." },
-  "finally": { kind: "keyword", desc: "Runs no matter what, whether a try block succeeded or raised an error." },
-  "for": { kind: "keyword", desc: "Repeats a block of code once for each item in a sequence." },
-  "from": { kind: "keyword", desc: "Used with import to bring in specific parts of a module." },
-  "global": { kind: "keyword", desc: "Lets a function modify a variable defined outside it, at the top level." },
-  "if": { kind: "keyword", desc: "Runs a block of code only when its condition is true." },
-  "import": { kind: "keyword", desc: "Brings in code from another file or module so you can use it." },
-  "in": { kind: "keyword", desc: "Checks whether a value appears in a sequence, or drives a for loop." },
-  "is": { kind: "keyword", desc: "Checks whether two names refer to the exact same object in memory." },
-  "lambda": { kind: "keyword", desc: "Creates a small, unnamed function in a single expression." },
-  "nonlocal": { kind: "keyword", desc: "Lets a nested function modify a variable from its enclosing function." },
-  "not": { kind: "keyword", desc: "Flips a boolean value: true becomes false, and false becomes true." },
-  "or": { kind: "keyword", desc: "Combines two conditions. The result is true if at least one side is true." },
-  "pass": { kind: "keyword", desc: "Does nothing. A placeholder where code is syntactically required but not needed yet." },
-  "raise": { kind: "keyword", desc: "Triggers an error on purpose, with a chosen exception type and message." },
-  "return": { kind: "keyword", desc: "Sends a value back from a function to wherever it was called." },
-  "try": { kind: "keyword", desc: "Marks a block of code where errors should be caught instead of crashing the script." },
-  "while": { kind: "keyword", desc: "Repeats a block of code for as long as its condition stays true." },
-  "with": { kind: "keyword", desc: "Wraps a block of code so a resource, like a file, is automatically cleaned up afterward." },
-  "yield": { kind: "keyword", desc: "Produces one value from a generator function, pausing until the next value is requested." },
-  "print": { kind: "function", desc: "Displays text or values to the output." },
-  "range": { kind: "function", desc: "Produces a sequence of numbers, commonly used to control how many times a loop runs." },
-  "len": { kind: "function", desc: "Returns how many items are in something, like a string, list, or dictionary." },
-  "int": { kind: "function", desc: "Converts a value to a whole number, or defines an integer." },
-  "str": { kind: "function", desc: "Converts a value to text, or defines a string." },
-  "float": { kind: "function", desc: "Converts a value to a decimal number." },
-  "bool": { kind: "function", desc: "Converts a value to True or False." },
-  "input": { kind: "function", desc: "Pauses the script to read a line of text typed by the user." },
-  "list": { kind: "function", desc: "Creates a list: an ordered, changeable collection of items." },
-  "dict": { kind: "function", desc: "Creates a dictionary: a collection of key-value pairs." },
-  "tuple": { kind: "function", desc: "Creates a tuple: an ordered, unchangeable collection of items." },
-  "set": { kind: "function", desc: "Creates a set: an unordered collection of unique items." },
-  "type": { kind: "function", desc: "Returns the type of a value, like int, str, or list." },
-  "abs": { kind: "function", desc: "Returns the absolute (non-negative) value of a number." },
-  "min": { kind: "function", desc: "Returns the smallest value among its arguments or in a sequence." },
-  "max": { kind: "function", desc: "Returns the largest value among its arguments or in a sequence." },
-  "sum": { kind: "function", desc: "Adds up all the numbers in a sequence." },
-  "sorted": { kind: "function", desc: "Returns a new, sorted list from the items in a sequence." },
-  "enumerate": { kind: "function", desc: "Pairs each item in a sequence with its index, for use in a for loop." },
-  "zip": { kind: "function", desc: "Pairs up items from two or more sequences, one from each at a time." },
-  "open": { kind: "function", desc: "Opens a file so your script can read from or write to it." },
-  "isinstance": { kind: "function", desc: "Checks whether a value is of a particular type." },
+  "False": { kind: "keyword", desc: "The boolean value representing falsehood.", url: PY_DOCS + "library/constants.html#False" },
+  "None": { kind: "keyword", desc: "A special value meaning 'nothing' or 'no value here'.", url: PY_DOCS + "library/constants.html#None" },
+  "True": { kind: "keyword", desc: "The boolean value representing truth.", url: PY_DOCS + "library/constants.html#True" },
+  "and": { kind: "keyword", desc: "Combines two conditions. The result is true only if both sides are true.", url: PY_DOCS + "reference/expressions.html#boolean-operations" },
+  "as": { kind: "keyword", desc: "Gives something a short alias, often used with import or with.", url: PY_DOCS + "reference/simple_stmts.html#the-import-statement" },
+  "assert": { kind: "keyword", desc: "Checks that a condition is true, raising an error if it isn't. Often used to catch bugs early.", url: PY_DOCS + "reference/simple_stmts.html#the-assert-statement" },
+  "async": { kind: "keyword", desc: "Marks a function as asynchronous, able to pause and resume without blocking other code.", url: PY_DOCS + "reference/compound_stmts.html#async-def" },
+  "await": { kind: "keyword", desc: "Pauses an async function until another asynchronous operation finishes.", url: PY_DOCS + "reference/expressions.html#await-expression" },
+  "break": { kind: "keyword", desc: "Immediately exits the loop it's inside, skipping any remaining iterations.", url: PY_DOCS + "reference/simple_stmts.html#the-break-statement" },
+  "class": { kind: "keyword", desc: "Defines a new type of object, bundling data and behaviour together.", url: PY_DOCS + "reference/compound_stmts.html#class-definitions" },
+  "continue": { kind: "keyword", desc: "Skips the rest of the current loop iteration and moves to the next one.", url: PY_DOCS + "reference/simple_stmts.html#the-continue-statement" },
+  "def": { kind: "keyword", desc: "Defines a function.", url: PY_DOCS + "reference/compound_stmts.html#function-definitions" },
+  "del": { kind: "keyword", desc: "Deletes a variable, or removes an item from a list or dictionary.", url: PY_DOCS + "reference/simple_stmts.html#the-del-statement" },
+  "elif": { kind: "keyword", desc: "Short for 'else if': checks another condition if the previous ones were false.", url: PY_DOCS + "reference/compound_stmts.html#the-if-statement" },
+  "else": { kind: "keyword", desc: "Runs when none of the preceding if/elif conditions were true.", url: PY_DOCS + "reference/compound_stmts.html#the-if-statement" },
+  "except": { kind: "keyword", desc: "Catches and handles an error raised inside a try block.", url: PY_DOCS + "reference/compound_stmts.html#the-try-statement" },
+  "finally": { kind: "keyword", desc: "Runs no matter what, whether a try block succeeded or raised an error.", url: PY_DOCS + "reference/compound_stmts.html#the-try-statement" },
+  "for": { kind: "keyword", desc: "Repeats a block of code once for each item in a sequence.", url: PY_DOCS + "reference/compound_stmts.html#the-for-statement" },
+  "from": { kind: "keyword", desc: "Used with import to bring in specific parts of a module.", url: PY_DOCS + "reference/simple_stmts.html#the-import-statement" },
+  "global": { kind: "keyword", desc: "Lets a function modify a variable defined outside it, at the top level.", url: PY_DOCS + "reference/simple_stmts.html#the-global-statement" },
+  "if": { kind: "keyword", desc: "Runs a block of code only when its condition is true.", url: PY_DOCS + "reference/compound_stmts.html#the-if-statement" },
+  "import": { kind: "keyword", desc: "Brings in code from another file or module so you can use it.", url: PY_DOCS + "reference/simple_stmts.html#the-import-statement" },
+  "in": { kind: "keyword", desc: "Checks whether a value appears in a sequence, or drives a for loop.", url: PY_DOCS + "reference/expressions.html#comparisons" },
+  "is": { kind: "keyword", desc: "Checks whether two names refer to the exact same object in memory.", url: PY_DOCS + "reference/expressions.html#comparisons" },
+  "lambda": { kind: "keyword", desc: "Creates a small, unnamed function in a single expression.", url: PY_DOCS + "reference/expressions.html#lambda" },
+  "nonlocal": { kind: "keyword", desc: "Lets a nested function modify a variable from its enclosing function.", url: PY_DOCS + "reference/simple_stmts.html#the-nonlocal-statement" },
+  "not": { kind: "keyword", desc: "Flips a boolean value: true becomes false, and false becomes true.", url: PY_DOCS + "reference/expressions.html#boolean-operations" },
+  "or": { kind: "keyword", desc: "Combines two conditions. The result is true if at least one side is true.", url: PY_DOCS + "reference/expressions.html#boolean-operations" },
+  "pass": { kind: "keyword", desc: "Does nothing. A placeholder where code is syntactically required but not needed yet.", url: PY_DOCS + "reference/simple_stmts.html#the-pass-statement" },
+  "raise": { kind: "keyword", desc: "Triggers an error on purpose, with a chosen exception type and message.", url: PY_DOCS + "reference/simple_stmts.html#the-raise-statement" },
+  "return": { kind: "keyword", desc: "Sends a value back from a function to wherever it was called.", url: PY_DOCS + "reference/simple_stmts.html#the-return-statement" },
+  "try": { kind: "keyword", desc: "Marks a block of code where errors should be caught instead of crashing the script.", url: PY_DOCS + "reference/compound_stmts.html#the-try-statement" },
+  "while": { kind: "keyword", desc: "Repeats a block of code for as long as its condition stays true.", url: PY_DOCS + "reference/compound_stmts.html#the-while-statement" },
+  "with": { kind: "keyword", desc: "Wraps a block of code so a resource, like a file, is automatically cleaned up afterward.", url: PY_DOCS + "reference/compound_stmts.html#the-with-statement" },
+  "yield": { kind: "keyword", desc: "Produces one value from a generator function, pausing until the next value is requested.", url: PY_DOCS + "reference/expressions.html#yield-expressions" },
+  "print": { kind: "function", desc: "Displays text or values to the output.", url: PY_DOCS + "library/functions.html#print" },
+  "range": { kind: "function", desc: "Produces a sequence of numbers, commonly used to control how many times a loop runs.", url: PY_DOCS + "library/functions.html#func-range" },
+  "len": { kind: "function", desc: "Returns how many items are in something, like a string, list, or dictionary.", url: PY_DOCS + "library/functions.html#len" },
+  "int": { kind: "function", desc: "Converts a value to a whole number, or defines an integer.", url: PY_DOCS + "library/functions.html#int" },
+  "str": { kind: "function", desc: "Converts a value to text, or defines a string.", url: PY_DOCS + "library/stdtypes.html#str" },
+  "float": { kind: "function", desc: "Converts a value to a decimal number.", url: PY_DOCS + "library/functions.html#float" },
+  "bool": { kind: "function", desc: "Converts a value to True or False.", url: PY_DOCS + "library/functions.html#bool" },
+  "input": { kind: "function", desc: "Pauses the script to read a line of text typed by the user.", url: PY_DOCS + "library/functions.html#input" },
+  "list": { kind: "function", desc: "Creates a list: an ordered, changeable collection of items.", url: PY_DOCS + "library/stdtypes.html#list" },
+  "dict": { kind: "function", desc: "Creates a dictionary: a collection of key-value pairs.", url: PY_DOCS + "library/stdtypes.html#dict" },
+  "tuple": { kind: "function", desc: "Creates a tuple: an ordered, unchangeable collection of items.", url: PY_DOCS + "library/stdtypes.html#tuple" },
+  "set": { kind: "function", desc: "Creates a set: an unordered collection of unique items.", url: PY_DOCS + "library/stdtypes.html#set" },
+  "type": { kind: "function", desc: "Returns the type of a value, like int, str, or list.", url: PY_DOCS + "library/functions.html#type" },
+  "abs": { kind: "function", desc: "Returns the absolute (non-negative) value of a number.", url: PY_DOCS + "library/functions.html#abs" },
+  "min": { kind: "function", desc: "Returns the smallest value among its arguments or in a sequence.", url: PY_DOCS + "library/functions.html#min" },
+  "max": { kind: "function", desc: "Returns the largest value among its arguments or in a sequence.", url: PY_DOCS + "library/functions.html#max" },
+  "sum": { kind: "function", desc: "Adds up all the numbers in a sequence.", url: PY_DOCS + "library/functions.html#sum" },
+  "sorted": { kind: "function", desc: "Returns a new, sorted list from the items in a sequence.", url: PY_DOCS + "library/functions.html#sorted" },
+  "enumerate": { kind: "function", desc: "Pairs each item in a sequence with its index, for use in a for loop.", url: PY_DOCS + "library/functions.html#enumerate" },
+  "zip": { kind: "function", desc: "Pairs up items from two or more sequences, one from each at a time.", url: PY_DOCS + "library/functions.html#zip" },
+  "open": { kind: "function", desc: "Opens a file so your script can read from or write to it.", url: PY_DOCS + "library/functions.html#open" },
+  "isinstance": { kind: "function", desc: "Checks whether a value is of a particular type.", url: PY_DOCS + "library/functions.html#isinstance" },
 }
 
 function renderGlossary() {
@@ -1994,6 +2016,7 @@ function renderGlossary() {
     return `<div class="glossary-entry" id="gloss-${term}" data-term="${term.toLowerCase()}">
       <span class="term">${term}<span class="kind">${e.kind}</span></span>
       <p>${e.desc}</p>
+      <a class="glossary-link" href="${e.url}" target="_blank" rel="noopener">Official docs &#8599;</a>
     </div>`
   }).join("")
 }
@@ -2218,7 +2241,10 @@ function setupBlocks() {
     cm.getWrapperElement().addEventListener("mousedown", e => {
       if (!inspecting) return
       e.preventDefault()
-      const pos = cm.coordsChar({ left: e.clientX, top: e.clientY })
+      // "window" mode matches clientX/clientY (viewport-relative); the
+      // default "page" mode is document-relative and drifts further off
+      // the further down the page (more scrollY) a block sits.
+      const pos = cm.coordsChar({ left: e.clientX, top: e.clientY }, "window")
       const range = cm.findWordAt(pos)
       const word = cm.getRange(range.anchor, range.head)
       if (PYTHON_GLOSSARY[word]) openGlossaryTerm(word)
@@ -2226,14 +2252,31 @@ function setupBlocks() {
   })
 }
 
+/* Web fonts (IBM Plex Mono/Sans) swap in after the initial paint, which
+   reflows every code block below the first and leaves CodeMirror measuring
+   itself against stale metrics, so clicks (and inspect-mode's coordinate
+   lookup) drift more the further down the page they are. Refreshing every
+   editor once fonts are confirmed loaded re-syncs them to final layout. */
+function refreshAllEditors() {
+  requestAnimationFrame(() => {
+    ALL_EDITORS.forEach(e => e.cm.refresh())
+  })
+}
+
 async function boot() {
   setupSubsections()
   setupBlocks()
+  if (document.fonts && document.fonts.ready) {
+    document.fonts.ready.then(refreshAllEditors)
+  }
+  window.addEventListener("load", refreshAllEditors)
   const status = document.getElementById("pyStatus")
   pyodide = await loadPyodide()
   status.textContent = "Python ready"
   status.classList.add("ready")
   document.querySelectorAll(".run-btn").forEach(b => b.disabled = false)
+  document.querySelectorAll(".inspect-btn").forEach(b => b.disabled = false)
+  refreshAllEditors()
 }
 
 boot()
