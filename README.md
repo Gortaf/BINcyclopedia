@@ -16,24 +16,24 @@ Start at the [landing page](https://gortaf.github.io/BINcyclopedia/), which link
 
 ## AI disclaimer
 
-Some of the visuals and interactive pages on this site are built with the help of Claude (Anthropic). All of the underlying information is mine, written and vetted from my own training and experience, and I double-check every page for accuracy before it goes up. Claude helps with the interactive presentation; it doesn't write the science.
+Some of the visuals and interactive pages on this site are built with the help of Claude (Anthropic). I write and check all of the underlying science myself, from my own training and experience, and I double-check every page for accuracy before it goes up. Claude's role is the interactive presentation around that content.
 
 ## Structure
 
-- `index.html` — landing page, renders itself from the data below
-- `assets/css/style.css` — shared styling
-- `assets/js/lessons.js` — the `CATEGORIES` and `LESSONS` manifest (see tags below)
-- `assets/js/icons.js` — small hand-authored SVG icons, atlas-style, keyed by name
-- `assets/js/site.js` — renders the landing page and handles search/tag filtering
-- `lessons/<lesson-name>/index.html` — one self-contained page per lesson
+- `index.html`: landing page, renders itself from the data below
+- `assets/css/style.css`: shared styling
+- `assets/js/lessons.js`: the `CATEGORIES` and `LESSONS` manifest (see tags below)
+- `assets/js/icons.js`: small hand-authored SVG icons, atlas-style, keyed by name
+- `assets/js/site.js`: renders the landing page and handles search/tag filtering
+- `lessons/<lesson-name>/index.html`: one self-contained page per lesson
 
 ## Tags and categories
 
 Each entry in `LESSONS` (`assets/js/lessons.js`) carries:
 
-- `category` — one id from `CATEGORIES`, grouping lessons by subject under Computer Science, Biochemistry, Statistics, or Bioinformatics
-- `matter` — free-text topic tags for searching (e.g. `"immunology"`, `"dynamic programming"`)
-- `classes` — UdeM course codes a lesson is useful for (e.g. `"BIN6007"`), left empty until relevant
+- `category`: one id from `CATEGORIES`, grouping lessons by subject under Computer Science, Biochemistry, Statistics, or Bioinformatics
+- `matter`: free-text topic tags for searching (e.g. `"immunology"`, `"dynamic programming"`)
+- `classes`: UdeM course codes a lesson is useful for (e.g. `"BIN6007"`), left empty until relevant
 
 All three show up as clickable tags on the landing page and feed the search box.
 
