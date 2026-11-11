@@ -62,15 +62,8 @@ const ENTRIES = [
     classes: [],
     icon: "terminal",
   },
-  {
-    id: "number-guessing-game",
-    title: "Number Guessing Game",
-    blurb: "Build a little guessing game that pulls together scripts, flow control, and loops. No grades, just a fun challenge, with AI prompts to tutor you through it and review your work when you're done.",
-    href: "lessons/number-guessing-game/index.html",
-    type: "project",
-    category: "cs-programming",
-    matter: ["python", "flow control", "loops", "project", "beginner"],
-    classes: [],
-    icon: "terminal",
-  },
+  // "number-guessing-game" is unpublished for now: the Project structure
+  // works, but the first Project should be bigger and more fun, with
+  // intermediate steps and prompts. The page is still in lessons/ as a
+  // template; re-add an entry here once it's fleshed out.
 ]
