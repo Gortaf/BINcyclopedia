@@ -51,4 +51,33 @@ const ICONS = {
       <text x="-21" y="12" font-family="ui-monospace, monospace" font-size="19" font-weight="700" fill="#e3f0ff">&gt;_</text>
     </svg>
   `,
+
+  /* Node tree: a small root-and-children structure on a purple blob,
+     standing in for "how data is organized in memory" the way the terminal
+     stands in for "code you write and run". */
+  nodes: `
+    <svg viewBox="-40 -40 80 80" aria-hidden="true">
+      <defs>
+        <radialGradient id="icon-g-nodes" cx="0.35" cy="0.28" r="0.88">
+          <stop offset="0" stop-color="#ddc3f5"/>
+          <stop offset="0.6" stop-color="#b680e4"/>
+          <stop offset="1" stop-color="#7c54a0"/>
+        </radialGradient>
+      </defs>
+      <circle r="27" fill="url(#icon-g-nodes)"/>
+      <ellipse cx="-9" cy="-10" rx="9" ry="5" transform="rotate(-35 -9 -10)" fill="#fff" opacity="0.2"/>
+      <g stroke="#2c1f45" stroke-width="2.2">
+        <line x1="0" y1="-14" x2="-15" y2="7"/>
+        <line x1="0" y1="-14" x2="15" y2="7"/>
+        <line x1="-15" y1="7" x2="-22" y2="18"/>
+        <line x1="-15" y1="7" x2="-8" y2="18"/>
+      </g>
+      <circle cx="0" cy="-14" r="7" fill="#2c1f45"/>
+      <circle cx="-15" cy="7" r="6" fill="#e3d4f7"/>
+      <circle cx="15" cy="7" r="6" fill="#e3d4f7"/>
+      <circle cx="-22" cy="18" r="5" fill="#2c1f45"/>
+      <circle cx="-8" cy="18" r="5" fill="#2c1f45"/>
+      <circle cx="-2" cy="-16" r="2" fill="#fff" opacity="0.3"/>
+    </svg>
+  `,
 }

@@ -62,6 +62,17 @@ const ENTRIES = [
     classes: [],
     icon: "terminal",
   },
+  {
+    id: "data-structure-atlas",
+    title: "Data Structure Atlas",
+    blurb: "An explorable map of core data structures: click any one to see its properties, Big-O complexities, how it relates to the others, and a runnable Python example.",
+    href: "lessons/data-structure-atlas/index.html",
+    type: "cheatsheet",
+    category: "cs-algorithms",
+    matter: ["data structures", "big-o", "complexity", "arrays", "linked lists", "trees", "graphs", "hash tables"],
+    classes: [],
+    icon: "nodes",
+  },
   // "number-guessing-game" is unpublished for now: the Project structure
   // works, but the first Project should be bigger and more fun, with
   // intermediate steps and prompts. The page is still in lessons/ as a

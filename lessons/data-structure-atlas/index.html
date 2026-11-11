@@ -1,0 +1,1547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data Structure Atlas | BINcyclopedia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #0d1117;
+  --surface: #151b24;
+  --surface-2: #1c2431;
+  --line: #2a3445;
+  --text: #e6e9ef;
+  --muted: #8d99ac;
+  --accent: #f2c14e;
+  --c-sequential: #5aa2ec;
+  --c-linked: #4cc2a0;
+  --c-adt: #f2994a;
+  --c-hash: #ec6c9c;
+  --c-tree: #b680e4;
+  --c-graph: #ee7650;
+  --display: "Fraunces", Georgia, serif;
+  --body: "IBM Plex Sans", system-ui, sans-serif;
+  --mono: "IBM Plex Mono", ui-monospace, monospace;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--body);
+  font-size: 15px;
+  line-height: 1.5;
+  display: flex;
+  flex-direction: column;
+}
+header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 24px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--line);
+}
+.home-link {
+  color: var(--muted);
+  text-decoration: none;
+  font: 500 12.5px var(--mono);
+  letter-spacing: 0.5px;
+}
+.home-link:hover { color: var(--accent); }
+h1 {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 24px;
+  margin: 0;
+  letter-spacing: 0.2px;
+  text-wrap: balance;
+}
+h1 small {
+  font-family: var(--mono);
+  font-weight: 400;
+  font-size: 12px;
+  color: var(--muted);
+  margin-left: 10px;
+}
+.controls { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 11px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text);
+  font: 500 12.5px var(--body);
+  cursor: pointer;
+}
+.chip i { width: 10px; height: 10px; border-radius: 50%; background: var(--c); display: inline-block; }
+.chip:hover { border-color: var(--c); }
+.chip[aria-pressed="false"] { opacity: 0.4; }
+.chip:focus-visible, .node:focus-visible, button:focus-visible, input:focus-visible, .rel:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+#search {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 6px 11px;
+  font: 400 13px var(--body);
+  width: 190px;
+}
+main { flex: 1; min-height: 0; display: flex; }
+#stage { flex: 1; min-width: 0; min-height: 280px; overflow: hidden; position: relative; touch-action: none; }
+#stage svg { display: block; width: 100%; height: 100%; cursor: grab; user-select: none; }
+#stage svg.panning { cursor: grabbing; }
+.toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 9px 20px; border-bottom: 1px solid var(--line); }
+.toolbar .controls { margin-left: 0; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg button { background: var(--surface); color: var(--muted); border: 0; border-right: 1px solid var(--line); padding: 6px 13px; font: 500 12.5px var(--body); cursor: pointer; }
+.seg button:last-child { border-right: 0; }
+.seg button:hover { color: var(--text); }
+.seg button[aria-pressed="true"] { background: var(--accent); color: #0d1117; }
+.btn { background: var(--surface); color: var(--text); border: 1px solid var(--line); border-radius: 8px; padding: 6px 13px; font: 500 12.5px var(--body); cursor: pointer; }
+.btn:hover:not(:disabled) { border-color: var(--accent); }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn[aria-pressed="true"] { background: var(--accent); color: #0d1117; border-color: var(--accent); }
+.spacer { flex: 1; }
+.hero { width: 100%; max-width: 110px; height: auto; display: block; margin: 0 auto 4px; }
+#panel {
+  width: 430px;
+  flex: none;
+  border-left: 1px solid var(--line);
+  background: var(--surface);
+  overflow-y: auto;
+  padding: 20px 22px 28px;
+}
+#panel h2 { font-family: var(--display); font-size: 26px; line-height: 1.15; margin: 6px 0 4px; text-wrap: balance; }
+#panel h3 {
+  font: 500 11px var(--mono);
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 20px 0 6px;
+}
+#panel p { margin: 0 0 8px; }
+.badge {
+  display: inline-block;
+  font: 500 11px var(--mono);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 2px 9px;
+  border-radius: 4px;
+  color: #0d1117;
+  background: var(--c);
+}
+.sub { color: var(--muted); font-size: 13.5px; margin: 0 0 6px; }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.tag {
+  font: 400 12px var(--mono);
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--surface-2);
+}
+.rel {
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--line);
+  padding: 6px 2px;
+  color: var(--text);
+  font: 400 13.5px var(--body);
+  cursor: pointer;
+}
+.rel:hover { background: var(--surface-2); }
+.rel b { color: var(--c); font-weight: 600; white-space: nowrap; }
+.rel span { color: var(--muted); font-size: 12.5px; }
+.dir { font-family: var(--mono); color: var(--muted); font-size: 12px; }
+.note {
+  border-left: 3px solid var(--accent);
+  background: var(--surface-2);
+  padding: 8px 12px;
+  border-radius: 0 6px 6px 0;
+  font-size: 14px;
+}
+#hint { color: var(--muted); }
+#hint h2 { color: var(--text); }
+.legend { display: grid; gap: 7px; margin-top: 10px; }
+.legend div { display: flex; align-items: center; gap: 10px; font-size: 13.5px; }
+.legend svg { width: 46px; height: 12px; flex: none; }
+.node { cursor: pointer; transition: opacity 0.35s; }
+.node .gfx { transition: filter 0.2s; }
+.node:hover .gfx { filter: brightness(1.18); }
+.node .ring { fill: none; stroke: var(--accent); stroke-width: 2.5; opacity: 0; transition: opacity 0.2s; }
+.node:hover .ring { opacity: 0.35; }
+.node.sel .ring { opacity: 1; }
+.node:focus-visible { outline: none; }
+.node:focus-visible .ring { opacity: 1; }
+.node .lbl { font: 600 13px var(--body); fill: var(--text); text-anchor: middle; paint-order: stroke; stroke: var(--bg); stroke-width: 4.5px; stroke-linejoin: round; pointer-events: none; }
+.node.sel .lbl { fill: var(--accent); }
+.node.dim { opacity: 0.16; }
+.node.gone { opacity: 0; pointer-events: none; }
+.backdrop { transition: opacity 0.4s; pointer-events: none; }
+.backdrop rect { stroke-width: 1.2; }
+.backdrop text { font: 500 12px var(--mono); letter-spacing: 2.5px; text-transform: uppercase; }
+#zones { transition: opacity 0.4s; }
+.edge { fill: none; stroke-width: 1.4; opacity: 0.28; transition: opacity 0.2s; }
+.edge.on { opacity: 0.95; stroke-width: 2; }
+.edge.off { opacity: 0.05; }
+.edge.gone { display: none; }
+.elabel { pointer-events: none; }
+.elabel rect { fill: var(--bg); fill-opacity: 0.94; stroke-width: 1.4; }
+.elabel text { font: 500 11px var(--mono); fill: var(--text); text-anchor: middle; }
+.zone { font: 500 12px var(--mono); letter-spacing: 3px; fill: var(--muted); opacity: 0.55; }
+@media (max-width: 900px) {
+  main { flex-direction: column; }
+  #panel { width: 100%; border-left: 0; border-top: 1px solid var(--line); max-height: 55%; }
+  .controls { margin-left: 0; }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* Complexity table */
+.complexity-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-bottom: 4px;
+}
+.complexity-table th {
+  text-align: left;
+  font: 500 10.5px var(--mono);
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 4px 6px 6px 0;
+  border-bottom: 1px solid var(--line);
+}
+.complexity-table td {
+  padding: 5px 6px 5px 0;
+  border-bottom: 1px solid var(--line);
+}
+.complexity-table td:last-child {
+  font-family: var(--mono);
+  color: var(--accent);
+  white-space: nowrap;
+}
+
+/* Runnable Python block in the panel */
+.py-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: 500 10.5px var(--mono);
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 10px;
+  margin-left: 10px;
+}
+.py-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--muted); }
+.py-status.ready::before { background: #4cc2a0; }
+.py-status.ready { color: #4cc2a0; border-color: #4cc2a0; }
+.code-block {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface-2);
+  padding: 0.8rem 0.9rem 0.9rem;
+  margin: 0.5rem 0 1rem;
+}
+.code-block .starter { display: none; }
+.editor-mount .CodeMirror {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  height: auto;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  padding: 2px 0;
+}
+.code-actions { display: flex; align-items: center; gap: 0.6rem; margin-top: 0.6rem; }
+.run-btn {
+  background: var(--accent);
+  color: #0d1117;
+  border: 0;
+  border-radius: 8px;
+  padding: 6px 14px;
+  font: 600 12.5px var(--body);
+  cursor: pointer;
+}
+.run-btn:hover { filter: brightness(1.08); }
+.output {
+  margin-top: 0.6rem;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0.5rem 0.7rem;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  white-space: pre-wrap;
+  word-break: break-word;
+  min-height: 1.4em;
+  color: var(--text);
+}
+.output.error { color: #ee7650; }
+.output:empty::before { content: "(output appears here)"; color: var(--muted); }
+</style>
+</head>
+<body>
+<header>
+  <h1>Data Structure Atlas<small>click any structure</small></h1>
+  <span class="py-status" id="pyStatus">Loading Python&hellip;</span>
+  <input id="search" type="search" placeholder="Search structure, operation, complexity" aria-label="Search" style="margin-left:auto">
+</header>
+<div class="toolbar">
+  <div class="controls" id="chips"></div>
+  <span class="spacer"></span>
+  <div class="seg" id="layout" role="group" aria-label="Layout">
+    <button data-mode="lineage" aria-pressed="true">Map</button>
+    <button data-mode="category" aria-pressed="false">Categories</button>
+    <button data-mode="network" aria-pressed="false">Network</button>
+  </div>
+  <button class="btn" id="focusBtn" aria-pressed="false" disabled title="Select a structure first">Focus on selection</button>
+  <button class="btn" id="fitBtn">Fit to view</button>
+</div>
+<main>
+  <div id="stage"><svg id="svg" viewBox="0 0 1300 860" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Data structure relationship diagram"></svg></div>
+  <aside id="panel" aria-live="polite"></aside>
+</main>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+<script src="https://cdn.jsdelivr.net/pyodide/v0.26.4/full/pyodide.js"></script>
+<script>
+const GROUPS = {
+  sequential: { name: "Array-based", color: "var(--c-sequential)" },
+  linked: { name: "Linked structures", color: "var(--c-linked)" },
+  adt: { name: "Abstract data types", color: "var(--c-adt)" },
+  hash: { name: "Hash-based", color: "var(--c-hash)" },
+  tree: { name: "Trees", color: "var(--c-tree)" },
+  graph: { name: "Graphs", color: "var(--c-graph)" },
+}
+const NODES = []
+const EDGES = []
+const N = o => NODES.push(o)
+const E = (a, b, type, label, curve) => EDGES.push({ a, b, type, label, curve: curve || 0 })
+
+N({
+  id: "arr", name: "Array", g: "sequential", x: 130, y: 90,
+  sub: "Fixed-size, contiguous block of memory",
+  markers: ["Fixed size", "Contiguous memory", "O(1) random access", "Index-based"],
+  where: "Python's array module, NumPy arrays, low-level buffers",
+  roles: [
+    "This is the simplest way to store a sequence of values: one fixed-size block of memory, with each slot sitting right next to the last.",
+    "Because every element takes the same amount of space, the computer can jump straight to index i by computing its memory address directly, which is why reading any element is instant regardless of the array's size.",
+    "The size is fixed when the array is created. Growing it means allocating a whole new, larger block and copying every element over, which is slow."
+  ],
+  products: ["Read by index", "Write by index", "Fixed capacity"],
+  complexity: [["Access", "O(1)"], ["Search", "O(n)"], ["Insert", "O(n)"], ["Delete", "O(n)"], ["Space", "O(n)"]],
+  code: `from array import array
+
+nums = array('i', [10, 20, 30, 40])   # 'i' = signed int, fixed-type array
+print(nums[2])        # O(1) access by index
+nums[2] = 99           # O(1) write by index
+print(list(nums))`,
+  notes: "Python's everyday list is not this: it's a dynamic array that resizes itself automatically (see the next node). True fixed-size arrays in Python come from the array module or NumPy."
+})
+N({
+  id: "dyn", name: "Dynamic Array", g: "sequential", x: 380, y: 90,
+  sub: "A resizable array that grows automatically: this is what Python's list is",
+  markers: ["Amortized O(1) append", "Contiguous memory", "Resizes automatically", "O(1) random access"],
+  where: "Python's built-in list, Java's ArrayList, C++'s std::vector",
+  roles: [
+    "This is a static array wearing a disguise: underneath, it's still one contiguous block, but it automatically allocates a bigger block and copies everything over once it runs out of room.",
+    "Because it usually grows by a multiple, like doubling, rather than one slot at a time, resizing happens rarely enough that appending an element is O(1) on average, even though any single append might trigger a full O(n) copy.",
+    "This is exactly what Python's built-in list is. Every my_list.append(x) you've ever written has been resizing a dynamic array behind the scenes."
+  ],
+  products: ["Append", "Pop (from end)", "Read/write by index", "Resize"],
+  complexity: [["Access", "O(1)"], ["Search", "O(n)"], ["Insert (end)", "O(1) amortized"], ["Insert (start/middle)", "O(n)"], ["Delete (end)", "O(1)"], ["Space", "O(n)"]],
+  code: `my_list = []
+my_list.append(1)
+my_list.append(2)
+my_list.append(3)
+print(my_list)
+my_list.insert(0, 0)   # O(n): shifts everything right
+print(my_list)
+print(my_list.pop())   # O(1): removes from the end`,
+  notes: "Because growth is amortized, not guaranteed, a single append can occasionally be slow when a resize triggers, even though appends are O(1) on average. This rarely matters in practice."
+})
+N({
+  id: "lnk", name: "Linked List", g: "linked", x: 680, y: 90,
+  sub: "A chain of nodes, each pointing to the next",
+  markers: ["O(1) insert/delete at head", "No random access", "Non-contiguous memory", "Each node stores a pointer"],
+  where: "Implementing stacks and queues, undo history, when O(1) insertion without shifting matters",
+  roles: [
+    "Instead of one contiguous block, each element lives in its own node scattered anywhere in memory, and holds a pointer to the next node in the chain.",
+    "Finding the fifth element means starting at the head and following pointers one at a time. There is no way to jump directly to an index like an array can.",
+    "Adding or removing a node at the front is just a pointer swap, O(1), regardless of how long the list is, since nothing else needs to move."
+  ],
+  products: ["Insert at head", "Delete at head", "Traverse"],
+  complexity: [["Access", "O(n)"], ["Search", "O(n)"], ["Insert (head)", "O(1)"], ["Insert (tail)", "O(n)*"], ["Delete (head)", "O(1)"], ["Space", "O(n)"]],
+  code: `class Node:
+    def __init__(self, value, next=None):
+        self.value = value
+        self.next = next
+
+head = Node(1, Node(2, Node(3)))   # 1 -> 2 -> 3
+head = Node(0, head)                # insert new head: O(1)
+
+node = head
+while node:
+    print(node.value)
+    node = node.next`,
+  notes: "Python has no built-in singly linked list type; list is a dynamic array instead. You'd write your own Node class, as in the example. *Tail insertion is O(1) if you keep a tail pointer."
+})
+N({
+  id: "dll", name: "Doubly Linked List", g: "linked", x: 950, y: 90,
+  sub: "Like a linked list, but each node also points backward",
+  markers: ["O(1) insert/delete at both ends", "Bidirectional traversal", "More memory per node"],
+  where: "Python's collections.deque, browser back/forward history, LRU caches",
+  roles: [
+    "This is a linked list where every node keeps two pointers instead of one: one to the next node, and one back to the previous node.",
+    "That extra backward pointer means you can walk the list in either direction, and remove a node in O(1) once you have a reference to it, without needing to search for its predecessor first.",
+    "Python's collections.deque is built this way, which is why it supports fast operations at both ends, unlike a plain list."
+  ],
+  products: ["Insert at either end", "Delete at either end", "Traverse forward or backward"],
+  complexity: [["Access", "O(n)"], ["Search", "O(n)"], ["Insert (either end)", "O(1)"], ["Delete (either end)", "O(1)"], ["Space", "O(n)"]],
+  code: `from collections import deque
+
+dll = deque([2, 3, 4])
+dll.appendleft(1)    # O(1): insert at the front
+dll.append(5)        # O(1): insert at the back
+print(dll)
+dll.pop()             # O(1): remove from the back
+dll.popleft()         # O(1): remove from the front
+print(dll)`,
+  notes: "The extra prev pointer roughly doubles the memory overhead per node compared to a singly linked list, in exchange for bidirectional O(1) operations."
+})
+N({
+  id: "stk", name: "Stack", g: "adt", x: 680, y: 300,
+  sub: "Last in, first out (LIFO)",
+  markers: ["LIFO order", "Push/pop at one end", "O(1) push and pop"],
+  where: "Undo history, call stacks and recursion, matching brackets, depth-first search",
+  roles: [
+    "A stack only lets you add or remove from one end, called the top, so the last thing you put in is always the first thing that comes out.",
+    "It's more an abstract idea than a specific structure: you can build one on top of a dynamic array (push/pop at the end) or a linked list (push/pop at the head), since both give O(1) at one end.",
+    "Every time a function calls another function, the computer pushes a new frame onto a call stack, which is exactly why deep, unbounded recursion eventually crashes with a stack overflow."
+  ],
+  products: ["Push", "Pop", "Peek (look at top)"],
+  complexity: [["Push", "O(1)"], ["Pop", "O(1)"], ["Peek", "O(1)"], ["Search", "O(n)"], ["Space", "O(n)"]],
+  code: `stack = []
+stack.append("a")
+stack.append("b")
+stack.append("c")
+print(stack.pop())    # "c": last one in, first one out
+print(stack.pop())    # "b"
+print(stack)`,
+  notes: "Python has no dedicated stack type: a plain list already does the job, since .append() and .pop() both operate on the end in O(1)."
+})
+N({
+  id: "que", name: "Queue", g: "adt", x: 900, y: 300,
+  sub: "First in, first out (FIFO)",
+  markers: ["FIFO order", "Enqueue at back, dequeue at front", "O(1) with the right structure"],
+  where: "Task scheduling, breadth-first search, print and job queues, buffering",
+  roles: [
+    "A queue only lets you add at the back and remove from the front, so the first thing you put in is the first thing that comes out, like a line at a store.",
+    "A plain Python list is a poor choice to build one with: removing from the front with .pop(0) has to shift every remaining element over, which is O(n).",
+    "collections.deque solves this: it's built as a doubly linked list under the hood, so popping from the front is O(1), just like popping from the back."
+  ],
+  products: ["Enqueue", "Dequeue", "Peek (look at front)"],
+  complexity: [["Enqueue", "O(1)"], ["Dequeue", "O(1)*"], ["Peek", "O(1)"], ["Space", "O(n)"]],
+  code: `from collections import deque
+
+queue = deque()
+queue.append("first")
+queue.append("second")
+queue.append("third")
+print(queue.popleft())   # "first": first one in, first one out
+print(queue.popleft())   # "second"
+print(queue)`,
+  notes: "Reaching for list.pop(0) to dequeue is a common beginner mistake: it works, but turns every dequeue into an O(n) operation on a long queue. *O(1) only when backed by a deque, not a plain list."
+})
+N({
+  id: "deq", name: "Deque", g: "adt", x: 1120, y: 300,
+  sub: "Insert and remove from both ends",
+  markers: ["O(1) at both ends", "Generalizes stack and queue", "Python's deque also gives fast access near the ends"],
+  where: "Sliding-window algorithms, undo/redo, work-stealing schedulers",
+  roles: [
+    "A deque, pronounced 'deck', is a queue that dropped the one-way rule: you can push and pop from either the front or the back, both in O(1).",
+    "Because it can act like a stack (use one end) or a queue (use both ends) interchangeably, it's often the default choice once you know you need fast operations at the edges.",
+    "Python's collections.deque implements this directly, and also happens to give fast indexed access near the ends, though not the guaranteed O(1) a true array gives for arbitrary indices."
+  ],
+  products: ["Append/pop at back", "Append/pop at front", "Rotate"],
+  complexity: [["Insert (either end)", "O(1)"], ["Delete (either end)", "O(1)"], ["Access (middle)", "O(n)"], ["Space", "O(n)"]],
+  code: `from collections import deque
+
+dq = deque([2, 3])
+dq.appendleft(1)
+dq.append(4)
+print(dq)
+dq.rotate(1)     # shifts every element one step right, wrapping around
+print(dq)`,
+  notes: "Despite the name overlap, this is a different structure from Python's queue.Queue, which adds thread-safety for producer/consumer patterns at the cost of extra overhead."
+})
+N({
+  id: "hsh", name: "Hash Table", g: "hash", x: 380, y: 300,
+  sub: "Maps keys to values using a hash function for near-instant lookup",
+  markers: ["O(1) average lookup", "Hash function + buckets", "Collisions handled via chaining or probing"],
+  where: "Python's dict, caches, database indexes, counting and frequency tables",
+  roles: [
+    "A hash table converts each key into a number, its hash, and uses that number to jump almost directly to where the value lives, instead of searching through everything.",
+    "Different keys can occasionally hash to the same slot, called a collision. Most implementations handle this by storing a small list at each slot (chaining) or by probing for the next free slot.",
+    "This is exactly what Python's built-in dict is, and since Python 3.7 it also happens to preserve insertion order as a side effect of its implementation, though that was never the main point."
+  ],
+  products: ["Insert", "Lookup", "Delete", "Iterate keys/values"],
+  complexity: [["Insert", "O(1) avg, O(n) worst"], ["Lookup", "O(1) avg, O(n) worst"], ["Delete", "O(1) avg, O(n) worst"], ["Space", "O(n)"]],
+  code: `ages = {}
+ages["Ada"] = 36
+ages["Alan"] = 41
+ages["Grace"] = 85
+
+print(ages["Alan"])      # O(1) average lookup by key
+ages["Alan"] = 42         # overwrite
+del ages["Grace"]
+print(ages)`,
+  notes: "Average-case O(1) assumes a decent hash function spreading keys out evenly. A bad hash function, or an attacker deliberately choosing colliding keys, can degrade every operation to O(n)."
+})
+N({
+  id: "btr", name: "Binary Tree", g: "tree", x: 130, y: 540,
+  sub: "Each node has at most two children: left and right",
+  markers: ["Up to 2 children per node", "Height determines performance", "No ordering rule by itself"],
+  where: "The base shape underneath BSTs, heaps, and many parsers and expression trees",
+  roles: [
+    "A tree where every node points to at most two children, conventionally called left and right, with one special node at the top called the root.",
+    "On its own, a plain binary tree has no rule about where values go. It's the shape that specialised trees like the BST and the heap are built from, each adding their own rule on top.",
+    "A balanced tree with n nodes has a height of roughly log n, meaning any node can be reached in about log n hops. An unbalanced, lopsided tree can have a height of n, which erases that advantage entirely."
+  ],
+  products: ["Insert a child", "Traverse (in/pre/post-order)", "Compute height/depth"],
+  complexity: [["Access/Search", "O(h), h = height"], ["Insert", "O(h)"], ["Delete", "O(h)"], ["Space", "O(n)"]],
+  code: `class TreeNode:
+    def __init__(self, value, left=None, right=None):
+        self.value = value
+        self.left = left
+        self.right = right
+
+def in_order(node):
+    if node is None:
+        return
+    in_order(node.left)
+    print(node.value)
+    in_order(node.right)
+
+root = TreeNode(2, TreeNode(1), TreeNode(3))
+in_order(root)`,
+  notes: "Many traversal algorithms (in-order, pre-order, post-order) are defined on plain binary trees and get reused unchanged for every specialised tree built on top."
+})
+N({
+  id: "bst", name: "Binary Search Tree", g: "tree", x: 380, y: 540,
+  sub: "A binary tree with an ordering rule: left is smaller, right is bigger",
+  markers: ["Left < node < right", "O(log n) average, O(n) worst case", "In-order traversal visits values sorted"],
+  where: "Ordered maps and sets, range queries, the base idea behind database indexes",
+  roles: [
+    "This is a binary tree with one extra rule: every value in a node's left subtree is smaller than the node, and everything in its right subtree is bigger.",
+    "That rule is what makes searching fast: at every node, comparing your target to the current value tells you to go left or right, cutting the remaining search space roughly in half each step, the same idea as binary search.",
+    "The catch is that nothing keeps it balanced. Inserting values in already-sorted order builds a tree that's really just a straight line, degrading every operation from O(log n) to O(n)."
+  ],
+  products: ["Insert", "Search", "Delete", "Find min/max", "In-order traversal (gives sorted order)"],
+  complexity: [["Search", "O(log n) avg, O(n) worst"], ["Insert", "O(log n) avg, O(n) worst"], ["Delete", "O(log n) avg, O(n) worst"], ["Space", "O(n)"]],
+  code: `class BSTNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+def insert(node, value):
+    if node is None:
+        return BSTNode(value)
+    if value &lt; node.value:
+        node.left = insert(node.left, value)
+    else:
+        node.right = insert(node.right, value)
+    return node
+
+root = None
+for v in [5, 3, 8, 1, 4]:
+    root = insert(root, v)
+
+def in_order(node):
+    if node is None:
+        return
+    in_order(node.left)
+    print(node.value, end=" ")
+    in_order(node.right)
+
+in_order(root)   # prints values in sorted order`,
+  notes: "This worst-case degradation is exactly what self-balancing trees like the AVL tree exist to fix, by rebalancing after every insertion."
+})
+N({
+  id: "avl", name: "AVL Tree", g: "tree", x: 630, y: 540,
+  sub: "A self-balancing BST that guarantees O(log n)",
+  markers: ["Balance factor kept in {-1,0,1}", "Rotations after insert/delete", "Guaranteed O(log n) height"],
+  where: "Anywhere a BST is needed but worst-case O(n) is unacceptable, like real-time systems",
+  roles: [
+    "This is a binary search tree with one more rule on top: for every node, the heights of its left and right subtrees can differ by at most one.",
+    "Whenever an insertion or deletion would break that balance, the tree performs a rotation, a local rearrangement of a few nodes, to restore it immediately.",
+    "Because the tree is never allowed to lean too far in one direction, its height stays within a constant factor of log n at all times, which is what turns the BST's worst-case O(n) into a guaranteed O(log n)."
+  ],
+  products: ["Insert (with rebalancing)", "Delete (with rebalancing)", "Search"],
+  complexity: [["Search", "O(log n)"], ["Insert", "O(log n)"], ["Delete", "O(log n)"], ["Space", "O(n)"]],
+  code: `class AVLNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+        self.height = 1
+
+def height(node):
+    return node.height if node else 0
+
+def balance_factor(node):
+    return height(node.left) - height(node.right)
+
+def rotate_right(y):
+    x = y.left
+    y.left = x.right
+    x.right = y
+    y.height = 1 + max(height(y.left), height(y.right))
+    x.height = 1 + max(height(x.left), height(x.right))
+    return x   # x is the new subtree root
+
+root = AVLNode(3)
+root.left = AVLNode(2)
+root.left.left = AVLNode(1)
+root.height, root.left.height = 3, 2
+
+print("Balance factor before:", balance_factor(root))
+root = rotate_right(root)
+print("New root after rotation:", root.value)`,
+  notes: "AVL trees stay more strictly balanced than their cousin the red-black tree, which makes AVL lookups slightly faster but its insertions and deletions slightly slower, since more rotations happen on average."
+})
+N({
+  id: "hep", name: "Heap", g: "tree", x: 880, y: 540,
+  sub: "A complete binary tree where every parent beats its children",
+  markers: ["Min-heap or max-heap", "O(log n) insert/extract", "O(1) peek at the min/max", "Array-backed, no pointers needed"],
+  where: "Priority queues, scheduling, Dijkstra's and Prim's algorithms, heap sort, Python's heapq",
+  roles: [
+    "A heap keeps one promise: every parent node is smaller than both of its children (a min-heap), so the smallest value in the entire structure is always sitting right at the root.",
+    "Unlike a BST, a heap gives no guarantee about left versus right, only parent versus child, which is a weaker rule that's cheaper to maintain.",
+    "Because a heap is always a complete tree, filled left to right level by level, it can be stored directly in a plain array with no pointers at all: a node at index i has children at 2i+1 and 2i+2."
+  ],
+  products: ["Insert", "Extract min/max", "Peek at min/max", "Heapify a whole list"],
+  complexity: [["Insert", "O(log n)"], ["Extract-min", "O(log n)"], ["Peek", "O(1)"], ["Build from n items", "O(n)"], ["Space", "O(n)"]],
+  code: `import heapq
+
+tasks = []
+heapq.heappush(tasks, (3, "write report"))
+heapq.heappush(tasks, (1, "fix critical bug"))
+heapq.heappush(tasks, (2, "reply to email"))
+
+while tasks:
+    priority, task = heapq.heappop(tasks)   # always returns the smallest priority
+    print(priority, task)`,
+  notes: "Python's heapq module only implements a min-heap. To use it as a max-heap, the common trick is to push negated values and negate them again on the way out."
+})
+N({
+  id: "tri", name: "Trie", g: "tree", x: 1120, y: 540,
+  sub: "A tree built for fast prefix lookups on strings",
+  markers: ["One node per shared character prefix", "O(k) lookup where k = word length", "Shares memory between common prefixes"],
+  where: "Autocomplete, spell checkers, IP routing tables, dictionary word lookup",
+  roles: [
+    "A trie stores strings one character at a time, where each node represents one letter, and the path from the root down to a node spells out a prefix.",
+    "Two words that share a prefix, like 'car' and 'cart', share the exact same nodes for their common letters, branching apart only where they differ.",
+    "Looking up a word, or checking whether any word starts with a given prefix, takes time proportional only to the length of that word or prefix, completely independent of how many other words are stored."
+  ],
+  products: ["Insert a word", "Search for a word", "Check if any word has a given prefix"],
+  complexity: [["Insert", "O(k), k = word length"], ["Search", "O(k)"], ["Prefix search", "O(k)"], ["Space", "O(total characters)"]],
+  code: `class TrieNode:
+    def __init__(self):
+        self.children = {}
+        self.is_word = False
+
+root = TrieNode()
+
+def insert(word):
+    node = root
+    for ch in word:
+        node = node.children.setdefault(ch, TrieNode())
+    node.is_word = True
+
+def starts_with(prefix):
+    node = root
+    for ch in prefix:
+        if ch not in node.children:
+            return False
+        node = node.children[ch]
+    return True
+
+insert("car")
+insert("cart")
+print(starts_with("ca"))    # True
+print(starts_with("cab"))   # False`,
+  notes: "The name is pronounced 'try', from re-trieval, though many people say 'tree' instead, which causes no end of confused conversations."
+})
+N({
+  id: "grp", name: "Graph", g: "graph", x: 630, y: 740,
+  sub: "Nodes connected by edges, stored as each node's list of neighbours",
+  markers: ["Directed or undirected", "Weighted or unweighted", "O(V+E) space for sparse graphs"],
+  where: "Social networks, maps and routing, dependency graphs, anything modelled as things connected to other things",
+  roles: [
+    "A graph is the most general structure here: just a set of nodes (vertices) and connections between them (edges), with no restriction on how many connections a node can have.",
+    "An adjacency list stores one small list per node, containing just its direct neighbours, which is why it only uses space proportional to the number of edges, rather than reserving space for every possible pair of nodes.",
+    "Trees and linked lists are both graphs with extra restrictions: a tree is a graph with no cycles, and a linked list is a tree where every node has exactly one child."
+  ],
+  products: ["Add vertex", "Add edge", "Get neighbours", "Traverse (BFS/DFS)"],
+  complexity: [["Add vertex", "O(1)"], ["Add edge", "O(1)"], ["Check edge exists", "O(degree)"], ["Space", "O(V+E)"]],
+  code: `graph = {
+    "A": ["B", "C"],
+    "B": ["D"],
+    "C": ["D"],
+    "D": [],
+}
+
+def bfs(start):
+    visited = [start]
+    queue = [start]
+    while queue:
+        node = queue.pop(0)
+        for neighbour in graph[node]:
+            if neighbour not in visited:
+                visited.append(neighbour)
+                queue.append(neighbour)
+    return visited
+
+print(bfs("A"))`,
+  notes: "The alternative, an adjacency matrix, gives O(1) edge lookups but costs O(V squared) space regardless of how many edges actually exist, which wastes a lot of memory on sparse, real-world graphs."
+})
+
+E("arr", "dyn", "specializes", "adds resizing")
+E("lnk", "dll", "specializes", "adds a backward pointer")
+E("dyn", "stk", "implements", "append/pop at end")
+E("lnk", "stk", "implements", "push/pop at head", 0.2)
+E("lnk", "que", "implements", "enqueue/dequeue")
+E("dll", "deq", "implements", "both ends O(1)")
+E("dyn", "hsh", "implements", "bucket array", -0.15)
+E("lnk", "hsh", "implements", "chaining", 0.25)
+E("btr", "bst", "specializes", "adds ordering rule")
+E("bst", "avl", "specializes", "adds balance rule")
+E("btr", "hep", "specializes", "adds heap-order rule", 0.2)
+E("dyn", "hep", "implements", "array-backed", -0.2)
+E("hsh", "tri", "implements", "dict of dicts", 0.2)
+E("hsh", "grp", "implements", "adjacency list", -0.15)
+E("lnk", "grp", "implements", "adjacency list", 0.3)
+
+const zones = [
+  ["ARRAY-BASED", 30, 40],
+  ["LINKED STRUCTURES", 600, 40],
+  ["BUILT FROM THE ABOVE", 600, 250],
+  ["HASH-BASED", 300, 250],
+  ["TREES", 30, 480],
+  ["GRAPHS", 520, 700],
+]
+/* ## Cell artwork: flat geometric icons, generated from small recipes ## */
+const HEX = { sequential: "#5aa2ec", linked: "#4cc2a0", adt: "#f2994a", hash: "#ec6c9c", tree: "#b680e4", graph: "#ee7650" }
+const hx = h => {
+  if (h.length === 4) h = "#" + h[1] + h[1] + h[2] + h[2] + h[3] + h[3]
+  return [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16))
+}
+const mix = (a, b, t) => {
+  const A = hx(a)
+  const B = hx(b)
+  return "#" + A.map((v, i) => Math.round(v + (B[i] - v) * t).toString(16).padStart(2, "0")).join("")
+}
+const f1 = v => +v.toFixed(1)
+
+function nodeCircle(x, y, r, fill, stroke) {
+  return `<circle cx="${x}" cy="${y}" r="${r}" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`
+}
+
+const RECIPES = {
+  arr: { r: 34, draw: T => {
+    let o = `<rect x="-32" y="-13" width="64" height="26" rx="4" fill="${T.nc}" stroke="${T.c}" stroke-width="2.5"/>`
+    o += `<rect x="-32" y="-13" width="16" height="26" fill="${T.c}" opacity="0.5"/>`
+    for (let i = -1; i <= 1; i++) o += `<line x1="${i * 16}" y1="-13" x2="${i * 16}" y2="13" stroke="${T.c}" stroke-width="2"/>`
+    return o
+  } },
+  dyn: { r: 38, draw: T => {
+    let o = `<rect x="-30" y="-13" width="45" height="26" rx="4" fill="${T.nc}" stroke="${T.c}" stroke-width="2.5"/>`
+    o += `<rect x="-30" y="-13" width="15" height="26" fill="${T.c}" opacity="0.5"/>`
+    o += `<line x1="0" y1="-13" x2="0" y2="13" stroke="${T.c}" stroke-width="2"/>`
+    o += `<rect x="18" y="-13" width="15" height="26" rx="4" fill="none" stroke="${T.lt}" stroke-width="2" stroke-dasharray="3 3"/>`
+    o += `<path d="M38 -8 L30 0 L38 8" fill="none" stroke="${T.lt}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`
+    return o
+  } },
+  lnk: { r: 36, draw: T => {
+    let o = ""
+    const xs = [-24, 0, 24]
+    for (let i = 0; i < xs.length - 1; i++) {
+      o += `<line x1="${xs[i] + 10}" y1="0" x2="${xs[i + 1] - 10}" y2="0" stroke="${T.c}" stroke-width="2.4"/>`
+      o += `<path d="M${xs[i + 1] - 15} -5 L${xs[i + 1] - 9} 0 L${xs[i + 1] - 15} 5" fill="none" stroke="${T.c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`
+    }
+    xs.forEach(x => { o += nodeCircle(x, 0, 10, T.nc, T.c) })
+    return o
+  } },
+  dll: { r: 36, draw: T => {
+    let o = ""
+    const xs = [-24, 0, 24]
+    for (let i = 0; i < xs.length - 1; i++) {
+      const a = xs[i] + 10, b = xs[i + 1] - 10
+      o += `<line x1="${a}" y1="0" x2="${b}" y2="0" stroke="${T.c}" stroke-width="2.4"/>`
+      o += `<path d="M${a + 6} -5 L${a} 0 L${a + 6} 5" fill="none" stroke="${T.c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`
+      o += `<path d="M${b - 6} -5 L${b} 0 L${b - 6} 5" fill="none" stroke="${T.c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`
+    }
+    xs.forEach(x => { o += nodeCircle(x, 0, 10, T.nc, T.c) })
+    return o
+  } },
+  stk: { r: 36, draw: T => {
+    let o = ""
+    const bars = [[-24, 18, 60], [-18, 8, 48], [-12, -2, 36]]
+    bars.forEach(([x, y, w]) => { o += `<rect x="${x}" y="${y}" width="${w}" height="9" rx="3" fill="${T.nc}" stroke="${T.c}" stroke-width="2"/>` })
+    o += `<rect x="-20" y="-16" width="40" height="10" rx="3" fill="${T.c}"/>`
+    o += `<path d="M0 -28 L-6 -20 L6 -20 Z" fill="${T.lt}"/>`
+    return o
+  } },
+  que: { r: 36, draw: T => {
+    let o = ""
+    const xs = [-20, 0, 20]
+    xs.forEach(x => { o += nodeCircle(x, 0, 10, T.nc, T.c) })
+    o += `<line x1="-32" y1="0" x2="-30" y2="0" stroke="${T.c}" stroke-width="2.2"/>`
+    o += `<path d="M26 -6 L34 0 L26 6" fill="none" stroke="${T.c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`
+    return o
+  } },
+  deq: { r: 36, draw: T => {
+    let o = ""
+    const xs = [-18, 0, 18]
+    xs.forEach(x => { o += nodeCircle(x, 0, 10, T.nc, T.c) })
+    o += `<path d="M-26 -6 L-34 0 L-26 6" fill="none" stroke="${T.c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`
+    o += `<path d="M26 -6 L34 0 L26 6" fill="none" stroke="${T.c}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>`
+    return o
+  } },
+  hsh: { r: 38, draw: T => {
+    let o = ""
+    const xs = [-27, -9, 9, 27]
+    xs.forEach(x => { o += `<rect x="${x - 8}" y="-6" width="16" height="22" rx="3" fill="${T.nc}" stroke="${T.c}" stroke-width="2"/>` })
+    o += `<circle cx="-9" cy="4" r="2.6" fill="${T.lt}"/>`
+    o += `<circle cx="9" cy="4" r="2.6" fill="${T.lt}"/><circle cx="9" cy="10" r="2.6" fill="${T.lt}"/>`
+    o += `<path d="M-2 -24 L-2 -14 M-6 -18 L-2 -14 L2 -18" fill="none" stroke="${T.lt}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`
+    return o
+  } },
+  btr: { r: 36, draw: T => treeIcon(T, 2) },
+  bst: { r: 36, draw: T => treeIcon(T, 2) + `<text x="-20" y="18" font-family="var(--mono)" font-size="11" fill="${T.lt}">&lt;</text><text x="14" y="18" font-family="var(--mono)" font-size="11" fill="${T.lt}">&gt;</text>` },
+  avl: { r: 36, draw: T => treeIcon(T, 3) + `<path d="M0 26 L-14 32 L14 32 Z M-14 32 L14 32" fill="none" stroke="${T.lt}" stroke-width="1.6"/><circle cx="-14" cy="32" r="2" fill="${T.lt}"/><circle cx="14" cy="32" r="2" fill="${T.lt}"/>` },
+  hep: { r: 36, draw: T => {
+    let o = `<path d="M0 -26 L-30 22 L30 22 Z" fill="none" stroke="${T.c}" stroke-width="2.2"/>`
+    o += nodeCircle(0, -14, 9, T.c, T.c)
+    o += nodeCircle(-14, 10, 8, T.nc, T.c)
+    o += nodeCircle(14, 10, 8, T.nc, T.c)
+    o += `<line x1="0" y1="-14" x2="-14" y2="10" stroke="${T.c}" stroke-width="1.6"/><line x1="0" y1="-14" x2="14" y2="10" stroke="${T.c}" stroke-width="1.6"/>`
+    return o
+  } },
+  tri: { r: 36, draw: T => {
+    let o = nodeCircle(0, -22, 8, T.nc, T.c)
+    const kids = [-22, 0, 22]
+    kids.forEach(x => {
+      o += `<line x1="0" y1="-22" x2="${x}" y2="4" stroke="${T.c}" stroke-width="1.8"/>`
+      o += nodeCircle(x, 4, 7, T.nc, T.c)
+    })
+    o += `<line x1="-22" y1="4" x2="-30" y2="26" stroke="${T.c}" stroke-width="1.6"/><line x1="-22" y1="4" x2="-14" y2="26" stroke="${T.c}" stroke-width="1.6"/>`
+    kids.forEach(x => { o += nodeCircle(x, 4, 7, T.nc, T.c) })
+    return o
+  } },
+  grp: { r: 36, draw: T => {
+    const pts = [[0, -26], [-26, -6], [26, -6], [-16, 24], [16, 24]]
+    const lines = [[0, 1], [0, 2], [1, 3], [2, 4], [1, 4], [3, 4], [0, 3]]
+    let o = ""
+    lines.forEach(([a, b]) => { o += `<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="${T.c}" stroke-width="1.6" opacity="0.8"/>` })
+    pts.forEach(([x, y]) => { o += nodeCircle(x, y, 7, T.nc, T.c) })
+    return o
+  } },
+}
+function treeIcon(T, depth) {
+  let o = nodeCircle(0, -22, 9, T.c, T.c)
+  o += `<line x1="0" y1="-22" x2="-20" y2="4" stroke="${T.c}" stroke-width="2"/><line x1="0" y1="-22" x2="20" y2="4" stroke="${T.c}" stroke-width="2"/>`
+  o += nodeCircle(-20, 4, 8, T.nc, T.c) + nodeCircle(20, 4, 8, T.nc, T.c)
+  if (depth > 2) {
+    o += `<line x1="-20" y1="4" x2="-30" y2="26" stroke="${T.c}" stroke-width="1.8"/><line x1="-20" y1="4" x2="-10" y2="26" stroke="${T.c}" stroke-width="1.8"/>`
+    o += `<line x1="20" y1="4" x2="10" y2="26" stroke="${T.c}" stroke-width="1.8"/><line x1="20" y1="4" x2="30" y2="26" stroke="${T.c}" stroke-width="1.8"/>`
+    ;[-30, -10, 10, 30].forEach(x => { o += nodeCircle(x, 26, 6, T.nc, T.c) })
+  }
+  return o
+}
+function makeCell(n) {
+  const c = HEX[n.g]
+  const T = { k: n.g, c, nc: mix(c, "#1e1236", 0.6), lt: mix(c, "#ffffff", 0.55), dk: mix(c, "#000000", 0.35) }
+  const R = RECIPES[n.id]
+  n.r = R.r
+  n.svg = R.draw(T)
+}
+/* ## Edges, state and DOM ## */
+const ETYPES = {
+  specializes: { name: "Specializes into", color: "#5aa2ec", dash: "" },
+  implements: { name: "Can be implemented with", color: "#ee7650", dash: "4 5" },
+}
+const NS = "http://www.w3.org/2000/svg"
+const svg = document.getElementById("svg")
+const stage = document.getElementById("stage")
+const panel = document.getElementById("panel")
+const byId = {}
+const nodeEls = {}
+const edgeEls = []
+const hiddenGroups = new Set()
+const cur = {}
+let vis = new Set()
+let selected = null
+let query = ""
+let mode = "lineage"
+let focus = false
+let view = { cx: 650, cy: 420, w: 1300 }
+let anim = null
+
+const el = (tag, attrs, parent) => {
+  const e = document.createElementNS(NS, tag)
+  for (const k in attrs) e.setAttribute(k, attrs[k])
+  if (parent) parent.appendChild(e)
+  return e
+}
+
+NODES.forEach(n => {
+  byId[n.id] = n
+  makeCell(n)
+  cur[n.id] = { x: n.x, y: n.y }
+})
+
+const defs = el("defs", {}, svg)
+for (const k in ETYPES) {
+  const m = el("marker", { id: "ar-" + k, viewBox: "0 0 10 10", refX: 9, refY: 5, markerWidth: 7, markerHeight: 7, orient: "auto-start-reverse" }, defs)
+  el("path", { d: "M0 1 L10 5 L0 9 Z", fill: ETYPES[k].color }, m)
+}
+
+const backLayer = el("g", {}, svg)
+const zonesG = el("g", { id: "zones" }, svg)
+const edgeLayer = el("g", {}, svg)
+const nodeLayer = el("g", {}, svg)
+const labelLayer = el("g", {}, svg)
+
+zones.forEach(z => { const t = el("text", { x: z[1], y: z[2], class: "zone" }, zonesG); t.textContent = z[0] })
+
+const backdrops = {}
+Object.keys(GROUPS).forEach(k => {
+  const g = el("g", { class: "backdrop", opacity: 0 }, backLayer)
+  el("rect", { rx: 22, fill: HEX[k], "fill-opacity": 0.07, stroke: HEX[k], "stroke-opacity": 0.35 }, g)
+  const t = el("text", { fill: HEX[k] }, g)
+  t.textContent = GROUPS[k].name
+  backdrops[k] = g
+})
+
+EDGES.forEach(e => {
+  const ty = ETYPES[e.type]
+  const p = el("path", { class: "edge", stroke: ty.color, "marker-end": `url(#ar-${e.type})` }, edgeLayer)
+  if (ty.dash) p.setAttribute("stroke-dasharray", ty.dash)
+  const lead = el("line", { stroke: ty.color, "stroke-width": 1, "stroke-opacity": 0.6, visibility: "hidden" }, labelLayer)
+  const lab = el("g", { class: "elabel", visibility: "hidden" }, labelLayer)
+  const w = (e.label || "").length * 6.7 + 16
+  el("rect", { x: -w / 2, y: -9, width: w, height: 18, rx: 9, stroke: ty.color }, lab)
+  const txt = el("text", { y: 4 }, lab)
+  txt.textContent = e.label || ""
+  edgeEls.push({ e, p, lab, lead, w, on: false, ax: 0, ay: 0, x: 0, y: 0 })
+})
+
+NODES.forEach(n => {
+  const g = el("g", { class: "node", tabindex: 0, role: "button", "aria-label": n.name + ", " + GROUPS[n.g].name }, nodeLayer)
+  const gfx = el("g", { class: "gfx" }, g)
+  gfx.innerHTML = n.svg
+  el("circle", { class: "ring", r: n.r + 7 }, g)
+  el("circle", { r: n.r, fill: "transparent" }, g)
+  const t = el("text", { class: "lbl", y: -(n.r + 10) }, g)
+  t.textContent = n.name
+  g.addEventListener("pointerdown", ev => ev.stopPropagation())
+  g.addEventListener("click", ev => { ev.stopPropagation(); select(n.id) })
+  g.addEventListener("dblclick", ev => {
+    ev.stopPropagation()
+    const exiting = focus && selected === n.id
+    if (selected !== n.id) select(n.id)
+    if (exiting) setFocus(false)
+    else if (!focus) setFocus(true)
+  })
+  g.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); select(n.id) } })
+  nodeEls[n.id] = g
+})
+
+function drawEdge(item) {
+  const { e, p } = item
+  const a = cur[e.a]
+  const b = cur[e.b]
+  const na = byId[e.a]
+  const nb = byId[e.b]
+  const dx = b.x - a.x
+  const dy = b.y - a.y
+  const k = e.curve || 0.08
+  const c = { x: (a.x + b.x) / 2 - dy * k, y: (a.y + b.y) / 2 + dx * k }
+  const clip = (o, r, m) => {
+    const vx = c.x - o.x
+    const vy = c.y - o.y
+    const l = Math.hypot(vx, vy) || 1
+    return { x: o.x + vx / l * (r + m), y: o.y + vy / l * (r + m) }
+  }
+  const s = clip(a, na.r, 3)
+  const t = clip(b, nb.r, 7)
+  p.setAttribute("d", `M${f1(s.x)} ${f1(s.y)}Q${f1(c.x)} ${f1(c.y)} ${f1(t.x)} ${f1(t.y)}`)
+  const u = 0.55
+  item.ax = (1 - u) * (1 - u) * s.x + 2 * u * (1 - u) * c.x + u * u * t.x
+  item.ay = (1 - u) * (1 - u) * s.y + 2 * u * (1 - u) * c.y + u * u * t.y
+}
+
+function placeLabels() {
+  const L = edgeEls.filter(it => it.on)
+  if (!L.length) return
+  L.forEach(it => { it.x = it.ax; it.y = it.ay })
+  const obs = []
+  vis.forEach(id => {
+    const n = byId[id]
+    const p = cur[id]
+    obs.push({ x: p.x, y: p.y, hw: n.r + 6, hh: n.r + 6 })
+    obs.push({ x: p.x, y: p.y - n.r - 17, hw: n.name.length * 4.3 + 6, hh: 11 })
+  })
+  for (let k = 0; k < 70; k++) {
+    for (let i = 0; i < L.length; i++) {
+      const a = L[i]
+      for (let j = i + 1; j < L.length; j++) {
+        const b = L[j]
+        const ox = (a.w + b.w) / 2 + 4 - Math.abs(a.x - b.x)
+        const oy = 22 - Math.abs(a.y - b.y)
+        if (ox > 0 && oy > 0) {
+          if (oy < ox) {
+            const sg = a.y <= b.y ? -1 : 1
+            a.y += sg * oy / 2
+            b.y -= sg * oy / 2
+          } else {
+            const sg = a.x <= b.x ? -1 : 1
+            a.x += sg * ox / 2
+            b.x -= sg * ox / 2
+          }
+        }
+      }
+      obs.forEach(o => {
+        const ox = a.w / 2 + o.hw - Math.abs(a.x - o.x)
+        const oy = 9 + o.hh - Math.abs(a.y - o.y)
+        if (ox > 0 && oy > 0) {
+          if (oy < ox) a.y += (a.y >= o.y ? 1 : -1) * oy
+          else a.x += (a.x >= o.x ? 1 : -1) * ox
+        }
+      })
+      a.x += (a.ax - a.x) * 0.03
+      a.y += (a.ay - a.y) * 0.03
+    }
+  }
+  L.forEach(it => {
+    it.lab.setAttribute("transform", `translate(${f1(it.x)} ${f1(it.y)})`)
+    const far = Math.hypot(it.x - it.ax, it.y - it.ay) > 16
+    it.lead.setAttribute("visibility", far ? "visible" : "hidden")
+    if (far) {
+      it.lead.setAttribute("x1", f1(it.ax))
+      it.lead.setAttribute("y1", f1(it.ay))
+      it.lead.setAttribute("x2", f1(it.x))
+      it.lead.setAttribute("y2", f1(it.y))
+    }
+  })
+}
+function drawAll() {
+  NODES.forEach(n => nodeEls[n.id].setAttribute("transform", `translate(${f1(cur[n.id].x)} ${f1(cur[n.id].y)})`))
+  edgeEls.forEach(drawEdge)
+  placeLabels()
+}
+function applyView() {
+  const W = stage.clientWidth || 1000
+  const H = stage.clientHeight || 600
+  const h = view.w * H / W
+  svg.setAttribute("viewBox", `${f1(view.cx - view.w / 2)} ${f1(view.cy - h / 2)} ${f1(view.w)} ${f1(h)}`)
+}
+
+const GORDER = ["sequential", "linked", "hash", "adt", "tree", "graph"]
+const baseVisible = () => NODES.filter(n => !hiddenGroups.has(n.g)).map(n => n.id)
+
+function layoutLineage(ids) {
+  const pos = {}
+  ids.forEach(id => { pos[id] = { x: byId[id].x, y: byId[id].y } })
+  return { pos, ids, boxes: null }
+}
+
+function layoutCategory(ids) {
+  const pos = {}
+  const blocks = []
+  const sx = 110
+  const sy = 110
+  GORDER.forEach(k => {
+    const mem = ids.filter(id => byId[id].g === k)
+    if (!mem.length) return
+    const cols = mem.length <= 4 ? mem.length : mem.length <= 8 ? 4 : 5
+    const rows = Math.ceil(mem.length / cols)
+    blocks.push({ k, mem, cols, rows, w: cols * sx + 36, h: rows * sy + 62 })
+  })
+  const maxW = 1400
+  let x = 0
+  let y = 0
+  let rowH = 0
+  const boxes = []
+  blocks.forEach(b => {
+    if (x > 0 && x + b.w > maxW) { x = 0; y += rowH + 34; rowH = 0 }
+    b.mem.forEach((id, i) => {
+      pos[id] = { x: x + 18 + sx / 2 + (i % b.cols) * sx, y: y + 58 + sy / 2 + Math.floor(i / b.cols) * sy - 14 }
+    })
+    boxes.push({ k: b.k, x, y, w: b.w, h: b.h })
+    x += b.w + 34
+    rowH = Math.max(rowH, b.h)
+  })
+  return { pos, ids, boxes }
+}
+
+function layoutNetwork(ids) {
+  const P = ids.map(id => ({ id, x: byId[id].x + (byId[id].y % 7) * 3, y: byId[id].y + (byId[id].x % 5) * 3, vx: 0, vy: 0, g: byId[id].g, r: byId[id].r }))
+  const idx = {}
+  P.forEach((p, i) => { idx[p.id] = i })
+  const links = EDGES.filter(e => idx[e.a] !== undefined && idx[e.b] !== undefined)
+  const iters = 360
+  for (let it = 0; it < iters; it++) {
+    const a = 1 - it / iters
+    for (let i = 0; i < P.length; i++) {
+      for (let j = i + 1; j < P.length; j++) {
+        const p = P[i]
+        const q = P[j]
+        let dx = p.x - q.x
+        let dy = p.y - q.y
+        const d2 = dx * dx + dy * dy + 0.5
+        const d = Math.sqrt(d2)
+        let fr = 60000 / d2
+        const min = p.r + q.r + 95
+        if (d < min) fr += (min - d) * 0.25
+        dx /= d
+        dy /= d
+        p.vx += dx * fr * a
+        p.vy += dy * fr * a
+        q.vx -= dx * fr * a
+        q.vy -= dy * fr * a
+      }
+    }
+    links.forEach(e => {
+      const p = P[idx[e.a]]
+      const q = P[idx[e.b]]
+      const dx = q.x - p.x
+      const dy = q.y - p.y
+      const d = Math.hypot(dx, dy) || 1
+      const fs = (d - 220) * 0.02 * a
+      p.vx += dx / d * fs
+      p.vy += dy / d * fs
+      q.vx -= dx / d * fs
+      q.vy -= dy / d * fs
+    })
+    const cen = {}
+    P.forEach(p => {
+      const c = cen[p.g] || (cen[p.g] = { x: 0, y: 0, n: 0 })
+      c.x += p.x
+      c.y += p.y
+      c.n++
+    })
+    P.forEach(p => {
+      const c = cen[p.g]
+      p.vx += (c.x / c.n - p.x) * 0.03 * a - p.x * 0.004
+      p.vy += (c.y / c.n - p.y) * 0.03 * a - p.y * 0.004
+      p.vx *= 0.8
+      p.vy *= 0.8
+      p.x += p.vx
+      p.y += p.vy
+    })
+  }
+  const pos = {}
+  P.forEach(p => { pos[p.id] = { x: p.x, y: p.y } })
+  return { pos, ids, boxes: null }
+}
+
+function neighborsOf(id) {
+  const ins = []
+  const outs = []
+  const both = []
+  const seen = {}
+  EDGES.forEach(e => {
+    if (e.a !== id && e.b !== id) return
+    const o = e.a === id ? e.b : e.a
+    if (hiddenGroups.has(byId[o].g)) return
+    seen[o] = seen[o] || { i: false, o: false }
+    if (e.a === id) seen[o].o = true
+    else seen[o].i = true
+  })
+  for (const o in seen) (seen[o].i && seen[o].o ? both : seen[o].i ? ins : outs).push(o)
+  return { ins, outs, both }
+}
+
+function layoutFocus(id) {
+  const nb = neighborsOf(id)
+  const pos = { [id]: { x: 0, y: 0 } }
+  const col = (list, side) => {
+    const per = 6
+    const cols = Math.ceil(list.length / per)
+    list.forEach((o, i) => {
+      const c = Math.floor(i / per)
+      const inCol = Math.min(per, list.length - c * per)
+      pos[o] = { x: side * (330 + c * 150), y: (i % per - (inCol - 1) / 2) * 120 }
+    })
+  }
+  col(nb.ins, -1)
+  col(nb.outs, 1)
+  nb.both.forEach((o, i) => { pos[o] = { x: (i - (nb.both.length - 1) / 2) * 140, y: i % 2 ? 250 : -250 } })
+  return { pos, ids: Object.keys(pos), boxes: null }
+}
+
+function computeLayout() {
+  if (focus && selected) return layoutFocus(selected)
+  const ids = baseVisible()
+  if (mode === "category") return layoutCategory(ids)
+  if (mode === "network") return layoutNetwork(ids)
+  return layoutLineage(ids)
+}
+
+function fitFor(layout) {
+  let x0 = Infinity
+  let x1 = -Infinity
+  let y0 = Infinity
+  let y1 = -Infinity
+  layout.ids.forEach(id => {
+    const p = layout.pos[id]
+    const r = byId[id].r
+    x0 = Math.min(x0, p.x - r - 22)
+    x1 = Math.max(x1, p.x + r + 22)
+    y0 = Math.min(y0, p.y - r - 34)
+    y1 = Math.max(y1, p.y + r + 22)
+  })
+  if (layout.boxes) layout.boxes.forEach(b => { x0 = Math.min(x0, b.x - 10); x1 = Math.max(x1, b.x + b.w + 10); y0 = Math.min(y0, b.y - 10); y1 = Math.max(y1, b.y + b.h + 10) })
+  if (mode === "lineage" && !(focus && selected)) { x0 = Math.min(x0, 10); y0 = Math.min(y0, 20) }
+  const W = stage.clientWidth || 1000
+  const H = stage.clientHeight || 600
+  const w = Math.max((x1 - x0) * 1.04, (y1 - y0) * 1.04 * W / H, 1100)
+  return { cx: (x0 + x1) / 2, cy: (y0 + y1) / 2, w }
+}
+
+const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2
+
+function applyLayout(instant) {
+  const L = computeLayout()
+  const newVis = new Set(L.ids)
+  L.ids.forEach(id => { if (!vis.has(id)) cur[id] = { x: L.pos[id].x, y: L.pos[id].y } })
+  vis = newVis
+  const from = {}
+  L.ids.forEach(id => { from[id] = { x: cur[id].x, y: cur[id].y } })
+  const vFrom = { ...view }
+  const vTo = fitFor(L)
+  Object.keys(backdrops).forEach(k => {
+    const bx = L.boxes && L.boxes.find(b => b.k === k)
+    const g = backdrops[k]
+    if (bx) {
+      const r = g.querySelector("rect")
+      r.setAttribute("x", bx.x)
+      r.setAttribute("y", bx.y)
+      r.setAttribute("width", bx.w)
+      r.setAttribute("height", bx.h)
+      const t = g.querySelector("text")
+      t.setAttribute("x", bx.x + 20)
+      t.setAttribute("y", bx.y + 30)
+    }
+    g.setAttribute("opacity", bx ? 1 : 0)
+  })
+  zonesG.style.opacity = mode === "lineage" && !(focus && selected) ? 1 : 0
+  refresh()
+  if (instant) {
+    L.ids.forEach(id => { cur[id] = { x: L.pos[id].x, y: L.pos[id].y } })
+    view = vTo
+    drawAll()
+    applyView()
+    return
+  }
+  const t0 = performance.now()
+  const token = {}
+  anim = token
+  const dur = 750
+  const frame = now => {
+    if (anim !== token) return
+    const t = ease(Math.min(1, (now - t0) / dur))
+    L.ids.forEach(id => {
+      cur[id].x = from[id].x + (L.pos[id].x - from[id].x) * t
+      cur[id].y = from[id].y + (L.pos[id].y - from[id].y) * t
+    })
+    view = { cx: vFrom.cx + (vTo.cx - vFrom.cx) * t, cy: vFrom.cy + (vTo.cy - vFrom.cy) * t, w: vFrom.w + (vTo.w - vFrom.w) * t }
+    drawAll()
+    applyView()
+    if (t < 1) requestAnimationFrame(frame)
+  }
+  requestAnimationFrame(frame)
+}
+const matches = n => {
+  if (!query) return true
+  const hay = [n.name, n.sub, n.markers.join(" "), n.products.join(" "), n.roles.join(" "), n.notes, n.where, n.complexity.map(c => c.join(" ")).join(" ")].join(" ").toLowerCase()
+  return hay.includes(query)
+}
+
+function refresh() {
+  NODES.forEach(n => {
+    const g = nodeEls[n.id]
+    const shown = vis.has(n.id)
+    const rel = selected && (n.id === selected || EDGES.some(e => (e.a === selected && e.b === n.id) || (e.b === selected && e.a === n.id)))
+    g.classList.toggle("gone", !shown)
+    g.classList.toggle("dim", shown && (!matches(n) || (!!selected && !rel)))
+    g.classList.toggle("sel", n.id === selected)
+  })
+  edgeEls.forEach(it => {
+    const { e, p, lab, lead } = it
+    const shown = vis.has(e.a) && vis.has(e.b)
+    const on = !!(shown && selected && (e.a === selected || e.b === selected))
+    it.on = on
+    p.classList.toggle("gone", !shown)
+    p.classList.toggle("on", on)
+    p.classList.toggle("off", shown && !!selected && !on)
+    lab.setAttribute("visibility", on ? "visible" : "hidden")
+    if (!on) lead.setAttribute("visibility", "hidden")
+  })
+  placeLabels()
+}
+
+const list = a => a.map(x => `<p>${x}</p>`).join("")
+const tags = a => `<div class="tags">${a.map(x => `<span class="tag">${x}</span>`).join("")}</div>`
+const complexityTable = rows => `<table class="complexity-table"><thead><tr><th>Operation</th><th>Time</th></tr></thead><tbody>${rows.map(([op, v]) => `<tr><td>${op}</td><td>${v}</td></tr>`).join("")}</tbody></table>`
+
+function relRows(id) {
+  const rows = []
+  EDGES.forEach(e => {
+    if (e.a === id) rows.push({ other: e.b, out: true, type: e.type, label: e.label })
+    else if (e.b === id) rows.push({ other: e.a, out: false, type: e.type, label: e.label })
+  })
+  return rows.map(r => {
+    const o = byId[r.other]
+    const verb = r.out ? ETYPES[r.type].name.toLowerCase() : "comes from"
+    return `<button class="rel" data-go="${o.id}" style="--c:${GROUPS[o.g].color}"><span class="dir">${r.out ? "→" : "←"}</span><b>${o.name}</b><span>${verb}${r.label ? ", " + r.label : ""}</span></button>`
+  }).join("")
+}
+
+function showDefault() {
+  const legend = Object.keys(ETYPES).map(k => {
+    const t = ETYPES[k]
+    const head = `<path d="M36 1 L45 6 L36 11 Z" fill="${t.color}"/>`
+    return `<div><svg viewBox="0 0 46 12"><line x1="2" y1="6" x2="38" y2="6" stroke="${t.color}" stroke-width="2" ${t.dash ? `stroke-dasharray="${t.dash}"` : ""}/>${head}</svg>${t.name}</div>`
+  }).join("")
+  panel.innerHTML = `<div id="hint"><h2>Pick a structure</h2>
+  <p>Click any structure and its connections light up, showing what it's built from and what's built from it. The panel fills with its properties, Big-O complexities, and a runnable Python example.</p>
+  <h3>Controls</h3>
+  <p>Map, Categories, or Network layouts. Chips hide a family. Focus on selection isolates a structure's inputs and outputs. Double-click to focus, drag to pan, scroll to zoom, search by name, operation, or complexity.</p>
+  <h3>Edge types</h3><div class="legend">${legend}</div></div>`
+}
+
+function showNode(n) {
+  panel.innerHTML = `<svg class="hero" viewBox="-44 -44 88 88" aria-hidden="true">${n.svg}</svg>
+  <span class="badge" style="--c:${GROUPS[n.g].color}">${GROUPS[n.g].name}</span>
+  <h2>${n.name}</h2><p class="sub">${n.sub}</p>
+  <h3>Properties</h3>${tags(n.markers)}
+  <h3>Used for</h3><p>${n.where}</p>
+  <h3>How it works</h3>${list(n.roles)}
+  <h3>Core operations</h3>${tags(n.products)}
+  <h3>Complexity</h3>${complexityTable(n.complexity)}
+  <h3>Try it in Python</h3>
+  <div class="code-block">
+    <pre class="starter">${n.code}</pre>
+    <div class="editor-mount"></div>
+    <div class="code-actions"><button class="run-btn">Run &#9658;</button></div>
+    <pre class="output"></pre>
+  </div>
+  <h3>Worth knowing</h3><div class="note">${n.notes}</div>
+  <h3>Relationships (click to jump)</h3><div>${relRows(n.id)}</div>`
+  panel.scrollTop = 0
+  panel.querySelectorAll("[data-go]").forEach(b => b.addEventListener("click", () => select(b.dataset.go)))
+  mountCodeBlock(panel.querySelector(".code-block"))
+}
+
+/* ## Pyodide-powered runnable example in the panel ## */
+let pyodide = null
+let pyodideReady = false
+let runQueue = Promise.resolve()
+function runUserCode(code) {
+  const task = runQueue.then(() => executeInPyodide(code))
+  runQueue = task.then(() => {}, () => {})
+  return task
+}
+async function executeInPyodide(code) {
+  pyodide.globals.set("__user_code__", code)
+  const resultProxy = await pyodide.runPythonAsync(`
+import io, contextlib, traceback
+__buf__ = io.StringIO()
+__err__ = None
+try:
+    with contextlib.redirect_stdout(__buf__):
+        exec(__user_code__, {})
+except Exception:
+    __err__ = traceback.format_exc()
+[__buf__.getvalue(), __err__]
+`)
+  const [out, err] = resultProxy.toJs()
+  if (resultProxy && resultProxy.destroy) resultProxy.destroy()
+  return [out, err]
+}
+function mountCodeBlock(block) {
+  if (!block) return
+  const starterEl = block.querySelector(".starter")
+  const mount = block.querySelector(".editor-mount")
+  const cm = CodeMirror(mount, {
+    value: starterEl.textContent,
+    mode: "python",
+    theme: "dracula",
+    lineNumbers: true,
+    indentUnit: 4,
+    viewportMargin: Infinity,
+  })
+  const runBtn = block.querySelector(".run-btn")
+  const output = block.querySelector(".output")
+  runBtn.addEventListener("click", async () => {
+    if (!pyodideReady) {
+      output.textContent = "Python is still loading, try again in a moment…"
+      return
+    }
+    runBtn.disabled = true
+    output.textContent = "Running…"
+    output.classList.remove("error")
+    try {
+      const [out, err] = await runUserCode(cm.getValue())
+      if (err) {
+        output.textContent = err
+        output.classList.add("error")
+      } else {
+        output.textContent = out.length ? out : ""
+      }
+    } finally {
+      runBtn.disabled = false
+    }
+  })
+  requestAnimationFrame(() => cm.refresh())
+}
+
+const focusBtn = document.getElementById("focusBtn")
+function select(id) {
+  selected = id
+  if (id) showNode(byId[id])
+  else showDefault()
+  focusBtn.disabled = !id
+  focusBtn.title = id ? "Arrange inputs left and outputs right of this structure (or double-click a structure)" : "Select a structure first"
+  try { history.replaceState(null, "", id ? "#" + id : location.pathname) } catch (err) {}
+  if (focus) applyLayout(false)
+  else refresh()
+}
+
+const chips = document.getElementById("chips")
+Object.keys(GROUPS).forEach(k => {
+  const b = document.createElement("button")
+  b.className = "chip"
+  b.setAttribute("aria-pressed", "true")
+  b.style.setProperty("--c", GROUPS[k].color)
+  b.innerHTML = `<i></i>${GROUPS[k].name}`
+  b.addEventListener("click", () => {
+    if (hiddenGroups.has(k)) hiddenGroups.delete(k)
+    else hiddenGroups.add(k)
+    b.setAttribute("aria-pressed", hiddenGroups.has(k) ? "false" : "true")
+    if (selected && hiddenGroups.has(byId[selected].g)) { selected = null; showDefault(); focusBtn.disabled = true }
+    applyLayout(false)
+  })
+  chips.appendChild(b)
+})
+document.querySelectorAll("#layout button").forEach(b => {
+  b.addEventListener("click", () => {
+    mode = b.dataset.mode
+    document.querySelectorAll("#layout button").forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"))
+    applyLayout(false)
+  })
+})
+function setFocus(on) {
+  focus = on
+  focusBtn.setAttribute("aria-pressed", on ? "true" : "false")
+  applyLayout(false)
+}
+focusBtn.addEventListener("click", () => setFocus(!focus))
+document.getElementById("fitBtn").addEventListener("click", () => applyLayout(false))
+const search = document.getElementById("search")
+search.addEventListener("input", () => { query = search.value.trim().toLowerCase(); refresh() })
+search.addEventListener("keydown", ev => {
+  if (ev.key === "Enter" && query) {
+    const m = NODES.find(n => matches(n) && vis.has(n.id))
+    if (m) select(m.id)
+  }
+})
+document.addEventListener("keydown", ev => { if (ev.key === "Escape") select(null) })
+window.addEventListener("hashchange", () => {
+  const id = location.hash.slice(1)
+  if (byId[id] && !hiddenGroups.has(byId[id].g)) select(id)
+})
+
+let drag = null
+svg.addEventListener("pointerdown", ev => {
+  anim = null
+  drag = { x: ev.clientX, y: ev.clientY, cx: view.cx, cy: view.cy, moved: false }
+  svg.setPointerCapture(ev.pointerId)
+})
+svg.addEventListener("pointermove", ev => {
+  if (!drag) return
+  const dx = ev.clientX - drag.x
+  const dy = ev.clientY - drag.y
+  if (Math.abs(dx) + Math.abs(dy) > 4) { drag.moved = true; svg.classList.add("panning") }
+  if (!drag.moved) return
+  const k = view.w / stage.clientWidth
+  view.cx = drag.cx - dx * k
+  view.cy = drag.cy - dy * k
+  applyView()
+})
+svg.addEventListener("pointerup", () => {
+  if (drag && !drag.moved) select(null)
+  drag = null
+  svg.classList.remove("panning")
+})
+svg.addEventListener("wheel", ev => {
+  ev.preventDefault()
+  anim = null
+  const W = stage.clientWidth
+  const H = stage.clientHeight
+  const r = svg.getBoundingClientRect()
+  const h = view.w * H / W
+  const px = view.cx - view.w / 2 + (ev.clientX - r.left) / W * view.w
+  const py = view.cy - h / 2 + (ev.clientY - r.top) / H * h
+  const nw = Math.min(3600, Math.max(300, view.w * Math.exp(ev.deltaY * 0.0015)))
+  const s = nw / view.w
+  view.cx = px - (px - view.cx) * s
+  view.cy = py - (py - view.cy) * s
+  view.w = nw
+  applyView()
+}, { passive: false })
+
+const start = location.hash.slice(1)
+if (byId[start]) { selected = start; showNode(byId[start]); focusBtn.disabled = false } else showDefault()
+applyLayout(true)
+let lastW = stage.clientWidth
+new ResizeObserver(() => {
+  if (stage.clientWidth !== lastW) { lastW = stage.clientWidth; applyLayout(true) }
+  else applyView()
+}).observe(stage)
+
+async function bootPyodide() {
+  const status = document.getElementById("pyStatus")
+  pyodide = await loadPyodide()
+  pyodideReady = true
+  status.textContent = "Python ready"
+  status.classList.add("ready")
+}
+bootPyodide()
+</script>
+</body>
+</html>
