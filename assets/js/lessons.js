@@ -44,7 +44,7 @@ const LESSONS = [
     blurb: "Write and run real Python right in the page: scripts, debugging, flow control, loops, and functions, with predict-and-check challenges and a built-in Python dictionary.",
     href: "lessons/intro-to-programming/index.html",
     category: "cs-programming",
-    matter: ["python", "debugging", "flow control", "loops", "functions", "beginner"],
+    matter: ["python", "types", "debugging", "flow control", "loops", "functions", "strings", "lists", "beginner"],
     classes: [],
     icon: "terminal",
   },
