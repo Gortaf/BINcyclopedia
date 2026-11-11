@@ -90,6 +90,56 @@
   margin: 0 0 0.75rem;
   color: var(--text);
 }
+.predict-field {
+  display: block;
+  margin: 0.75rem 0 0;
+  font: 500 11px var(--mono);
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.predict-input {
+  display: block;
+  margin-top: 0.4rem;
+  width: 100%;
+  font-family: var(--mono) !important;
+  text-transform: none;
+  letter-spacing: normal;
+  font-size: 13px !important;
+  resize: vertical;
+}
+.solution-btn {
+  background: var(--surface-2);
+  border: 1px solid var(--line);
+  color: var(--muted);
+  border-radius: 8px;
+  padding: 7px 14px;
+  font: 500 12px var(--body);
+  cursor: pointer;
+}
+.solution-btn:disabled { opacity: 0.35; cursor: default; }
+.solution-btn:not(:disabled):hover { border-color: var(--accent); color: var(--text); }
+.solution-btn.unlocked { border-color: var(--accent); color: var(--accent); }
+.solution-code {
+  margin-top: 0.75rem;
+  background: var(--surface-2);
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+  font-family: var(--mono);
+  font-size: 13px;
+  color: var(--text);
+  white-space: pre-wrap;
+}
+.predict-explain {
+  margin: 0.75rem 0 0;
+  padding: 0.6rem 0.9rem;
+  border-left: 3px solid var(--accent);
+  background: var(--surface-2);
+  border-radius: 0 8px 8px 0;
+  font-size: 13.5px;
+  color: var(--text);
+}
 .code-block .starter { display: none; }
 .editor-mount .CodeMirror {
   border: 1px solid var(--line);
@@ -99,7 +149,11 @@
   font-size: 13.5px;
   padding: 2px 0;
 }
-.code-block.inspecting .CodeMirror { cursor: help; }
+.code-block.inspecting .CodeMirror {
+  cursor: zoom-in;
+  background: #262a1f !important;
+  border-color: var(--accent);
+}
 .code-block-actions {
   display: flex;
   align-items: center;
@@ -133,6 +187,21 @@
 }
 .inspect-btn:hover { border-color: var(--accent); color: var(--text); }
 .inspect-btn.active { background: var(--accent); color: #0d1117; border-color: var(--accent); }
+.inspect-label {
+  display: inline-block;
+  max-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  opacity: 0;
+  font: 500 12px var(--body);
+  color: var(--accent);
+  vertical-align: middle;
+  transition: max-width 0.35s ease, opacity 0.25s ease 0.05s;
+}
+.inspect-btn.active + .inspect-label {
+  max-width: 320px;
+  opacity: 1;
+}
 .result-badge { font: 500 12.5px var(--mono); }
 .result-badge.pass { color: #4cc2a0; }
 .result-badge.fail { color: #ee7650; }
@@ -281,6 +350,7 @@ print("Nice to meet you,", name)</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -297,6 +367,7 @@ print("Total cost:", total)</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -314,6 +385,7 @@ print("Your name has", len(full_name), "characters.")</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -326,37 +398,43 @@ print("Your name has", len(full_name), "characters.")</pre>
     <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
     <div class="subsection-body" hidden>
 
-      <div class="code-block" data-item-id="script-predict-1" data-track="predict">
+      <div class="code-block" data-item-id="script-predict-1" data-track="predict" data-predict-answer="6">
         <span class="label">Predict</span>
         <p class="task">What will this print? Decide first, then run it to check.</p>
         <pre class="starter">x = 5
 x = x + 1
 print(x)</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden><code>x = x + 1</code> reads the current value of <code>x</code> (5), adds 1, and stores the new value back in <code>x</code>. The <code>=</code> sign means "store this value", not mathematical equality.</p>
       </div>
 
-      <div class="code-block" data-item-id="script-predict-2" data-track="predict">
+      <div class="code-block" data-item-id="script-predict-2" data-track="predict" data-predict-answer="3333">
         <span class="label">Predict</span>
         <p class="task">What will this print? Decide first, then run it to check.</p>
         <pre class="starter">a = "3"
 b = 4
 print(a * b)</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden>Multiplying a string by a number repeats the string that many times, it doesn't do arithmetic. <code>"3" * 4</code> is the text "3" repeated 4 times, not the number 12.</p>
       </div>
 
-      <div class="code-block" data-item-id="script-predict-3" data-track="predict">
+      <div class="code-block" data-item-id="script-predict-3" data-track="predict" data-predict-answer="Hello, World!&#10;H">
         <span class="label">Predict</span>
         <p class="task">What will both lines print? Decide first, then run it to check.</p>
         <pre class="starter">greeting = "Hello"
@@ -364,12 +442,15 @@ greeting = greeting + ", World!"
 print(greeting)
 print(greeting[0])</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden>The first print shows the updated greeting after concatenation. The second print shows just the character at position 0, the first character of the string, since indexing starts at 0.</p>
       </div>
 
     </div>
@@ -389,9 +470,14 @@ last = ""
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>first = "Ada"
+last = "Lovelace"
+print(first + " " + last)</pre>
       </div>
 
       <div class="code-block" data-item-id="script-diy-2" data-expected="64">
@@ -403,9 +489,13 @@ last = ""
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>n = 8
+print(n * n)</pre>
       </div>
 
       <div class="code-block" data-item-id="script-diy-3" data-expected="Area: 18">
@@ -418,9 +508,203 @@ height = 3
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>width = 6
+height = 3
+print("Area:", width * height)</pre>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section class="concept" id="concept-types">
+  <h2>Types: int, float, str, bool, None</h2>
+  <p>Every value in Python has a type, which decides what you can do with it. A whole number behaves differently from text, even when they look similar on screen, and mixing the wrong types together is one of the most common beginner mistakes, one you'll meet again in the next section.</p>
+
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="true"><span class="chevron">&#9662;</span> Examples</button>
+    <div class="subsection-body">
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">print(type(5))
+print(type(3.14))
+print(type("hello"))
+print(type(True))</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">age_text = "25"
+age_number = int(age_text)
+print(age_number + 5)
+print(type(age_number))</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+      <div class="code-block">
+        <span class="label">Example</span>
+        <pre class="starter">quantity = 3
+price = 2.5
+total = quantity * price
+print(total)
+print(type(total))
+
+result = None
+print(result)
+print(type(result))</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="types-predict-1" data-track="predict" data-predict-answer="7&#10;52">
+        <span class="label">Predict</span>
+        <p class="task">What will both lines print? Decide first, then run it to check.</p>
+        <pre class="starter">print(5 + 2)
+print("5" + "2")</pre>
+        <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+        <p class="predict-explain" hidden><code>+</code> does arithmetic when both sides are numbers, giving 7. When both sides are strings it concatenates them instead, giving the text "52", it does not add them as numbers.</p>
+      </div>
+
+      <div class="code-block" data-item-id="types-predict-2" data-track="predict" data-predict-answer="False&#10;True&#10;False&#10;True">
+        <span class="label">Predict</span>
+        <p class="task">What will these four lines print? Decide first, then run it to check.</p>
+        <pre class="starter">print(bool(0))
+print(bool(1))
+print(bool(""))
+print(bool("hi"))</pre>
+        <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="3" placeholder="Type what you think will print..."></textarea></label>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+        <p class="predict-explain" hidden>Zero and an empty string both convert to <code>False</code>, they count as "empty" or "nothing". Any nonzero number and any non-empty string convert to <code>True</code>.</p>
+      </div>
+
+      <div class="code-block" data-item-id="types-predict-3" data-track="predict" data-predict-answer="101010">
+        <span class="label">Predict</span>
+        <p class="task">What will this print? Decide first, then run it to check.</p>
+        <pre class="starter">x = "10"
+y = 3
+print(x * y)</pre>
+        <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+        <p class="predict-explain" hidden><code>x</code> is a string here, not a number, so <code>x * y</code> repeats the string 3 times rather than multiplying 10 by 3.</p>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="subsection">
+    <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Do it yourself <span class="progress-count"></span></button>
+    <div class="subsection-body" hidden>
+
+      <div class="code-block" data-item-id="types-diy-1" data-expected="50">
+        <span class="label">Do it yourself</span>
+        <p class="task">Convert the string <code>value = "42"</code> to an integer, add 8 to it, and print the result.</p>
+        <pre class="starter">value = "42"
+# your code here</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+        <pre class="solution-code" hidden>value = "42"
+print(int(value) + 8)</pre>
+      </div>
+
+      <div class="code-block" data-item-id="types-diy-2" data-expected="19 dollars">
+        <span class="label">Do it yourself</span>
+        <p class="task">Create <code>price = 19</code> (an int). Print it combined with the word "dollars", like <code>"19 dollars"</code>.</p>
+        <pre class="starter">price = 19
+# your code here</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+        <pre class="solution-code" hidden>price = 19
+print(price, "dollars")</pre>
+      </div>
+
+      <div class="code-block" data-item-id="types-diy-3" data-expected="10.0">
+        <span class="label">Do it yourself</span>
+        <p class="task">Given <code>quantity = "4"</code> (text) and <code>unit_price = 2.5</code>, convert quantity to a number and print the total cost (<code>quantity * unit_price</code>).</p>
+        <pre class="starter">quantity = "4"
+unit_price = 2.5
+# your code here</pre>
+        <div class="editor-mount"></div>
+        <div class="code-block-actions">
+          <button class="run-btn" disabled>Run &#9658;</button>
+          <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
+          <span class="result-badge"></span>
+        </div>
+        <pre class="output"></pre>
+        <pre class="solution-code" hidden>quantity = "4"
+unit_price = 2.5
+print(int(quantity) * unit_price)</pre>
       </div>
 
     </div>
@@ -447,6 +731,7 @@ print(player_name)</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -460,6 +745,7 @@ print("I am " + age + " years old.")</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -474,6 +760,7 @@ for i in range(4):
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -486,35 +773,41 @@ for i in range(4):
     <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
     <div class="subsection-body" hidden>
 
-      <div class="code-block" data-item-id="debug-predict-1" data-track="predict">
+      <div class="code-block" data-item-id="debug-predict-1" data-track="predict" data-predict-answer="ZeroDivisionError">
         <span class="label">Predict</span>
         <p class="task">Will this run cleanly, or raise an error? If it errors, which exception type do you expect?</p>
         <pre class="starter">total = 10
 print(total / 0)</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="e.g. ZeroDivisionError, or 'no error'"></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden>Dividing by zero is mathematically undefined, so Python raises a <code>ZeroDivisionError</code> instead of continuing.</p>
       </div>
 
-      <div class="code-block" data-item-id="debug-predict-2" data-track="predict">
+      <div class="code-block" data-item-id="debug-predict-2" data-track="predict" data-predict-answer="IndexError">
         <span class="label">Predict</span>
         <p class="task">Will this run cleanly, or raise an error? If it errors, which exception type do you expect?</p>
         <pre class="starter">items = ["pen", "book"]
 print(items[2])</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="e.g. IndexError, or 'no error'"></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden>The list has two items, at indices 0 and 1. Asking for index 2 is out of range, so Python raises an <code>IndexError</code>.</p>
       </div>
 
-      <div class="code-block" data-item-id="debug-predict-3" data-track="predict">
+      <div class="code-block" data-item-id="debug-predict-3" data-track="predict" data-predict-answer="TypeError">
         <span class="label">Predict</span>
         <p class="task">Will this run cleanly, or raise an error? If it errors, which exception type do you expect?</p>
         <pre class="starter">def add(a, b):
@@ -522,12 +815,15 @@ print(items[2])</pre>
 
 print(add(2))</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="e.g. TypeError, or 'no error'"></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden><code>add</code> is defined to take two arguments, <code>a</code> and <code>b</code>. Calling it with only one argument leaves <code>b</code> unfilled, which Python reports as a <code>TypeError</code> about a missing argument.</p>
       </div>
 
     </div>
@@ -546,9 +842,13 @@ print(mesage)</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>message = "Hello there!"
+print(message)</pre>
       </div>
 
       <div class="code-block" data-item-id="debug-diy-2" data-expected="Final price: 15">
@@ -561,9 +861,14 @@ print("Final price: " + (price - discount))</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>price = 20
+discount = 5
+print("Final price:", price - discount)</pre>
       </div>
 
       <div class="code-block" data-item-id="debug-diy-3" data-expected="Total: 66">
@@ -578,9 +883,16 @@ print("Total:", total)</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>numbers = [4, 8, 15, 16, 23]
+total = 0
+for i in range(len(numbers)):
+    total = total + numbers[i]
+print("Total:", total)</pre>
       </div>
 
     </div>
@@ -609,6 +921,7 @@ else:
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -632,6 +945,7 @@ print("Grade:", grade)</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -650,6 +964,7 @@ else:
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -662,7 +977,7 @@ else:
     <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
     <div class="subsection-body" hidden>
 
-      <div class="code-block" data-item-id="flow-predict-1" data-track="predict">
+      <div class="code-block" data-item-id="flow-predict-1" data-track="predict" data-predict-answer="odd">
         <span class="label">Predict</span>
         <p class="task">What will this print? Decide first, then run it to check.</p>
         <pre class="starter">x = 7
@@ -671,15 +986,18 @@ if x % 2 == 0:
 else:
     print("odd")</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden>7 divided by 2 leaves a remainder of 1, not 0, so <code>x % 2 == 0</code> is false and the <code>else</code> branch runs.</p>
       </div>
 
-      <div class="code-block" data-item-id="flow-predict-2" data-track="predict">
+      <div class="code-block" data-item-id="flow-predict-2" data-track="predict" data-predict-answer="b wins">
         <span class="label">Predict</span>
         <p class="task">What will this print? Decide first, then run it to check.</p>
         <pre class="starter">a = 5
@@ -691,15 +1009,18 @@ elif a &lt; b:
 else:
     print("tie")</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden>a is less than b (5 &lt; 10), so the <code>elif a &lt; b</code> branch is the one that runs.</p>
       </div>
 
-      <div class="code-block" data-item-id="flow-predict-3" data-track="predict">
+      <div class="code-block" data-item-id="flow-predict-3" data-track="predict" data-predict-answer="flag is off">
         <span class="label">Predict</span>
         <p class="task">What will this print? Decide first, then run it to check.</p>
         <pre class="starter">flag = False
@@ -708,12 +1029,15 @@ if not flag:
 else:
     print("flag is on")</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden><code>not False</code> evaluates to <code>True</code>, so the <code>if not flag:</code> branch runs.</p>
       </div>
 
     </div>
@@ -732,9 +1056,16 @@ else:
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>number = 14
+if number % 2 == 0:
+    print("Even")
+else:
+    print("Odd")</pre>
       </div>
 
       <div class="code-block" data-item-id="flow-diy-2" data-expected="Minor">
@@ -746,9 +1077,16 @@ else:
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>age = 16
+if age &lt; 18:
+    print("Minor")
+else:
+    print("Adult")</pre>
       </div>
 
       <div class="code-block" data-item-id="flow-diy-3" data-expected="See a doctor">
@@ -761,9 +1099,17 @@ has_fever_symptoms = True
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>temp = 101
+has_fever_symptoms = True
+if temp &gt; 100 and has_fever_symptoms:
+    print("See a doctor")
+else:
+    print("You're probably fine.")</pre>
       </div>
 
     </div>
@@ -788,6 +1134,7 @@ print("The total is", total)</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -804,6 +1151,7 @@ print("Liftoff!")</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -818,6 +1166,7 @@ for fruit in fruits:
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -830,21 +1179,24 @@ for fruit in fruits:
     <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
     <div class="subsection-body" hidden>
 
-      <div class="code-block" data-item-id="loops-predict-1" data-track="predict">
+      <div class="code-block" data-item-id="loops-predict-1" data-track="predict" data-predict-answer="0&#10;1&#10;2">
         <span class="label">Predict</span>
         <p class="task">What will this print? Decide first, then run it to check.</p>
         <pre class="starter">for i in range(3):
     print(i)</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden><code>range(3)</code> produces 0, 1, and 2, three numbers starting at 0. It does not include 3.</p>
       </div>
 
-      <div class="code-block" data-item-id="loops-predict-2" data-track="predict">
+      <div class="code-block" data-item-id="loops-predict-2" data-track="predict" data-predict-answer="32">
         <span class="label">Predict</span>
         <p class="task">What single number will this print? Decide first, then run it to check.</p>
         <pre class="starter">n = 1
@@ -852,27 +1204,33 @@ while n &lt; 20:
     n = n * 2
 print(n)</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden>n doubles each time: 1, 2, 4, 8, 16, 32. At 16 the condition <code>16 &lt; 20</code> is still true so the loop runs once more, producing 32, at which point <code>32 &lt; 20</code> is false and the loop stops.</p>
       </div>
 
-      <div class="code-block" data-item-id="loops-predict-3" data-track="predict">
+      <div class="code-block" data-item-id="loops-predict-3" data-track="predict" data-predict-answer="c&#10;a&#10;t">
         <span class="label">Predict</span>
         <p class="task">What will this print? A string is a sequence of characters, so it can be looped over too.</p>
         <pre class="starter">word = "cat"
 for letter in word:
     print(letter)</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden>A string is a sequence of characters, so <code>for letter in word</code> visits each character in order: 'c', then 'a', then 't'.</p>
       </div>
 
     </div>
@@ -890,9 +1248,13 @@ for letter in word:
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>for i in range(1, 6):
+    print(i)</pre>
       </div>
 
       <div class="code-block" data-item-id="loops-diy-2" data-expected="Go!&#10;Go!&#10;Go!">
@@ -903,9 +1265,15 @@ for letter in word:
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>count = 0
+while count &lt; 3:
+    print("Go!")
+    count = count + 1</pre>
       </div>
 
       <div class="code-block" data-item-id="loops-diy-3" data-expected="6&#10;12&#10;18&#10;24">
@@ -917,9 +1285,14 @@ for letter in word:
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>numbers = [3, 6, 9, 12]
+for n in numbers:
+    print(n * 2)</pre>
       </div>
 
     </div>
@@ -945,6 +1318,7 @@ print(greet("Alan"))</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -961,6 +1335,7 @@ print(rectangle_area(10, 2))</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -980,6 +1355,7 @@ print(sum_up_to(10))</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
@@ -992,7 +1368,7 @@ print(sum_up_to(10))</pre>
     <button class="subsection-toggle" aria-expanded="false"><span class="chevron">&#9656;</span> Predict what this code does <span class="progress-count"></span></button>
     <div class="subsection-body" hidden>
 
-      <div class="code-block" data-item-id="functions-predict-1" data-track="predict">
+      <div class="code-block" data-item-id="functions-predict-1" data-track="predict" data-predict-answer="12">
         <span class="label">Predict</span>
         <p class="task">What will this print? Decide first, then run it to check.</p>
         <pre class="starter">def double(x):
@@ -1001,15 +1377,18 @@ print(sum_up_to(10))</pre>
 result = double(6)
 print(result)</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden><code>double</code> returns <code>x * 2</code>, and 6 * 2 is 12.</p>
       </div>
 
-      <div class="code-block" data-item-id="functions-predict-2" data-track="predict">
+      <div class="code-block" data-item-id="functions-predict-2" data-track="predict" data-predict-answer="HELLO">
         <span class="label">Predict</span>
         <p class="task">What will this print? <code>.upper()</code> is a string method that returns an upper-case copy.</p>
         <pre class="starter">def shout(word):
@@ -1017,15 +1396,18 @@ print(result)</pre>
 
 shout("hello")</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden><code>.upper()</code> returns an upper-case copy of the string. It doesn't change <code>word</code> itself, but printing the result shows the upper-case version.</p>
       </div>
 
-      <div class="code-block" data-item-id="functions-predict-3" data-track="predict">
+      <div class="code-block" data-item-id="functions-predict-3" data-track="predict" data-predict-answer="True&#10;False">
         <span class="label">Predict</span>
         <p class="task">What will these two lines print? Decide first, then run it to check.</p>
         <pre class="starter">def is_even(n):
@@ -1034,12 +1416,15 @@ shout("hello")</pre>
 print(is_even(4))
 print(is_even(7))</pre>
         <div class="editor-mount"></div>
+        <label class="predict-field">Your prediction<textarea class="predict-input" rows="2" placeholder="Type what you think will print..."></textarea></label>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <p class="predict-explain" hidden>4 % 2 is 0 so <code>4 % 2 == 0</code> is <code>True</code>. 7 % 2 is 1 so <code>7 % 2 == 0</code> is <code>False</code>.</p>
       </div>
 
     </div>
@@ -1061,9 +1446,15 @@ print(square(7))</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>def square(n):
+    return n * n
+
+print(square(7))</pre>
       </div>
 
       <div class="code-block" data-item-id="functions-diy-2" data-expected="True&#10;False">
@@ -1079,9 +1470,16 @@ print(is_adult(15))</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>def is_adult(age):
+    return age &gt;= 18
+
+print(is_adult(20))
+print(is_adult(15))</pre>
       </div>
 
       <div class="code-block" data-item-id="functions-diy-3" data-expected="36">
@@ -1096,9 +1494,15 @@ print(total_cost(12, 3))</pre>
         <div class="code-block-actions">
           <button class="run-btn" disabled>Run &#9658;</button>
           <button class="inspect-btn" aria-pressed="false" title="Inspect mode: click a keyword to look it up">&#128269;</button>
+          <span class="inspect-label">Inspect Mode On: click any keyword for more info</span>
+          <button class="solution-btn" disabled title="Try a few times, or get it right, to unlock">Show solution</button>
           <span class="result-badge"></span>
         </div>
         <pre class="output"></pre>
+        <pre class="solution-code" hidden>def total_cost(price, quantity):
+    return price * quantity
+
+print(total_cost(12, 3))</pre>
       </div>
 
     </div>
@@ -1322,6 +1726,27 @@ function setupBlocks() {
     const output = block.querySelector(".output")
     const badge = block.querySelector(".result-badge")
 
+    /* "Do it yourself" blocks get a solution button that unlocks after a
+       few unsuccessful attempts, or immediately on success. */
+    const solutionBtn = block.querySelector(".solution-btn")
+    const solutionCode = block.querySelector(".solution-code")
+    let attempts = 0
+    let solutionUnlocked = false
+    function unlockSolution() {
+      if (solutionUnlocked || !solutionBtn) return
+      solutionUnlocked = true
+      solutionBtn.disabled = false
+      solutionBtn.classList.add("unlocked")
+      solutionBtn.title = "Click to see a suggested solution"
+    }
+    if (solutionBtn) {
+      solutionBtn.addEventListener("click", () => {
+        if (!solutionUnlocked) return
+        solutionCode.hidden = !solutionCode.hidden
+        solutionBtn.textContent = solutionCode.hidden ? "Show solution" : "Hide solution"
+      })
+    }
+
     runBtn.addEventListener("click", async () => {
       runBtn.disabled = true
       output.textContent = "Running…"
@@ -1340,15 +1765,36 @@ function setupBlocks() {
           let completed = false
           if (track === "predict") {
             completed = true
-            badge.textContent = "checked, compare with your guess"
-            badge.className = "result-badge checked"
+            const predictInput = block.querySelector(".predict-input")
+            const predictAnswer = block.dataset.predictAnswer
+            const explainEl = block.querySelector(".predict-explain")
+            if (predictAnswer !== undefined) {
+              const norm = s => s.trim().toLowerCase().replace(/\r\n/g, "\n")
+              const userAnswer = predictInput ? predictInput.value : ""
+              if (userAnswer.trim() === "") {
+                badge.textContent = "no prediction entered"
+                badge.className = "result-badge checked"
+              } else {
+                const correct = norm(userAnswer) === norm(predictAnswer)
+                badge.textContent = correct ? "✓ your prediction was correct!" : "✗ not quite what you predicted"
+                badge.className = "result-badge " + (correct ? "pass" : "fail")
+              }
+              if (explainEl) explainEl.hidden = false
+            } else {
+              badge.textContent = "checked, compare with your guess"
+              badge.className = "result-badge checked"
+            }
           } else if (expected !== undefined) {
             const pass = !err && out.trim() === expected.trim()
             completed = pass
             badge.textContent = pass ? "✓ matches expected output" : "✗ not quite yet"
             badge.className = "result-badge " + (pass ? "pass" : "fail")
+            if (pass) unlockSolution()
+            else { attempts++; if (attempts >= 3) unlockSolution() }
           } else {
             completed = !err
+            if (completed) unlockSolution()
+            else { attempts++; if (attempts >= 3) unlockSolution() }
           }
           if (completed) {
             setDone(itemId)
