@@ -338,7 +338,7 @@ const N = o => NODES.push(o)
 const E = (a, b, type, label, curve) => EDGES.push({ a, b, type, label, curve: curve || 0 })
 
 N({
-  id: "arr", name: "Array", g: "sequential", x: 130, y: 90,
+  id: "arr", name: "Array", g: "sequential", x: 100, y: 90,
   sub: "Fixed-size, contiguous block of memory",
   markers: ["Fixed size", "Contiguous memory", "O(1) random access", "Index-based"],
   where: "Python's array module, NumPy arrays, low-level buffers",
@@ -358,7 +358,7 @@ print(list(nums))`,
   notes: "Python's everyday list is not this: it's a dynamic array that resizes itself automatically (see the next node). True fixed-size arrays in Python come from the array module or NumPy."
 })
 N({
-  id: "dyn", name: "Dynamic Array", g: "sequential", x: 380, y: 90,
+  id: "dyn", name: "Dynamic Array", g: "sequential", x: 320, y: 90,
   sub: "A resizable array that grows automatically: this is what Python's list is",
   markers: ["Amortized O(1) append", "Contiguous memory", "Resizes automatically", "O(1) random access"],
   where: "Python's built-in list, Java's ArrayList, C++'s std::vector",
@@ -380,7 +380,7 @@ print(my_list.pop())   # O(1): removes from the end`,
   notes: "Because growth is amortized, not guaranteed, a single append can occasionally be slow when a resize triggers, even though appends are O(1) on average. This rarely matters in practice."
 })
 N({
-  id: "lnk", name: "Linked List", g: "linked", x: 680, y: 90,
+  id: "lnk", name: "Linked List", g: "linked", x: 980, y: 90,
   sub: "A chain of nodes, each pointing to the next",
   markers: ["O(1) insert/delete at head", "No random access", "Non-contiguous memory", "Each node stores a pointer"],
   where: "Implementing stacks and queues, undo history, when O(1) insertion without shifting matters",
@@ -406,7 +406,7 @@ while node:
   notes: "Python has no built-in singly linked list type; list is a dynamic array instead. You'd write your own Node class, as in the example. *Tail insertion is O(1) if you keep a tail pointer."
 })
 N({
-  id: "dll", name: "Doubly Linked List", g: "linked", x: 950, y: 90,
+  id: "dll", name: "Doubly Linked List", g: "linked", x: 1200, y: 90,
   sub: "Like a linked list, but each node also points backward",
   markers: ["O(1) insert/delete at both ends", "Bidirectional traversal", "More memory per node"],
   where: "Python's collections.deque, browser back/forward history, LRU caches",
@@ -429,7 +429,7 @@ print(dll)`,
   notes: "The extra prev pointer roughly doubles the memory overhead per node compared to a singly linked list, in exchange for bidirectional O(1) operations."
 })
 N({
-  id: "stk", name: "Stack", g: "adt", x: 680, y: 300,
+  id: "stk", name: "Stack", g: "adt", x: 980, y: 300,
   sub: "Last in, first out (LIFO)",
   markers: ["LIFO order", "Push/pop at one end", "O(1) push and pop"],
   where: "Undo history, call stacks and recursion, matching brackets, depth-first search",
@@ -450,7 +450,7 @@ print(stack)`,
   notes: "Python has no dedicated stack type: a plain list already does the job, since .append() and .pop() both operate on the end in O(1)."
 })
 N({
-  id: "que", name: "Queue", g: "adt", x: 900, y: 300,
+  id: "que", name: "Queue", g: "adt", x: 1200, y: 300,
   sub: "First in, first out (FIFO)",
   markers: ["FIFO order", "Enqueue at back, dequeue at front", "O(1) with the right structure"],
   where: "Task scheduling, breadth-first search, print and job queues, buffering",
@@ -473,7 +473,7 @@ print(queue)`,
   notes: "Reaching for list.pop(0) to dequeue is a common beginner mistake: it works, but turns every dequeue into an O(n) operation on a long queue. *O(1) only when backed by a deque, not a plain list."
 })
 N({
-  id: "deq", name: "Deque", g: "adt", x: 1120, y: 300,
+  id: "deq", name: "Deque", g: "adt", x: 1420, y: 300,
   sub: "Insert and remove from both ends",
   markers: ["O(1) at both ends", "Generalizes stack and queue", "Python's deque also gives fast access near the ends"],
   where: "Sliding-window algorithms, undo/redo, work-stealing schedulers",
@@ -495,7 +495,7 @@ print(dq)`,
   notes: "Despite the name overlap, this is a different structure from Python's queue.Queue, which adds thread-safety for producer/consumer patterns at the cost of extra overhead."
 })
 N({
-  id: "hsh", name: "Hash Table", g: "hash", x: 380, y: 300,
+  id: "hsh", name: "Hash Table", g: "hash", x: 320, y: 300,
   sub: "Maps keys to values using a hash function for near-instant lookup",
   markers: ["O(1) average lookup", "Hash function + buckets", "Collisions handled via chaining or probing"],
   where: "Python's dict, caches, database indexes, counting and frequency tables",
@@ -518,7 +518,7 @@ print(ages)`,
   notes: "Average-case O(1) assumes a decent hash function spreading keys out evenly. A bad hash function, or an attacker deliberately choosing colliding keys, can degrade every operation to O(n)."
 })
 N({
-  id: "btr", name: "Binary Tree", g: "tree", x: 130, y: 540,
+  id: "btr", name: "Binary Tree", g: "tree", x: 100, y: 520,
   sub: "Each node has at most two children: left and right",
   markers: ["Up to 2 children per node", "Height determines performance", "No ordering rule by itself"],
   where: "The base shape underneath BSTs, heaps, and many parsers and expression trees",
@@ -547,7 +547,7 @@ in_order(root)`,
   notes: "Many traversal algorithms (in-order, pre-order, post-order) are defined on plain binary trees and get reused unchanged for every specialised tree built on top."
 })
 N({
-  id: "bst", name: "Binary Search Tree", g: "tree", x: 380, y: 540,
+  id: "bst", name: "Binary Search Tree", g: "tree", x: 320, y: 520,
   sub: "A binary tree with an ordering rule: left is smaller, right is bigger",
   markers: ["Left < node < right", "O(log n) average, O(n) worst case", "In-order traversal visits values sorted"],
   where: "Ordered maps and sets, range queries, the base idea behind database indexes",
@@ -588,7 +588,7 @@ in_order(root)   # prints values in sorted order`,
   notes: "This worst-case degradation is exactly what self-balancing trees like the AVL tree exist to fix, by rebalancing after every insertion."
 })
 N({
-  id: "avl", name: "AVL Tree", g: "tree", x: 630, y: 540,
+  id: "avl", name: "AVL Tree", g: "tree", x: 760, y: 520,
   sub: "A self-balancing BST that guarantees O(log n)",
   markers: ["Balance factor kept in {-1,0,1}", "Rotations after insert/delete", "Guaranteed O(log n) height"],
   where: "Anywhere a BST is needed but worst-case O(n) is unacceptable, like real-time systems",
@@ -631,7 +631,7 @@ print("New root after rotation:", root.value)`,
   notes: "AVL trees stay more strictly balanced than their cousin the red-black tree, which makes AVL lookups slightly faster but its insertions and deletions slightly slower, since more rotations happen on average."
 })
 N({
-  id: "hep", name: "Heap", g: "tree", x: 880, y: 540,
+  id: "hep", name: "Heap", g: "tree", x: 980, y: 520,
   sub: "A complete binary tree where every parent beats its children",
   markers: ["Min-heap or max-heap", "O(log n) insert/extract", "O(1) peek at the min/max", "Array-backed, no pointers needed"],
   where: "Priority queues, scheduling, Dijkstra's and Prim's algorithms, heap sort, Python's heapq",
@@ -655,7 +655,7 @@ while tasks:
   notes: "Python's heapq module only implements a min-heap. To use it as a max-heap, the common trick is to push negated values and negate them again on the way out."
 })
 N({
-  id: "tri", name: "Trie", g: "tree", x: 1120, y: 540,
+  id: "tri", name: "Trie", g: "tree", x: 1200, y: 520,
   sub: "A tree built for fast prefix lookups on strings",
   markers: ["One node per shared character prefix", "O(k) lookup where k = word length", "Shares memory between common prefixes"],
   where: "Autocomplete, spell checkers, IP routing tables, dictionary word lookup",
@@ -694,7 +694,7 @@ print(starts_with("cab"))   # False`,
   notes: "The name is pronounced 'try', from re-trieval, though many people say 'tree' instead, which causes no end of confused conversations."
 })
 N({
-  id: "grp", name: "Graph", g: "graph", x: 630, y: 740,
+  id: "grp", name: "Graph", g: "graph", x: 760, y: 740,
   sub: "Nodes connected by edges, stored as each node's list of neighbours",
   markers: ["Directed or undirected", "Weighted or unweighted", "O(V+E) space for sparse graphs"],
   where: "Social networks, maps and routing, dependency graphs, anything modelled as things connected to other things",
@@ -726,6 +726,254 @@ def bfs(start):
 print(bfs("A"))`,
   notes: "The alternative, an adjacency matrix, gives O(1) edge lookups but costs O(V squared) space regardless of how many edges actually exist, which wastes a lot of memory on sparse, real-world graphs."
 })
+N({
+  id: "cbuf", name: "Circular Buffer", g: "sequential", x: 540, y: 90,
+  sub: "A fixed-size array that wraps around, overwriting the oldest value once it's full",
+  markers: ["Fixed capacity", "Wraps around via modulo", "O(1) push", "Overwrites oldest when full"],
+  where: "Audio and video streaming buffers, producer/consumer pipelines, keeping the last N log lines or sensor readings",
+  roles: [
+    "This is a plain fixed-size array with one twist: once you reach the last slot, the next write wraps back around to the first slot instead of running out of room.",
+    "A head index and a count are enough to track which slot holds the oldest value and how many slots are filled, with every position computed as (start + offset) modulo the capacity.",
+    "Once the buffer is full, pushing a new value overwrites the oldest one automatically. That is exactly the behavior you want for 'keep only the most recent N items' without ever reallocating memory."
+  ],
+  products: ["Push (write, possibly overwriting the oldest)", "Read in order", "Check if full"],
+  complexity: [["Push", "O(1)"], ["Access by index", "O(1)"], ["Space", "O(n), fixed"]],
+  code: `class CircularBuffer:
+    def __init__(self, capacity):
+        self.data = [None] * capacity
+        self.capacity = capacity
+        self.head = 0      # index of the oldest value
+        self.size = 0
+
+    def push(self, value):
+        tail = (self.head + self.size) % self.capacity
+        self.data[tail] = value
+        if self.size < self.capacity:
+            self.size += 1
+        else:
+            self.head = (self.head + 1) % self.capacity  # overwrite oldest
+
+    def to_list(self):
+        return [self.data[(self.head + i) % self.capacity] for i in range(self.size)]
+
+buf = CircularBuffer(3)
+buf.push(1)
+buf.push(2)
+buf.push(3)
+print(buf.to_list())
+buf.push(4)   # buffer is full: overwrites the oldest value
+print(buf.to_list())`,
+  notes: "Because the capacity never changes, a circular buffer never needs the costly resize-and-copy step a dynamic array relies on. The tradeoff is that old data is lost once the buffer fills up."
+})
+N({
+  id: "skl", name: "Skip List", g: "linked", x: 1420, y: 90,
+  sub: "A linked list with extra express lanes on top, for log n search without any rebalancing",
+  markers: ["Multiple linked-list levels", "Higher levels skip more nodes", "Randomized level assignment", "No rotations needed"],
+  where: "Redis's sorted sets, LevelDB and other log-structured storage engines, concurrent ordered sets",
+  roles: [
+    "Start from a single sorted linked list, where search is O(n) because there is no way to skip ahead. A skip list adds a second, sparser linked list on top that only touches every few nodes, like an express train that only stops at some stations.",
+    "Searching starts on the top, sparsest level, moves forward as far as possible without passing the target, then drops down a level and repeats, covering long stretches of the list in just a few hops instead of walking it node by node.",
+    "In a real skip list, each node is randomly assigned how many levels it appears on when it's inserted, which keeps the structure balanced on average without ever needing to rebalance or rotate anything explicitly."
+  ],
+  products: ["Search (top-down across levels)", "Insert", "Delete", "Range queries"],
+  complexity: [["Search", "O(log n) expected"], ["Insert", "O(log n) expected"], ["Delete", "O(log n) expected"], ["Space", "O(n) expected"]],
+  code: `# simplified: one express lane over a sorted base list
+base = [1, 3, 4, 7, 9, 12, 17, 19, 21, 25]
+express = base[::3]   # every 3rd value, like a fast lane
+
+def skip_search(target):
+    i = 0
+    while i < len(express) and express[i] < target:
+        i += 1
+    start = max(0, i - 1) * 3   # jump close with the express lane
+    for j in range(start, len(base)):
+        if base[j] == target:
+            return True
+        if base[j] > target:
+            return False
+    return False
+
+print(skip_search(19))
+print(skip_search(20))`,
+  notes: "The example hardcodes one express lane over a fixed list to show the idea. A real skip list builds several levels at random as items are inserted, rather than one fixed lane."
+})
+N({
+  id: "ufd", name: "Union-Find", g: "adt", x: 1640, y: 300,
+  sub: "Tracks which items belong to the same group, with near O(1) union and find",
+  markers: ["Parent-pointer forest", "Path compression", "Union by rank", "Near-constant amortized time"],
+  where: "Kruskal's minimum spanning tree, detecting cycles in a graph, grouping pixels or accounts into connected components",
+  roles: [
+    "A disjoint set starts with every item in its own group, and supports two operations: find out which group an item belongs to, and merge two groups into one.",
+    "Under the hood it is a forest of parent pointers: each item points to a parent, and the root of a tree is that group's representative. Following parent pointers up to the root answers 'which group am I in?'",
+    "Two tricks keep it fast: path compression flattens the tree every time find is called, and union by rank always attaches the smaller tree under the bigger one, so trees almost never grow tall."
+  ],
+  products: ["Find (look up a group)", "Union (merge two groups)", "Check if two items are connected"],
+  complexity: [["Find", "O(α(n)) amortized"], ["Union", "O(α(n)) amortized"], ["Space", "O(n)"]],
+  code: `class UnionFind:
+    def __init__(self, n):
+        self.parent = list(range(n))
+        self.rank = [0] * n
+
+    def find(self, x):
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])  # path compression
+        return self.parent[x]
+
+    def union(self, a, b):
+        ra, rb = self.find(a), self.find(b)
+        if ra == rb:
+            return
+        if self.rank[ra] < self.rank[rb]:
+            ra, rb = rb, ra
+        self.parent[rb] = ra           # union by rank
+        if self.rank[ra] == self.rank[rb]:
+            self.rank[ra] += 1
+
+uf = UnionFind(5)
+uf.union(0, 1)
+uf.union(1, 2)
+print(uf.find(0) == uf.find(2))
+print(uf.find(0) == uf.find(3))`,
+  notes: "α(n) is the inverse Ackermann function, which grows so slowly that it stays under 5 for any n you could ever actually store. In practice, this structure runs about as fast as constant time."
+})
+N({
+  id: "rbt", name: "Red-Black Tree", g: "tree", x: 540, y: 520,
+  sub: "A self-balancing BST that uses node colors instead of height counters",
+  markers: ["Every node is red or black", "No red node has a red child", "Guaranteed O(log n) height", "Used in std::map, Java's TreeMap"],
+  where: "C++'s std::map and std::set, Java's TreeMap and TreeSet, the Linux kernel's scheduler",
+  roles: [
+    "This is another self-balancing binary search tree, solving the same problem as the AVL tree, keeping height around log n, with a different bookkeeping trick: each node is labeled red or black.",
+    "A handful of rules, like 'no red node can have a red child' and 'every path from the root to an empty leaf passes through the same number of black nodes', together guarantee the tree can never become more than roughly twice as tall as perfectly balanced.",
+    "Compared to an AVL tree, a red-black tree allows slightly more imbalance, which makes insertions and deletions cheaper (fewer rotations) at the cost of slightly slower lookups. That tradeoff is why most standard library ordered maps use this instead of AVL."
+  ],
+  products: ["Insert (with recoloring and rotations)", "Delete (with recoloring and rotations)", "Search"],
+  complexity: [["Search", "O(log n)"], ["Insert", "O(log n)"], ["Delete", "O(log n)"], ["Space", "O(n)"]],
+  code: `RED, BLACK = "red", "black"
+
+class RBNode:
+    def __init__(self, value, color=BLACK):
+        self.value = value
+        self.color = color
+        self.left = None
+        self.right = None
+
+root = RBNode(10)
+root.left = RBNode(5)
+root.right = RBNode(15)
+root.left.left = RBNode(2, RED)
+
+def is_valid_red(node):
+    if node is None:
+        return True
+    if node.color == RED:
+        for child in (node.left, node.right):
+            if child and child.color == RED:
+                return False     # red node can't have a red child
+    return is_valid_red(node.left) and is_valid_red(node.right)
+
+print(is_valid_red(root))     # True: no red node has a red child yet
+root.left.color = RED          # recolor 5 to red
+print(is_valid_red(root))     # False: now 5 (red) has a red child, 2`,
+  notes: "Implementing the full insert and delete fixup logic is notoriously fiddly. This example only checks the coloring rule on a small hand-built tree, rather than reproducing the whole rebalancing algorithm."
+})
+N({
+  id: "bte", name: "B-Tree", g: "tree", x: 1420, y: 520,
+  sub: "A wide, shallow balanced tree that stores several keys per node",
+  markers: ["Many keys and children per node", "Shallow even for huge data", "Keeps data sorted", "Built for block storage"],
+  where: "Database indexes, file systems, anywhere data lives on disk and you want to minimize slow reads",
+  roles: [
+    "Where a binary tree gives each node at most 2 children, a B-tree node holds several sorted keys at once, each with one more child than it has keys, so a single node might have dozens of children.",
+    "That fan-out is deliberate: disk reads are slow and happen in fixed-size blocks, so a B-tree is shaped to match one node to one disk block, pulling in many keys worth of information per read instead of one key at a time.",
+    "Searching still works the same way as a BST in spirit: compare the target against the keys in a node to figure out which child to descend into, just with more than two choices at each step."
+  ],
+  products: ["Search across multiple keys per node", "Insert (splits a node when it overflows)", "Delete (merges nodes when they underflow)"],
+  complexity: [["Search", "O(log n)"], ["Insert", "O(log n)"], ["Delete", "O(log n)"], ["Space", "O(n)"]],
+  code: `class BTreeNode:
+    def __init__(self, keys, children=None):
+        self.keys = keys                # several sorted keys per node
+        self.children = children or []  # one more child than keys
+
+def search(node, target):
+    i = 0
+    while i < len(node.keys) and target > node.keys[i]:
+        i += 1
+    if i < len(node.keys) and node.keys[i] == target:
+        return True
+    if not node.children:
+        return False
+    return search(node.children[i], target)
+
+leaf_a = BTreeNode([1, 3])
+leaf_b = BTreeNode([7, 9, 12])
+root = BTreeNode([5], [leaf_a, leaf_b])   # one key, two children
+
+print(search(root, 9))
+print(search(root, 4))`,
+  notes: "This example only demonstrates the search across a pre-built tree. A real B-tree's insert also has to split an overfull node and push a key up to its parent, which can cascade all the way to the root."
+})
+N({
+  id: "blm", name: "Bloom Filter", g: "hash", x: 540, y: 300,
+  sub: "A probabilistic set that can say 'definitely not in the set' or 'maybe in the set'",
+  markers: ["Bit array, not a list of items", "Multiple hash functions per item", "No false negatives", "Occasional false positives", "Can't delete or retrieve items"],
+  where: "Checking a username against millions of taken usernames before hitting the database, spell checkers, flagging possibly-malicious URLs",
+  roles: [
+    "Instead of storing the actual items, a Bloom filter is just a long row of bits. Adding an item runs it through several different hash functions and flips the bit at each resulting position to 1.",
+    "Checking whether an item might be in the set runs it through the same hash functions and checks whether all of those bits are set. If even one bit is 0, the item is definitely not in the set.",
+    "If all the bits happen to be set, the item is only probably in the set, since other items could have flipped those same bits by coincidence. That's the one tradeoff for its tiny memory footprint: a small, tunable rate of false positives, but never a false negative."
+  ],
+  products: ["Add an item", "Check possible membership", "Tune size/hash-count for a target false-positive rate"],
+  complexity: [["Insert", "O(k), k = number of hash functions"], ["Lookup", "O(k)"], ["Space", "O(m), m = number of bits"]],
+  code: `def h(item, seed):
+    value = seed
+    for ch in item:
+        value = (value * 31 + ord(ch)) % 1000003
+    return value
+
+SIZE = 20
+bits = [0] * SIZE
+
+def add(item):
+    for seed in (1, 2, 3):
+        bits[h(item, seed) % SIZE] = 1
+
+def might_contain(item):
+    return all(bits[h(item, seed) % SIZE] for seed in (1, 2, 3))
+
+add("apple")
+add("banana")
+print(might_contain("apple"))
+print(might_contain("cherry"))`,
+  notes: "There is no way to remove an item from a standard Bloom filter, since clearing its bits could also erase evidence of a different item that happens to share one of those positions."
+})
+N({
+  id: "adjm", name: "Adjacency Matrix", g: "graph", x: 980, y: 740,
+  sub: "A graph stored as a grid, where row i and column j record whether an edge connects them",
+  markers: ["V by V grid of 0s and 1s (or weights)", "O(1) edge lookup", "Dense memory usage", "Easy to reason about and implement"],
+  where: "Dense graphs, algorithms that repeatedly ask 'is there an edge between i and j', small graphs where simplicity matters more than memory",
+  roles: [
+    "This is the other common way to store a graph: instead of each node keeping a list of its neighbours, one big V-by-V grid records a 1 (or a weight) at row i, column j whenever an edge connects node i and node j.",
+    "Because every possible pair of nodes gets a cell, checking whether two specific nodes are connected is a single lookup, O(1), regardless of how many edges the graph actually has.",
+    "That same guarantee is also its downside: the grid needs V squared cells no matter how sparse the graph is, which wastes a lot of memory once the number of nodes grows and most pairs are not connected."
+  ],
+  products: ["Add/remove an edge", "Check if an edge exists", "Read a whole row (a node's connections)"],
+  complexity: [["Add edge", "O(1)"], ["Check edge exists", "O(1)"], ["Add vertex", "O(V squared), full resize"], ["Space", "O(V squared)"]],
+  code: `names = ["A", "B", "C", "D"]
+index = {name: i for i, name in enumerate(names)}
+n = len(names)
+matrix = [[0] * n for _ in range(n)]
+
+def add_edge(a, b):
+    matrix[index[a]][index[b]] = 1
+    matrix[index[b]][index[a]] = 1   # undirected
+
+add_edge("A", "B")
+add_edge("A", "C")
+add_edge("B", "D")
+
+print(matrix[index["A"]])
+print(matrix[index["A"]][index["C"]] == 1)`,
+  notes: "An adjacency list (the Graph node elsewhere on this map) usually wins for sparse, real-world graphs. An adjacency matrix wins when the graph is dense or when O(1) edge lookups matter more than memory."
+})
 
 E("arr", "dyn", "specializes", "adds resizing")
 E("lnk", "dll", "specializes", "adds a backward pointer")
@@ -742,14 +990,21 @@ E("dyn", "hep", "implements", "array-backed", -0.2)
 E("hsh", "tri", "implements", "dict of dicts", 0.2)
 E("hsh", "grp", "implements", "adjacency list", -0.15)
 E("lnk", "grp", "implements", "adjacency list", 0.3)
+E("arr", "cbuf", "specializes", "wraps around circularly")
+E("lnk", "skl", "specializes", "adds randomized skip levels")
+E("arr", "ufd", "implements", "parent-pointer array", 0.25)
+E("bst", "rbt", "specializes", "adds color-based balance rule")
+E("bst", "bte", "specializes", "generalizes to multiple keys per node", -0.2)
+E("arr", "blm", "implements", "bit array + hash functions", -0.3)
+E("arr", "adjm", "implements", "2D grid of edges", 0.3)
 
 const zones = [
-  ["ARRAY-BASED", 30, 40],
-  ["LINKED STRUCTURES", 600, 40],
-  ["BUILT FROM THE ABOVE", 600, 250],
-  ["HASH-BASED", 300, 250],
-  ["TREES", 30, 480],
-  ["GRAPHS", 520, 700],
+  ["ARRAY-BASED", 60, 40],
+  ["LINKED STRUCTURES", 930, 40],
+  ["BUILT FROM THE ABOVE", 930, 250],
+  ["HASH-BASED", 260, 250],
+  ["TREES", 60, 480],
+  ["GRAPHS", 700, 700],
 ]
 /* ## Cell artwork: flat geometric icons, generated from small recipes ## */
 const HEX = { sequential: "#5aa2ec", linked: "#4cc2a0", adt: "#f2994a", hash: "#ec6c9c", tree: "#b680e4", graph: "#ee7650" }
@@ -866,6 +1121,94 @@ const RECIPES = {
     let o = ""
     lines.forEach(([a, b]) => { o += `<line x1="${pts[a][0]}" y1="${pts[a][1]}" x2="${pts[b][0]}" y2="${pts[b][1]}" stroke="${T.c}" stroke-width="1.6" opacity="0.8"/>` })
     pts.forEach(([x, y]) => { o += nodeCircle(x, y, 7, T.nc, T.c) })
+    return o
+  } },
+  cbuf: { r: 36, draw: T => {
+    let o = ""
+    const n = 6
+    for (let i = 0; i < n; i++) {
+      const a = (i / n) * Math.PI * 2 - Math.PI / 2
+      const x = Math.cos(a) * 22
+      const y = Math.sin(a) * 22
+      const fill = i === 0 ? T.lt : T.nc
+      o += `<rect x="${x - 7}" y="${y - 7}" width="14" height="14" rx="3" fill="${fill}" stroke="${T.c}" stroke-width="2"/>`
+    }
+    o += `<path d="M13 -30 A30 30 0 0 1 30 -9" fill="none" stroke="${T.c}" stroke-width="2.2" stroke-linecap="round"/>`
+    o += `<path d="M25 -15 L30 -9 L22 -11" fill="none" stroke="${T.c}" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>`
+    return o
+  } },
+  skl: { r: 36, draw: T => {
+    let o = ""
+    const rows = [
+      { y: -18, xs: [-28, 28] },
+      { y: 0, xs: [-28, -4, 20] },
+      { y: 18, xs: [-28, -14, 0, 14, 28] },
+    ]
+    rows.forEach(row => {
+      for (let i = 0; i < row.xs.length - 1; i++) o += `<line x1="${row.xs[i] + 6}" y1="${row.y}" x2="${row.xs[i + 1] - 6}" y2="${row.y}" stroke="${T.c}" stroke-width="2"/>`
+      row.xs.forEach(x => { o += nodeCircle(x, row.y, 6, T.nc, T.c) })
+    })
+    o += `<line x1="-28" y1="-18" x2="-28" y2="18" stroke="${T.c}" stroke-width="1.2" stroke-dasharray="2 3" opacity="0.6"/>`
+    o += `<line x1="28" y1="-18" x2="28" y2="18" stroke="${T.c}" stroke-width="1.2" stroke-dasharray="2 3" opacity="0.6"/>`
+    return o
+  } },
+  ufd: { r: 36, draw: T => {
+    let o = ""
+    o += `<line x1="-24" y1="-10" x2="-32" y2="10" stroke="${T.c}" stroke-width="1.8"/><line x1="-24" y1="-10" x2="-16" y2="10" stroke="${T.c}" stroke-width="1.8"/>`
+    o += nodeCircle(-24, -10, 7, T.c, T.c) + nodeCircle(-32, 10, 6, T.nc, T.c) + nodeCircle(-16, 10, 6, T.nc, T.c)
+    o += `<line x1="24" y1="-10" x2="16" y2="10" stroke="${T.c}" stroke-width="1.8"/><line x1="24" y1="-10" x2="32" y2="10" stroke="${T.c}" stroke-width="1.8"/>`
+    o += nodeCircle(24, -10, 7, T.c, T.c) + nodeCircle(16, 10, 6, T.nc, T.c) + nodeCircle(32, 10, 6, T.nc, T.c)
+    o += `<path d="M-17 -16 Q0 -30 17 -16" fill="none" stroke="${T.lt}" stroke-width="2.2" stroke-dasharray="3 3" stroke-linecap="round"/>`
+    return o
+  } },
+  rbt: { r: 36, draw: T => {
+    const black = "#1a1a22"
+    const red = "#e0484f"
+    let o = `<line x1="0" y1="-22" x2="-20" y2="4" stroke="${T.c}" stroke-width="2"/><line x1="0" y1="-22" x2="20" y2="4" stroke="${T.c}" stroke-width="2"/>`
+    o += nodeCircle(0, -22, 9, black, T.c)
+    o += nodeCircle(-20, 4, 8, red, T.c)
+    o += nodeCircle(20, 4, 8, black, T.c)
+    o += `<line x1="-20" y1="4" x2="-28" y2="24" stroke="${T.c}" stroke-width="1.8"/>`
+    o += nodeCircle(-28, 24, 6, black, T.c)
+    return o
+  } },
+  bte: { r: 38, draw: T => {
+    let o = `<rect x="-26" y="-30" width="52" height="16" rx="4" fill="${T.nc}" stroke="${T.c}" stroke-width="2.2"/>`
+    o += `<line x1="-9" y1="-30" x2="-9" y2="-14" stroke="${T.c}" stroke-width="1.8"/><line x1="9" y1="-30" x2="9" y2="-14" stroke="${T.c}" stroke-width="1.8"/>`
+    const xs = [-26, 0, 26]
+    xs.forEach(x => {
+      o += `<line x1="${x * 0.6}" y1="-14" x2="${x}" y2="6" stroke="${T.c}" stroke-width="1.6"/>`
+      o += `<rect x="${x - 16}" y="6" width="32" height="14" rx="3" fill="${T.nc}" stroke="${T.c}" stroke-width="2"/>`
+      o += `<line x1="${x - 2}" y1="6" x2="${x - 2}" y2="20" stroke="${T.c}" stroke-width="1.4"/>`
+    })
+    return o
+  } },
+  blm: { r: 34, draw: T => {
+    let o = ""
+    const bits = [1, 0, 1, 1, 0, 0, 1, 0]
+    const w = 8
+    const total = bits.length * w
+    bits.forEach((b, i) => {
+      const x = -total / 2 + i * w
+      o += `<rect x="${x}" y="-10" width="${w - 1.5}" height="20" rx="2" fill="${b ? T.c : T.nc}" opacity="${b ? 1 : 0.5}"/>`
+    })
+    o += `<path d="M-6 -26 L-6 -16 M-10 -22 L-6 -16 L-2 -22" fill="none" stroke="${T.lt}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>`
+    return o
+  } },
+  adjm: { r: 36, draw: T => {
+    let o = ""
+    const n = 4
+    const cell = 14
+    const total = n * cell
+    const filled = { "0,1": 1, "1,0": 1, "0,2": 1, "2,0": 1, "1,3": 1, "3,1": 1 }
+    for (let r = 0; r < n; r++) {
+      for (let c = 0; c < n; c++) {
+        const x = -total / 2 + c * cell
+        const y = -total / 2 + r * cell
+        const on = filled[r + "," + c]
+        o += `<rect x="${x}" y="${y}" width="${cell - 1.5}" height="${cell - 1.5}" fill="${on ? T.c : T.nc}" opacity="${on ? 0.95 : 0.5}" stroke="${T.dk}" stroke-width="0.6"/>`
+      }
+    }
     return o
   } },
 }
